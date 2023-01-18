@@ -7,18 +7,18 @@
 
     <div class="admin-biaogelist">
         <div class="listbiaoti am-cf">
-            <ul class="am-icon-flag on"> 模块列表</ul>
-            <dl class="am-icon-home" style="float: right;"> 当前位置： 模块管理 > <a href="#">模块展示</a></dl>
+            <ul class="am-icon-flag on"> bug列表</ul>
+            <dl class="am-icon-home" style="float: right;"> 当前位置： bug管理 > <a href="#">bug展示</a></dl>
             <dl>
                 <button type="button" class="am-btn am-btn-danger am-round am-btn-xs am-icon-plus"
-                        onclick="location='/add_module/'">新增模块
+                        onclick="location='/add_bug/'">新增bug
                 </button>
 
             </dl>
         </div>
 
         <div class="am-btn-toolbars am-btn-toolbar am-kg am-cf">
-            <form id="pro_filter" method="post" action="/module_list/1/">
+            <form id="pro_filter" method="post" action="/bug_list/">
                 <ul>
                     <li style="padding-top: 5px">
                         <select name="project" class="am-input-zm am-input-xm"
@@ -62,54 +62,34 @@
                 <tr class="am-success">
                     <th class="table-check"><input type="checkbox" id="select_all"/></th>
                     <th class="table-title">序号</th>
-                    <th class="table-type">模块名称</th>
-                    <th class="table-type">测试人员</th>
-                    <th class="table-type">所属项目</th>
-                    <th class="table-type">用例/配置</th>
-                    <th class="table-date am-hide-sm-only">创建日期</th>
-                    <th width="163px" class="table-set">操作</th>
+                    <th class="table-type">项目</th>
+                    <th class="table-type">模块</th>
+                    <th class="table-type">版本</th>
+                    <th class="table-type">bug描述</th>
+                    <th class="table-type">平台</th>
+                    <th class="table-type">状态</th>
+                    <th class="table-type">几星</th>
+                    <th class="table-type">开发人员</th>
                 </tr>
                 </thead>
                 <tbody>
 
-                {% for foo in module %}
+                {% for foo in bug_info %}
                     <tr>
-                        <td><input type="checkbox" name="module_{{ foo.id }}" value="{{ foo.id }}"/></td>
+                        <td><input type="checkbox" name="bug_{{ foo.id }}" value="{{ foo.id }}"/></td>
                         <td>{{ forloop.counter }}</td>
                         <td><a href="#"
-                               onclick="edit('{{ foo.id }}','{{ foo.module_name }}', '{{ foo.belong_project.project_name }}'
-                                       , '{{ foo.test_user }}', '{{ foo.simple_desc }}', '{{ foo.other_desc }}')">{{ foo.module_name }}</a>
+                               onclick="edit('{{ foo.id }}','{{ foo.project__project_name }}', '{{ foo.belong_project.project_name }}'
+                                       , '{{ foo.test_user }}', '{{ foo.simple_desc }}', '{{ foo.other_desc }}')">{{ foo.project__project_name }}</a>
                         </td>
-                        <td>{{ foo.test_user }}</td>
-                        <td>{{ foo.belong_project.project_name }}</td>
-                        {% for key, value in sum.items %}
-                            {% ifequal foo.id key %}
-                                <td>{{ value }}</td>
-                            {% endifequal %}
-                        {% endfor %}
-                        <td class="am-hide-sm-only">{{ foo.create_time }}</td>
-                        <td>
-                            <div class="am-btn-toolbar">
-                                <div class="am-btn-group am-btn-group-xs">
-                                    <button type="button"
-                                            class="am-btn am-btn-default am-btn-xs am-text-secondary am-round"
-                                            data-am-popover="{content: '运行', trigger: 'hover focus'}"
-                                            onclick="run_test('{{ foo.id }}', '/api/run_test/', 'module')">
-                                        <span class="am-icon-bug"></span></button>
-                                    <button type="button"
-                                            class="am-btn am-btn-default am-btn-xs am-text-secondary am-round"
-                                            data-am-popover="{content: '编辑', trigger: 'hover focus'}"
-                                            onclick="edit('{{ foo.id }}','{{ foo.module_name }}', '{{ foo.belong_project.project_name }}'
-                                                    , '{{ foo.test_user }}', '{{ foo.simple_desc }}', '{{ foo.other_desc }}')"> <span
-                                            class="am-icon-pencil-square-o"></span></button>
-                                    <button type="button"
-                                            class="am-btn am-btn-default am-btn-xs am-text-danger am-round"
-                                            data-am-popover="{content: '删除', trigger: 'hover focus'}"
-                                            onclick="invalid('{{ foo.id }}')"><span
-                                            class="am-icon-trash-o"></span></button>
-                                </div>
-                            </div>
-                        </td>
+                        <td>{{ foo.module__module_name }}</td>
+                        <td>{{ foo.version__version }}</td>
+                        <td>{{ foo.bug_title }}</td>
+                        <td>{{ foo.platform }}</td>
+                        <td>{{ foo.state }}</td>
+                        <td>{{ foo.start }}</td>
+                        <td>{{ foo.developer__username }}</td>
+
                     </tr>
                 {% endfor %}
 
@@ -150,31 +130,6 @@
             });
         }
 
-        function invalid(name) {
-            $('#my-invalid').modal({
-                relatedTarget: this,
-                onConfirm: function () {
-                    del_data_ajax(name, '/api/module_list/1/')
-                },
-                onCancel: function () {
-                }
-            });
-        }
-
-
-        $('#mode').change(function () {
-            if ($('#mode').val() == 'false') {
-                $('#report_name').removeAttr("readonly");
-            } else {
-                $('#report_name').attr('readonly', 'readonly');
-            }
-        });
-
-
-        $('#select_all').click(function () {
-            var isChecked = $(this).prop("checked");
-            $("input[name^='module']").prop("checked", isChecked);
-        })
     </script>
 
 {% endblock %}

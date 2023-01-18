@@ -1,16 +1,18 @@
 /*动态改变模块信息*/
-function show_module(module_info, id) {
-    module_info = module_info.split('replaceFlag');
-    var a = $(id);
-    a.empty();
-    for (var i = 0; i < module_info.length; i++) {
-        if (module_info[i] !== "") {
-            var value = module_info[i].split('^=');
-            a.prepend("<option value='" + value[0] + "' >" + value[1] + "</option>")
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
         }
     }
-    a.prepend("<option value='请选择' selected>请选择</option>");
-
+    return cookieValue;
 }
 
 function show_case(case_info, id) {
@@ -107,6 +109,72 @@ function auto_load(id, url, target, type) {
     });
 
 }
+
+function auto_load_module(id, url) {
+    const csrftoken = getCookie('csrftoken');
+    var data = $(id).serializeJSON();
+    $.ajax({
+        type: 'post',
+        headers: {'X-CSRFToken': csrftoken},
+        url: url,
+        data: JSON.stringify(data),
+        contentType: "application/json",
+        success: function (data) {
+            show_module(data)
+        }
+        ,
+        error: function () {
+            myAlert('Sorry，服务器可能开小差啦, 请重试!');
+        }
+    });
+
+}
+
+function show_module(module_info) {
+    //module_info = module_info.split('replaceFlag');
+    module_info = JSON.parse(module_info)['module']
+    var a = $('#module');
+    var result = []
+    a.empty();
+    for (var i = 0; i < module_info.length; i++) {
+        if (module_info[i] !== "") {
+            var value = module_info[i]['module_name'];
+            var num = result.indexOf(value)
+            if (num>-1){
+                continue
+            }else{
+                result.push(value)
+                a.prepend("<option value='" + value + "' >" + value + "</option>")
+            }
+
+        }
+    }
+    a.prepend("<option value='请选择' selected>请选择</option>");
+
+}
+
+function add_module(id,url){
+    const csrftoken = getCookie('csrftoken');
+    var data = $(id).serializeJSON();
+    $.ajax({
+        type: 'post',
+        headers: {'X-CSRFToken': csrftoken},
+        url: url,
+        data: JSON.stringify(data),
+        contentType: "application/json",
+        success: function (data) {
+            msg = JSON.parse(data)
+            myAlert(msg['msg'])
+        }
+        ,
+        error: function () {
+            myAlert('Sorry，服务器可能开小差啦, 请重试!');
+        }
+    });
+
+}
+
+
 
 function update_data_ajax(id, url) {
     var data = $(id).serializeJSON();
@@ -248,6 +316,11 @@ function case_ajax(type, editor) {
             myAlert('Sorry，服务器可能开小差啦, 请重试!');
         }
     });
+}
+
+
+function bug_ajax(){
+    var projectId = "test"
 }
 
 function config_ajax(type) {

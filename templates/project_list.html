@@ -19,14 +19,8 @@
             <ul>
                 <li style="padding-top: 5px">
                     <select name="project" class="am-input-zm am-input-xm">
-                        <option value="{{ info.belong_project }}"
-                                selected>{{ info.belong_project }}</option>
-
-                        {% for foo in project_all %}
-                            {% ifnotequal info.belong_project foo.project_name %}
-                                <option value="{{ foo.project_name }}">{{ foo.project_name }}</option>
-                            {% endifnotequal %}
-
+                        {% for foo in project_info %}
+                            <option value="{{ foo.project_name }}">{{ foo.project_name }}</option>
                         {% endfor %}
 
                         {% if info.belong_project != 'All' %}
@@ -34,9 +28,7 @@
                         {% endif %}
                     </select>
                 </li>
-                <li style="padding-top: 5px"><input value="{{ info.user }}" type="text" name="user"
-                                                    class="am-input-sm am-input-xm"
-                                                    placeholder="负责人"/></li>
+
 
                 <li>
                     <button style="padding-top: 5px; margin-top: 9px"
@@ -53,59 +45,26 @@
                 <th class="table-check"><input type="checkbox" id="select_all"/></th>
                 <th class="table-title">序号</th>
                 <th class="table-type">项目名称</th>
-                <th class="table-type">负责人</th>
-                <th class="table-title">发布应用</th>
-                <th class="table-title">测试人员</th>
-                <th class="table-title">模块/Suite/用例/配置</th>
+                <th class="table-title">项目描述</th>
                 <th class="table-date am-hide-sm-only">创建时间</th>
-                <th width="163px" class="table-set">操作</th>
             </tr>
             </thead>
             <tbody>
 
-            {% for foo in project %}
+            {% for foo in project_info %}
                 <tr>
                     <td><input type="checkbox" name="project_{{ foo.id }}" value="{{ foo.id }}"/></td>
                     <td>{{ forloop.counter }}</td>
                     <td><a href="#"
-                           onclick="edit('{{ foo.id }}','{{ foo.project_name }}', '{{ foo.responsible_name }}'
+                           onclick="edit('{{ foo.id }}','{{ foo.project_name }}', '{{ foo.simple_desc }}'
                                    , '{{ foo.test_user }}','{{ foo.dev_user }}', '{{ foo.publish_app }}'
                                    , '{{ foo.simple_desc }}', '{{ foo.other_desc }}')">{{ foo.project_name }}</a>
                     </td>
-                    <td>{{ foo.responsible_name }}</td>
-                    <td>{{ foo.publish_app }}</td>
-                    <td>{{ foo.test_user }}</td>
+                    <td>{{ foo.simple_desc }}</td>
+                    <td>{{ foo.create_time|date:"Y-m-d H:i:s" }}</td>
 
-                    {% for key, value in sum.items %}
-                        {% ifequal foo.id key %}
-                            <td>{{ value }}</td>
-                        {% endifequal %}
-                    {% endfor %}
 
-                    <td class="am-hide-sm-only">{{ foo.create_time }}</td>
-                    <td>
-                        <div class="am-btn-toolbar">
-                            <div class="am-btn-group am-btn-group-xs">
-                                <button type="button"
-                                        class="am-btn am-btn-default am-btn-xs am-text-secondary am-round"
-                                        data-am-popover="{content: '运行', trigger: 'hover focus'}"
-                                        onclick="run_test('{{ foo.id }}', '/api/run_test/', 'project')">
-                                    <span class="am-icon-bug"></span></button>
-                                <button type="button"
-                                        class="am-btn am-btn-default am-btn-xs am-text-secondary am-round"
-                                        data-am-popover="{content: '编辑', trigger: 'hover focus'}"
-                                        onclick="edit('{{ foo.id }}','{{ foo.project_name }}', '{{ foo.responsible_name }}'
-                                                , '{{ foo.test_user }}','{{ foo.dev_user }}', '{{ foo.publish_app }}'
-                                                , '{{ foo.simple_desc }}', '{{ foo.other_desc }}')"> <span
-                                        class="am-icon-pencil-square-o"></span></button>
-                                <button type="button"
-                                        class="am-btn am-btn-default am-btn-xs am-text-danger am-round"
-                                        data-am-popover="{content: '删除', trigger: 'hover focus'}"
-                                        onclick="invalid('{{ foo.id }}')"><span
-                                        class="am-icon-trash-o"></span></button>
-                            </div>
-                        </div>
-                    </td>
+
                 </tr>
             {% endfor %}
 

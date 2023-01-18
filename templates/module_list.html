@@ -18,34 +18,32 @@
         </div>
 
         <div class="am-btn-toolbars am-btn-toolbar am-kg am-cf">
-            <form id="pro_filter" method="post" action="/module_list/1/">
+            <form id="pro_filter" method="post" action="/module_list/">
                 <ul>
                     <li style="padding-top: 5px">
-                        <select name="project" class="am-input-zm am-input-xm"
-                                onchange="auto_load('#pro_filter', '/api/add_case/', '#module', 'module')">
-                            <option value="{{ info.belong_project }}"
-                                    selected>{{ info.belong_project }}</option>
-                            {% for foo in project %}
-                                {% ifnotequal info.belong_project foo.project_name %}
-                                    <option value="{{ foo.project_name }}">{{ foo.project_name }}</option>
-                                {% endifnotequal %}
+                            <select name="project" class="am-input-zm am-input-xm"
+                                    onchange="auto_load_module('#pro_filter', '/module_list/',)">
+                                {% for foo in module %}
+                                    {% ifchanged foo.belong_project__project_name %}
+                                         <option value="{{ foo.belong_project__project_name }}">{{ foo.belong_project__project_name }}</option>
+                                    {% endifchanged %}
 
-                            {% endfor %}
-
-                            {% if info.belong_project != 'All' %}
-                                <option value="All">All</option>
-                            {% endif %}
-                        </select>
+                                {% endfor %}
+                            </select>
                     </li>
+
 
                     <li style="padding-top: 5px">
                         <select name="module" class=" am-input-zm am-input-xm" id="module">
-                            <option selected value="{{ info.belong_module }}">{{ info.belong_module }}</option>
+                            {% for foo in module %}
+                                    {% ifchanged foo.module_name %}
+                                         <option selected value="{{ foo.module_name }}">{{ foo.module_name }}</option>
+                                    {% endifchanged %}
+
+                                {% endfor %}
+
                         </select>
                     </li>
-                    <li style="padding-top: 5px"><input value="{{ info.user }}" type="text" name="user"
-                                                        class="am-input-sm am-input-xm"
-                                                        placeholder="测试人员"/></li>
                     <li>
                         <button style="padding-top: 5px; margin-top: 9px"
                                 class="am-btn am-radius am-btn-xs am-btn-success">搜索
@@ -63,11 +61,8 @@
                     <th class="table-check"><input type="checkbox" id="select_all"/></th>
                     <th class="table-title">序号</th>
                     <th class="table-type">模块名称</th>
-                    <th class="table-type">测试人员</th>
                     <th class="table-type">所属项目</th>
-                    <th class="table-type">用例/配置</th>
                     <th class="table-date am-hide-sm-only">创建日期</th>
-                    <th width="163px" class="table-set">操作</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -76,40 +71,11 @@
                     <tr>
                         <td><input type="checkbox" name="module_{{ foo.id }}" value="{{ foo.id }}"/></td>
                         <td>{{ forloop.counter }}</td>
-                        <td><a href="#"
-                               onclick="edit('{{ foo.id }}','{{ foo.module_name }}', '{{ foo.belong_project.project_name }}'
-                                       , '{{ foo.test_user }}', '{{ foo.simple_desc }}', '{{ foo.other_desc }}')">{{ foo.module_name }}</a>
-                        </td>
-                        <td>{{ foo.test_user }}</td>
-                        <td>{{ foo.belong_project.project_name }}</td>
-                        {% for key, value in sum.items %}
-                            {% ifequal foo.id key %}
-                                <td>{{ value }}</td>
-                            {% endifequal %}
-                        {% endfor %}
-                        <td class="am-hide-sm-only">{{ foo.create_time }}</td>
-                        <td>
-                            <div class="am-btn-toolbar">
-                                <div class="am-btn-group am-btn-group-xs">
-                                    <button type="button"
-                                            class="am-btn am-btn-default am-btn-xs am-text-secondary am-round"
-                                            data-am-popover="{content: '运行', trigger: 'hover focus'}"
-                                            onclick="run_test('{{ foo.id }}', '/api/run_test/', 'module')">
-                                        <span class="am-icon-bug"></span></button>
-                                    <button type="button"
-                                            class="am-btn am-btn-default am-btn-xs am-text-secondary am-round"
-                                            data-am-popover="{content: '编辑', trigger: 'hover focus'}"
-                                            onclick="edit('{{ foo.id }}','{{ foo.module_name }}', '{{ foo.belong_project.project_name }}'
-                                                    , '{{ foo.test_user }}', '{{ foo.simple_desc }}', '{{ foo.other_desc }}')"> <span
-                                            class="am-icon-pencil-square-o"></span></button>
-                                    <button type="button"
-                                            class="am-btn am-btn-default am-btn-xs am-text-danger am-round"
-                                            data-am-popover="{content: '删除', trigger: 'hover focus'}"
-                                            onclick="invalid('{{ foo.id }}')"><span
-                                            class="am-icon-trash-o"></span></button>
-                                </div>
-                            </div>
-                        </td>
+                        <td>{{ foo.module_name }}</td>
+                    <td>{{ foo.belong_project__project_name }}</td>
+                        <td>{{ foo.create_time|date:"Y-m-d H:i:s" }}</td>
+
+
                     </tr>
                 {% endfor %}
 
@@ -169,6 +135,7 @@
                 $('#report_name').attr('readonly', 'readonly');
             }
         });
+
 
 
         $('#select_all').click(function () {

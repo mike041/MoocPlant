@@ -16,27 +16,26 @@ Including another URLconf
 from django.urls import path, re_path
 from django.views.generic import RedirectView
 from django.conf.urls.static import static
-from Imoocmapi.views import login, index, projectList, addProject, moduleList, addModule, imPerformance, \
-    chatPerformance, imChat, envList, addVersion, versionList, addBug, bugList
+from Imoocmapi.views import base_view,bug_view,module_view,project_view,user_view,version_view,user_view
 import xadmin
 from MoocPlant import settings
 
 urlpatterns = [
     path('xadmin/', xadmin.site.urls),
     re_path(r'^favicon\.ico$', RedirectView.as_view(url='/static/assets/img/favicon.ico')),
-    path('login/', login),
-    path('', index),
-    path('project_list/', projectList),
-    path('add_project/', addProject),
-    path('module_list/', moduleList),
-    path('add_module/', addModule),
-    path('im_performance/', imPerformance),
-    path('chat_performance/', chatPerformance),
-    path('im_chat/', imChat),
-    path('add_version/', addVersion),
-    path('version_list/', versionList),
-    path('env_list/', envList),
-    path('add_bug/',addBug),
-    path('bug_list/',bugList)
+    path('login/', user_view.login),
+    path('', base_view.index),
+    path('project_list/', project_view.projectList),
+    path('add_project/', project_view.addProject),
+    path('module_list/', module_view.moduleList),
+    path('add_module/', module_view.addModule),
+    path('im_performance/', base_view.imPerformance),
+    path('chat_performance/', base_view.chatPerformance),
+    path('im_chat/', base_view.imChat),
+    path('add_version/', version_view.addVersion),
+    path('version_list/', version_view.versionList),
+    path('env_list/', base_view.envList),
+    path('add_bug/', bug_view.addBug),
+    path('bug_list/', bug_view.bugList)
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -18,7 +18,7 @@ from xadmin.util import lookup_field, display_for_field, label_for_field, boolea
 from django.core import exceptions
 from .base import ModelAdminView, filter_hook, inclusion_tag, csrf_protect_m
 
-
+#解决module 'django.db.models' has no attribute 'FieldDoesNotExist'
 
 # List settings
 ALL_VAR = 'all'
@@ -263,7 +263,9 @@ class ListAdminView(ModelAdminView):
         try:
             field = self.opts.get_field(field_name)
             return field.name
-        except models.FieldDoesNotExist:
+        #except models.FieldDoesNotExist:
+        #尝试解决AttributeError: module 'django.db.models' has no attribute 'FieldDoesNotExist'
+        except exceptions.FieldDoesNotExist:
             # See whether field_name is a name of a non-field
             # that allows sorting.
             if callable(field_name):

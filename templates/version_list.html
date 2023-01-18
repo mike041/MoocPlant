@@ -25,10 +25,9 @@
                                 onchange="auto_load('#pro_filter', '/add_version/', '#module', 'module')">
                             <option value="{{ info.belong_project }}"
                                     selected>{{ info.belong_project }}</option>
-                            {% for foo in project %}
-                                {% ifnotequal info.belong_project foo.project_name %}
-                                    <option value="{{ foo.project_name }}">{{ foo.project_name }}</option>
-                                {% endifnotequal %}
+                            {% for version in version_info %}
+                                    <option value="{{ version.version }}">{{ version.version }}</option>
+
 
                             {% endfor %}
 
@@ -37,16 +36,6 @@
                             {% endif %}
                         </select>
                     </li>
-
-                    <li style="padding-top: 5px">
-                        <select name="module" class=" am-input-zm am-input-xm" id="module">
-                            <option selected value="{{ info.belong_module }}">{{ info.belong_module }}</option>
-                        </select>
-                    </li>
-                    <li style="padding-top: 5px"><input value="{{ info.user }}" type="text" name="user"
-                                                        class="am-input-sm am-input-xm"
-                                                        placeholder="测试人员"/></li>
-                    <li>
                         <button style="padding-top: 5px; margin-top: 9px"
                                 class="am-btn am-radius am-btn-xs am-btn-success">搜索
                         </button>
@@ -62,66 +51,29 @@
                 <tr class="am-success">
                     <th class="table-check"><input type="checkbox" id="select_all"/></th>
                     <th class="table-title">序号</th>
-                    <th class="table-type">模块名称</th>
-                    <th class="table-type">测试人员</th>
-                    <th class="table-type">所属项目</th>
-                    <th class="table-type">用例/配置</th>
+                    <th class="table-type">版本号</th>
+                    <th class="table-type">项目名称</th>
+                    <th class="table-type">描述</th>
                     <th class="table-date am-hide-sm-only">创建日期</th>
-                    <th width="163px" class="table-set">操作</th>
                 </tr>
                 </thead>
                 <tbody>
 
-                {% for foo in module %}
+                {% for version in version_info %}
                     <tr>
-                        <td><input type="checkbox" name="module_{{ foo.id }}" value="{{ foo.id }}"/></td>
+                        <td><input type="checkbox" name="module_{{ version.id }}" value="{{ version.id }}"/></td>
                         <td>{{ forloop.counter }}</td>
-                        <td><a href="#"
-                               onclick="edit('{{ foo.id }}','{{ foo.module_name }}', '{{ foo.belong_project.project_name }}'
-                                       , '{{ foo.test_user }}', '{{ foo.simple_desc }}', '{{ foo.other_desc }}')">{{ foo.module_name }}</a>
-                        </td>
-                        <td>{{ foo.test_user }}</td>
-                        <td>{{ foo.belong_project.project_name }}</td>
-                        {% for key, value in sum.items %}
-                            {% ifequal foo.id key %}
-                                <td>{{ value }}</td>
-                            {% endifequal %}
-                        {% endfor %}
-                        <td class="am-hide-sm-only">{{ foo.create_time }}</td>
-                        <td>
-                            <div class="am-btn-toolbar">
-                                <div class="am-btn-group am-btn-group-xs">
-                                    <button type="button"
-                                            class="am-btn am-btn-default am-btn-xs am-text-secondary am-round"
-                                            data-am-popover="{content: '运行', trigger: 'hover focus'}"
-                                            onclick="run_test('{{ foo.id }}', '/api/run_test/', 'module')">
-                                        <span class="am-icon-bug"></span></button>
-                                    <button type="button"
-                                            class="am-btn am-btn-default am-btn-xs am-text-secondary am-round"
-                                            data-am-popover="{content: '编辑', trigger: 'hover focus'}"
-                                            onclick="edit('{{ foo.id }}','{{ foo.module_name }}', '{{ foo.belong_project.project_name }}'
-                                                    , '{{ foo.test_user }}', '{{ foo.simple_desc }}', '{{ foo.other_desc }}')"> <span
-                                            class="am-icon-pencil-square-o"></span></button>
-                                    <button type="button"
-                                            class="am-btn am-btn-default am-btn-xs am-text-danger am-round"
-                                            data-am-popover="{content: '删除', trigger: 'hover focus'}"
-                                            onclick="invalid('{{ foo.id }}')"><span
-                                            class="am-icon-trash-o"></span></button>
-                                </div>
-                            </div>
-                        </td>
+                        <td>{{ version.version }}</td>
+                        <td>{{ version.project_name__project_name }}</td>
+                        <td>{{ version.simple_desc }}</td>
+                        <td class="am-hide-sm-only">{{ version.create_time|date:"Y-m-d H:i:s" }}</td>
+
                     </tr>
                 {% endfor %}
 
 
                 </tbody>
             </table>
-
-            <div class="am-btn-group am-btn-group-xs">
-                <button type="button" class="am-btn am-btn-default" onclick="location='/api/add_module/'"><span
-                        class="am-icon-plus"></span> 新增
-                </button>
-            </div>
 
             <ul class="am-pagination am-fr">
                 {{ page_list }}
@@ -132,49 +84,6 @@
 
         </form>
     </div>
-    <script type="text/javascript">
-        function edit(id, module_name, belong_project, test_user, simple_desc, other_desc) {
-            $('#index').val(id);
-            $('#module_name').val(module_name);
-            $('#belong_project').val(belong_project);
-            $('#test_user').val(test_user);
-            $('#simple_desc').val(simple_desc);
-            $('#other_desc').val(other_desc);
-            $('#my-edit').modal({
-                relatedTarget: this,
-                onConfirm: function () {
-                    update_data_ajax('#list_module', '/api/module_list/1/')
-                },
-                onCancel: function () {
-                }
-            });
-        }
 
-        function invalid(name) {
-            $('#my-invalid').modal({
-                relatedTarget: this,
-                onConfirm: function () {
-                    del_data_ajax(name, '/api/module_list/1/')
-                },
-                onCancel: function () {
-                }
-            });
-        }
-
-
-        $('#mode').change(function () {
-            if ($('#mode').val() == 'false') {
-                $('#report_name').removeAttr("readonly");
-            } else {
-                $('#report_name').attr('readonly', 'readonly');
-            }
-        });
-
-
-        $('#select_all').click(function () {
-            var isChecked = $(this).prop("checked");
-            $("input[name^='module']").prop("checked", isChecked);
-        })
-    </script>
 
 {% endblock %}

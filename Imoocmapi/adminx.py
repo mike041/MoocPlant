@@ -23,8 +23,8 @@ class UserAdmin(object):
 
 
 class ProjectAdmin(object):
-    search_fields = ['project_name', 'version']
-    list_display = ['id', 'project_name', 'version']
+    search_fields = ['project_name']
+    list_display = ['id', 'project_name']
 
 
 class ModuleAdmin(object):

@@ -1,4 +1,8 @@
+from dataclasses import dataclass
+
 from django.db import models
+
+from Imoocmapi.managers import ProjectInfoManager, ModuleInfoManager, VersionManager, BugManager
 
 
 class BaseTable(models.Model):
@@ -39,29 +43,31 @@ class EnvInfo(BaseTable):
     simple_desc = models.CharField(max_length=50, null=False)
 
 
-class Version(BaseTable):
-    class Meta:
-        verbose_name = '版本信息'
-        db_table = 'Version'
-
-    version = models.CharField(verbose_name='版本号', max_length=20)
-    simple_desc = models.CharField(max_length=50, verbose_name="版本描述信息", null=True)
-
-    def __str__(self):
-        return self.version
-
-
 class ProjectInfo(BaseTable):
     class Meta:
         verbose_name = '项目信息'
         db_table = 'ProjectInfo'
 
     project_name = models.CharField('项目名称', max_length=50, unique=True, null=False)
-    version = models.ForeignKey(Version, verbose_name='版本', on_delete=models.CASCADE, default="1.0")
+    # version = models.ForeignKey(Version, verbose_name='版本', on_delete=models.CASCADE, default="1.0")
     simple_desc = models.CharField('简要描述', max_length=100, null=True)
+    objects = ProjectInfoManager()
 
     def __str__(self):
         return self.project_name
+
+
+class Version(BaseTable):
+    class Meta:
+        verbose_name = '版本信息'
+        db_table = 'Version'
+
+    version = models.CharField(verbose_name='版本号', max_length=20)
+    project_name = models.ForeignKey(ProjectInfo, verbose_name="项目", on_delete=models.CASCADE,null=True)
+    simple_desc = models.CharField(max_length=50, verbose_name="版本描述信息", null=True)
+    objects = VersionManager()
+    def __str__(self):
+        return self.version
 
 
 class ModuleInfo(BaseTable):
@@ -72,6 +78,8 @@ class ModuleInfo(BaseTable):
     module_name = models.CharField('模块名称', max_length=50, null=False)
     belong_project = models.ForeignKey(ProjectInfo, on_delete=models.CASCADE)
     simple_desc = models.CharField('简要描述', max_length=100, null=True)
+
+    objects = ModuleInfoManager()
 
     def __str__(self):
         return self.module_name
@@ -84,7 +92,7 @@ class Bug(BaseTable):
         ('3', '3星'),
         ('4', '4星')
     )
-    platform = (
+    platform_choices = (
         ('1', 'ios'),
         ('2', 'android'),
         ('3', 'web'),
@@ -115,10 +123,11 @@ class Bug(BaseTable):
     buger = models.ForeignKey(UserInfo, verbose_name="创建者", related_name="buger", on_delete=models.CASCADE)
     bug_title = models.CharField(verbose_name="bug描述", max_length=500)
     bug_content = models.CharField(verbose_name="bug详情", max_length=1000)
-    platform = models.CharField(verbose_name="bug所属平台", choices=platform, max_length=12)
+    platform = models.CharField(verbose_name="bug所属平台", choices=platform_choices, max_length=12)
     state = models.CharField(verbose_name="bug状态", choices=bug_state, max_length=12)
     pic = models.ImageField(verbose_name="bug图片", upload_to="images/bug", blank=True)
+    png = models.CharField(verbose_name="图片地址",max_length=200, null=True)
     push = models.BooleanField(verbose_name="是否推送", choices=choices_push)
-
+    objects = BugManager()
     def __str__(self):
         return self.bug_title

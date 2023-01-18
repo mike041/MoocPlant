@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'reversion'
 
 ]
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -136,7 +135,8 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static/'),
 )
-
+OSS_SECRET_ID = "AKIDRksnW2JSN4bv1ukOgqxtb8VjmbFiz2FO"
+OSS_SECRET_KEY = "6B6qPkz66xeBYlnjU3QbaP0Um3GI8jCW"
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

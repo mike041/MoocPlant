@@ -45,6 +45,9 @@ class ProjectInfoManager(models.Manager):
         """
         self.create(**kwargs)
 
+    def get_project(self, project_id):
+        return self.get(id=project_id)
+
     def update_project(self, project_id, **kwargs):
         """
         更新项目信息
@@ -67,13 +70,64 @@ class ProjectInfoManager(models.Manager):
         """
         return self.filter(project_name__exact=project_name).count()
 
+    def get_project_name_list(self):
+        '''
+        获取所有项目名字
+        :return:
+        '''
+        projects = self.values("id", "project_name", "simple_desc", "create_time")
+        project_data = list([project for project in projects])
+        return project_data
+
 
 class ModuleInfoManager(models.Manager):
     """
     项目模块信息表 自定义管理器
     """
-    pass
 
+    def add_module(self, **kwargs):
+        # self.get_or_create()
+        self.create(**kwargs)
+
+    def get_module_name(self, project_name):
+        module_list = self.filter(belong_project__project_name=project_name).values("module_name")
+        module_name_list = [module for module in module_list]
+        return module_name_list
+
+    def get_all_module_name(self):
+        module_list = self.all().values("module_name", "belong_project__project_name", "create_time")
+        module_name_list = [module for module in module_list]
+        return module_name_list  # 62355068
+
+
+class VersionManager(models.Manager):
+    '''
+    版本管理
+    '''
+    def add_version(self,**kwargs):
+        self.create(**kwargs)
+
+    def get_all_version(self):
+        version_list = self.values("id", "version", "project_name__project_name", "simple_desc", "create_time")
+        version_name_list = [version for version in version_list]
+        return version_name_list  # 62355068
+
+
+class BugManager(models.Manager):
+    '''
+    bug管理
+    '''
+    def add_bug(self,**kwargs):
+        self.create(**kwargs)
+
+    def get_all_bug(self):
+        '''
+        展示所有bug
+        :return:
+        '''
+        bug_list = list(self.values("id","project__project_name","module__module_name","version__version","bug_title","platform","state","start","developer__username"))
+        #self.values("id","project__")
+        return bug_list
 
 class TestCaseSuiteInfoManager(models.Manager):
     """
@@ -94,4 +148,3 @@ class TestCaseInfoManager(models.Manager):
     测试case表 自定义管理器
     """
     pass
-
