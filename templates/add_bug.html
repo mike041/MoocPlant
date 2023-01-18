@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}新增项目{% endblock %}
+{% load static %}
+{% block content %}
+
+    <div class=" admin-content">
+
+        <div class="admin-biaogelist">
+            <div class="listbiaoti am-cf">
+                <ul class="am-icon-flag on"> 新增项目</ul>
+                <dl class="am-icon-home" style="float: right;"> 当前位置： 项目管理 > <a href="#">新增项目</a></dl>
+            </div>
+            <div class="fbneirong">
+                <form class="form-horizontal" id="add_project">
+                    <div class="form-group  has-feedback">
+                        <label class="control-label col-md-1 text-primary" for="project_name">项目名称：</label>
+                        <div class="col-md-5">
+                            <input type="text" class="form-control" id="project_name"
+                                   aria-describedby="inputSuccess3Status" name="project_name" placeholder="请输入项目名称"
+                                   value="">
+                        </div>
+                    </div>
+
+
+                    <div class="form-group  has-feedback">
+                        <label class="control-label col-md-1 text-primary" for="dev_user">项目版本：</label>
+                        <div class="col-md-5">
+                            <input type="text" class="form-control" id="dev_user" name="dev_user"
+                                   aria-describedby="inputSuccess3Status" placeholder="请输入项目版本号" value="">
+                        </div>
+                    </div>
+
+                    <div class="form-group  has-feedback">
+                        <label class="control-label col-md-1 text-primary" for="publish_app">项目描述：</label>
+                        <div class="col-md-5">
+                            <input type="text" class="form-control" id="publish_app" name="publish_app"
+                                   aria-describedby="inputSuccess3Status" placeholder="请输入发项目描述" value="">
+                        </div>
+                    </div>
+
+
+                    <div class="am-form-group am-cf">
+                        <div class="you" style="margin-left: 8%;">
+                            <button type="button" class="am-btn am-btn-success am-radius" id="send"
+                                    onclick="info_ajax('#add_project', '/add_project/')">点 击 提 交
+                            </button>&nbsp;
+
+                        </div>
+                    </div>
+                </form>
+
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
