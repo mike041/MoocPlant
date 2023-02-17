@@ -5,6 +5,7 @@
 @Author  :   Mushishi 
 """
 from django.db import models
+from django.db.models import Q
 
 
 class UserInfoManager(models.Manager):
@@ -22,7 +23,7 @@ class UserInfoManager(models.Manager):
         """
         self.create(username=username, password=password, email=email)
 
-    def get_user(self, username, password):
+    def get_user_count(self, username, password):
         """
         用户登录，获取登录
         :param username:
@@ -30,6 +31,18 @@ class UserInfoManager(models.Manager):
         :return:
         """
         return self.filter(username__exact=username, password__exact=password).count()
+
+    def get_develop_user(self):
+        '''
+        获取所有开发人员
+        :return:
+        '''
+        nick_name_list = self.filter(user_type=2).values("nick_name")
+        nick_name_data = list([nick_name for nick_name in nick_name_list])
+        return nick_name_data
+
+    def get_user_by_user_name(self, user_name):
+        return self.get(nick_name=user_name)
 
 
 class ProjectInfoManager(models.Manager):
@@ -48,6 +61,9 @@ class ProjectInfoManager(models.Manager):
     def get_project(self, project_id):
         return self.get(id=project_id)
 
+    def get_project_by_name(self,project_name):
+        return self.get(project_name=project_name)
+
     def update_project(self, project_id, **kwargs):
         """
         更新项目信息
@@ -61,7 +77,7 @@ class ProjectInfoManager(models.Manager):
         project_info.simple_desc = kwargs.get("simple_desc")
         project_info.save()
 
-    def get_project_num(self, project_name, project_id=None):
+    def get_project_num(self, project_name):
         """
         获取项目数
         :param project_name:
@@ -89,6 +105,9 @@ class ModuleInfoManager(models.Manager):
         # self.get_or_create()
         self.create(**kwargs)
 
+    def get_module(self, project_name, module_name):
+        return self.filter(Q(belong_project__project_name=project_name) & Q(module_name=module_name)).first()
+
     def get_module_name(self, project_name):
         module_list = self.filter(belong_project__project_name=project_name).values("module_name")
         module_name_list = [module for module in module_list]
@@ -99,25 +118,38 @@ class ModuleInfoManager(models.Manager):
         module_name_list = [module for module in module_list]
         return module_name_list  # 62355068
 
+    def get_module_num(self,project_name,module_name):
+        return self.filter(Q(belong_project=project_name) & Q(module_name=module_name)).count()
+
 
 class VersionManager(models.Manager):
     '''
     版本管理
     '''
-    def add_version(self,**kwargs):
+
+    def add_version(self, **kwargs):
         self.create(**kwargs)
+
+    def get_project_version(self, project_name):
+        version_list = self.filter(project_name__project_name=project_name).values("version")
+        version_name_list = [version for version in version_list]
+        return version_name_list
 
     def get_all_version(self):
         version_list = self.values("id", "version", "project_name__project_name", "simple_desc", "create_time")
         version_name_list = [version for version in version_list]
         return version_name_list  # 62355068
 
+    def get_version(self,project_name,version):
+        return self.get(Q(project_name__project_name=project_name)&Q(version=version))
+
 
 class BugManager(models.Manager):
     '''
     bug管理
     '''
-    def add_bug(self,**kwargs):
+
+    def add_bug(self, **kwargs):
         self.create(**kwargs)
 
     def get_all_bug(self):
@@ -125,9 +157,21 @@ class BugManager(models.Manager):
         展示所有bug
         :return:
         '''
-        bug_list = list(self.values("id","project__project_name","module__module_name","version__version","bug_title","platform","state","start","developer__username"))
-        #self.values("id","project__")
+        bug_list = list(
+            self.values("id", "project__project_name", "module__module_name", "version__version", "bug_title",
+                        "plantform", "state", "start", "developer__username","png"))
+        # self.values("id","project__")
         return bug_list
+
+    def update_bug(self,bug_id,bug_state):
+        '''
+        更新bug
+        :param bug_id:
+        :return:
+        '''
+        bug = self.filter(id=bug_id)
+        bug.update(state=bug_state)
+
 
 class TestCaseSuiteInfoManager(models.Manager):
     """

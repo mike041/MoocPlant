@@ -16,6 +16,12 @@ def addModule(request):
             "msg":"成功"
         }
         request_data = json.loads(request.body.decode('utf-8'))
+        project_name = request_data.get("belong_project")
+        module_name = request_data.get("module_name")
+        module_num = ModuleInfo.objects.get_module_num(project_name,module_name)
+        if module_num>1:
+            data['msg'] = "模块已存在"
+            return HttpResponse(json.dumps(data))
         belong_project = ProjectInfo.objects.get_project(project_id=request_data.get("belong_project"))
         request_data["belong_project"] = belong_project
         ModuleInfo.objects.add_module(**request_data)

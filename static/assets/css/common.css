@@ -50,6 +50,9 @@ table#extract tr td, table#hooks tr td, table#params tr td {
     opacity: 1;
 }
 
+#png {
+    display: none;
+}
 
 #pre_config li{
     position: relative;

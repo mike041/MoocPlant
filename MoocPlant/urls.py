@@ -36,6 +36,8 @@ urlpatterns = [
     path('version_list/', version_view.versionList),
     path('env_list/', base_view.envList),
     path('add_bug/', bug_view.addBug),
-    path('bug_list/', bug_view.bugList)
+    path('bug_list/', bug_view.bugList),
+    path('put_png/', bug_view.put_png),
+    path('edit_bug/',bug_view.edit_bug)
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

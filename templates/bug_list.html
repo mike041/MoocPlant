@@ -70,25 +70,34 @@
                     <th class="table-type">状态</th>
                     <th class="table-type">几星</th>
                     <th class="table-type">开发人员</th>
+                    <th class="table-type">图片</th>
                 </tr>
                 </thead>
                 <tbody>
 
                 {% for foo in bug_info %}
                     <tr>
-                        <td><input type="checkbox" name="bug_{{ foo.id }}" value="{{ foo.id }}"/></td>
-                        <td>{{ forloop.counter }}</td>
+                        <td><label>
+                            <input type="checkbox" name="bug_{{ foo.id }}" value="{{ foo.id }}"/>
+                        </label></td>
+                        <td id="bug_num">{{ foo.id }}</td>
                         <td><a href="#"
                                onclick="edit('{{ foo.id }}','{{ foo.project__project_name }}', '{{ foo.belong_project.project_name }}'
                                        , '{{ foo.test_user }}', '{{ foo.simple_desc }}', '{{ foo.other_desc }}')">{{ foo.project__project_name }}</a>
                         </td>
                         <td>{{ foo.module__module_name }}</td>
                         <td>{{ foo.version__version }}</td>
-                        <td>{{ foo.bug_title }}</td>
-                        <td>{{ foo.platform }}</td>
-                        <td>{{ foo.state }}</td>
+                        <td style="width: 50%">{{ foo.bug_title }}</td>
+                        <td><a onclick=""> {{ foo.plantform }}</a></td>
+                        <td><div id="bug_id_{{ foo.id }}"><a onclick="editstate({{ foo.id }})">{{ foo.state }}</a></div></td>
                         <td>{{ foo.start }}</td>
-                        <td>{{ foo.developer__username }}</td>
+                        <td><a onclick=""> {{ foo.developer__username }}</a></td>
+                        <td>{% if foo.png %}
+                            {% for png in foo.png %}
+                                <img id="pimg" height="50px" width="50px" src="{{ png }}">
+                            {% endfor %}
+
+                        {% endif %}</td>
 
                     </tr>
                 {% endfor %}
@@ -96,6 +105,11 @@
 
                 </tbody>
             </table>
+            <div id="outerdiv" style="position:fixed;top:0;left:0;background:rgba(0,0,0,0.7);z-index:2;width:100%;height:100%;display:none;">
+                <div id="innerdiv" style="position:absolute;">
+                    <img id="bigimg" style="border:5px solid #fff;" src="" />
+                </div>
+            </div>
 
             <div class="am-btn-group am-btn-group-xs">
                 <button type="button" class="am-btn am-btn-default" onclick="location='/api/add_module/'"><span

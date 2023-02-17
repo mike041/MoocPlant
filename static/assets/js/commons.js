@@ -110,9 +110,17 @@ function auto_load(id, url, target, type) {
 
 }
 
-function auto_load_module(id, url) {
+function auto_load_module(id, url,types) {
     const csrftoken = getCookie('csrftoken');
     var data = $(id).serializeJSON();
+    if(types == 'module'){
+        data['module'] = '请选择'
+        data['version'] = '请选择'
+    }
+    if(types =='versions'){
+        data['version'] = '请选择'
+    }
+    console.log(data)
     $.ajax({
         type: 'post',
         headers: {'X-CSRFToken': csrftoken},
@@ -120,7 +128,15 @@ function auto_load_module(id, url) {
         data: JSON.stringify(data),
         contentType: "application/json",
         success: function (data) {
-            show_module(data)
+            if(types =="module"){
+                show_module(data)
+            }else if(types=="versions"){
+                show_version(data)
+            }else {
+                var msg = JSON.parse(data)
+                myAlert(msg['msg']);
+            }
+
         }
         ,
         error: function () {
@@ -130,9 +146,35 @@ function auto_load_module(id, url) {
 
 }
 
+function show_version(data){
+    var version_list = JSON.parse(data)["version_list"]
+    var a = $('#version')
+    var result = []
+    a.empty()
+    a.prepend("<option >请选择</option>")
+    for (var i =0;i<version_list.length;i++) {
+        if (version_list[i] !== "") {
+            var value = version_list[i]['version'];
+            var num = result.indexOf(value)
+            if (num > -1) {
+                continue
+            } else {
+                result.push(value)
+                a.prepend("<option value='" + value + "' >" + value + "</option>")
+            }
+        }
+    }
+
+}
+
 function show_module(module_info) {
     //module_info = module_info.split('replaceFlag');
     module_info = JSON.parse(module_info)['module']
+    var version = $('#version')
+    version.empty();
+    //version.options.length=0;
+    version.prepend("<option>请选择</option>")
+
     var a = $('#module');
     var result = []
     a.empty();
@@ -497,4 +539,88 @@ function init_acs(language, theme, editor) {
 
 }
 
+function editstate(bug_id){
+    var bug = $('#bug_id_'+bug_id)
+    bug.children().remove()
+    bug.prepend('<select name="state"  class="form-control" onchange="update_bug('+bug_id+')" id="state">\n' +
+        '                                <option >请选择</option>\n' +
+        '                                <option value=\'1\' >未解决</option>\n' +
+        '                                <option value=\'2\' >已解决</option>\n' +
+        '                                <option value=\'3\' >延期解决</option>\n' +
+        '                                <option value=\'4\' >不解决</option>\n' +
+        '                                <option value=\'5\' >延期</option>\n' +
+        '                                <option value=\'6\' >激活</option>\n' +
+        '                            </select>')
+
+}
+
+function update_bug(bug_id){
+    const csrftoken = getCookie('csrftoken');
+    var data = $('#state').serializeJSON();
+    data['bug_id'] = bug_id
+    console.log(data['bug_id'])
+    $.ajax({
+        type: 'post',
+        headers: {'X-CSRFToken': csrftoken},
+        url: '/edit_bug/',
+        data: JSON.stringify(data),
+        contentType: "application/json",
+        success: function (data) {
+            data = JSON.parse(data)['state']
+            if (data !== 10000) {
+                myAlert(data['msg']);
+            }
+            else {
+                window.location.reload();
+            }
+        },
+        error: function () {
+            myAlert('Sorry，服务器可能开小差啦, 请重试!');
+        }
+    });
+}
+$(function(){
+        $("#pimg").click(function(){
+            var _this = $(this);//将当前的pimg元素作为_this传入函数
+            showImg("#outerdiv", "#innerdiv", "#bigimg", _this);
+        });
+    });
+function showImg(outerdiv, innerdiv, bigimg, _this){
+    var src = _this.attr("src");//获取当前点击的pimg元素中的src属性
+    $(bigimg).attr("src", src);//设置#bigimg元素的src属性
+
+        /*获取当前点击图片的真实大小，并显示弹出层及大图*/
+    $("<img/>").attr("src", src).load(function(){
+        var windowW = $(window).width();//获取当前窗口宽度
+        var windowH = $(window).height();//获取当前窗口高度
+        var realWidth = this.width;//获取图片真实宽度
+        var realHeight = this.height;//获取图片真实高度
+        var imgWidth, imgHeight;
+        var scale = 0.8;//缩放尺寸，当图片真实宽度和高度大于窗口宽度和高度时进行缩放
+
+        if(realHeight>windowH*scale) {//判断图片高度
+            imgHeight = windowH*scale;//如大于窗口高度，图片高度进行缩放
+            imgWidth = imgHeight/realHeight*realWidth;//等比例缩放宽度
+            if(imgWidth>windowW*scale) {//如宽度扔大于窗口宽度
+                imgWidth = windowW*scale;//再对宽度进行缩放
+            }
+        } else if(realWidth>windowW*scale) {//如图片高度合适，判断图片宽度
+            imgWidth = windowW*scale;//如大于窗口宽度，图片宽度进行缩放
+                        imgHeight = imgWidth/realWidth*realHeight;//等比例缩放高度
+        } else {//如果图片真实高度和宽度都符合要求，高宽不变
+            imgWidth = realWidth;
+            imgHeight = realHeight;
+        }
+                $(bigimg).css("width",imgWidth);//以最终的宽度对图片缩放
+
+        var w = (windowW-imgWidth)/2;//计算图片与窗口左边距
+        var h = (windowH-imgHeight)/2;//计算图片与窗口上边距
+        $(innerdiv).css({"top":h, "left":w});//设置#innerdiv的top和left属性
+        $(outerdiv).fadeIn("fast");//淡入显示#outerdiv及.pimg
+    });
+
+    $(outerdiv).click(function(){//再次点击淡出消失弹出层
+        $(this).fadeOut("fast");
+    });
+}
 

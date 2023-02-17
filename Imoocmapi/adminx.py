@@ -2,7 +2,7 @@
 # import xadmin
 import xadmin
 from xadmin import views
-from Imoocmapi.models import UserInfo, ProjectInfo, Version, ModuleInfo, Bug
+from Imoocmapi.models import UserInfo, ProjectInfo, Version, ModuleInfo, Bug, UserInfoType
 
 
 class GlobalSettings(object):
@@ -17,9 +17,14 @@ class BaseSettings(object):
 
 class UserAdmin(object):
     # 搜索字段
-    search_fields = ['username', 'email']
+    search_fields = ['username', 'email','user_type']
     # 显示字段
-    list_display = ['id', 'username', 'email', 'status']
+    list_display = ['id', 'username', 'email', 'status','nick_name','user_type']
+
+class UserInfoTypeAdmin(object):
+    search_fields = [ 'user_type']
+    # 显示字段
+    list_display = [ 'id','user_type']
 
 
 class ProjectAdmin(object):
@@ -37,8 +42,8 @@ class VersionAdmin(object):
     list_display = ['id', 'version', 'simple_desc']
 
 class BugAdmin(object):
-    search_fields = ['project', 'version','module', 'developer','buger','platform','state','bug_title']
-    list_display = ['project', 'version','module', 'developer','buger','platform','state','bug_title','push']
+    search_fields = ['project', 'version','module', 'developer','buger','plantform','state','bug_title']
+    list_display = ['project', 'version','module', 'developer','buger','plantform','state','bug_title','push']
 
 
 xadmin.site.register(UserInfo, UserAdmin)
@@ -46,6 +51,7 @@ xadmin.site.register(ProjectInfo, ProjectAdmin)
 xadmin.site.register(Version, VersionAdmin)
 xadmin.site.register(ModuleInfo, ModuleAdmin)
 xadmin.site.register(Bug,BugAdmin)
+xadmin.site.register(UserInfoType, UserInfoTypeAdmin)
 
 xadmin.site.register(views.CommAdminView, GlobalSettings)
 xadmin.site.register(views.BaseAdminView, BaseSettings)

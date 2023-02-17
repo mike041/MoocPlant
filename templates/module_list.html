@@ -22,7 +22,7 @@
                 <ul>
                     <li style="padding-top: 5px">
                             <select name="project" class="am-input-zm am-input-xm"
-                                    onchange="auto_load_module('#pro_filter', '/module_list/',)">
+                                    onchange="auto_load_module('#pro_filter', '/module_list/','module')">
                                 {% for foo in module %}
                                     {% ifchanged foo.belong_project__project_name %}
                                          <option value="{{ foo.belong_project__project_name }}">{{ foo.belong_project__project_name }}</option>

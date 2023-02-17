@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from django.db import models
 
-from Imoocmapi.managers import ProjectInfoManager, ModuleInfoManager, VersionManager, BugManager
+from Imoocmapi.managers import ProjectInfoManager, ModuleInfoManager, VersionManager, BugManager, UserInfoManager
 
 
 class BaseTable(models.Model):
@@ -15,6 +15,18 @@ class BaseTable(models.Model):
         db_table = 'BaseTable'
 
 
+class UserInfoType(BaseTable):
+
+    class Meta:
+        verbose_name = '用户类型'
+        db_table = "UserInfoType"
+
+    user_type = models.CharField(verbose_name='用户类型名字', max_length=10)
+
+    def __str__(self):
+        return self.user_type
+
+
 class UserInfo(BaseTable):
     class Meta:
         verbose_name = '用户信息'
@@ -22,9 +34,11 @@ class UserInfo(BaseTable):
 
     username = models.CharField(verbose_name='用户名', max_length=20, unique=True, null=False)
     password = models.CharField(verbose_name='密码', max_length=20, null=False)
+    nick_name = models.CharField(verbose_name="昵称", max_length=20,unique=True,default='test')
     email = models.EmailField(verbose_name='邮箱', null=False, unique=True)
     status = models.IntegerField(verbose_name='用户状态', default=1)
-
+    user_type = models.ForeignKey(UserInfoType, on_delete=models.CASCADE,max_length=10,default=2)
+    objects = UserInfoManager()
     def __str__(self):
         return self.username
 
@@ -63,9 +77,10 @@ class Version(BaseTable):
         db_table = 'Version'
 
     version = models.CharField(verbose_name='版本号', max_length=20)
-    project_name = models.ForeignKey(ProjectInfo, verbose_name="项目", on_delete=models.CASCADE,null=True)
+    project_name = models.ForeignKey(ProjectInfo, verbose_name="项目", on_delete=models.CASCADE, null=True)
     simple_desc = models.CharField(max_length=50, verbose_name="版本描述信息", null=True)
     objects = VersionManager()
+
     def __str__(self):
         return self.version
 
@@ -97,14 +112,17 @@ class Bug(BaseTable):
         ('2', 'android'),
         ('3', 'web'),
         ('4', 'pc'),
-        ('5', 'pad')
+        ('5', 'pad'),
+        ('6', '服务端'),
     )
     bug_state = (
         ('1', '未解决'),
         ('2', '已解决'),
         ('3', '延期解决'),
         ('4', '不解决'),
-        ('5', '关闭')
+        ('5', '关闭'),
+        ('6', '激活'),
+
     )
     choices_push = (
         (False, '推送'),
@@ -123,11 +141,12 @@ class Bug(BaseTable):
     buger = models.ForeignKey(UserInfo, verbose_name="创建者", related_name="buger", on_delete=models.CASCADE)
     bug_title = models.CharField(verbose_name="bug描述", max_length=500)
     bug_content = models.CharField(verbose_name="bug详情", max_length=1000)
-    platform = models.CharField(verbose_name="bug所属平台", choices=platform_choices, max_length=12)
+    plantform = models.CharField(verbose_name="bug所属平台", choices=platform_choices, max_length=12)
     state = models.CharField(verbose_name="bug状态", choices=bug_state, max_length=12)
     pic = models.ImageField(verbose_name="bug图片", upload_to="images/bug", blank=True)
-    png = models.CharField(verbose_name="图片地址",max_length=200, null=True)
+    png = models.CharField(verbose_name="图片地址", max_length=200, null=True)
     push = models.BooleanField(verbose_name="是否推送", choices=choices_push)
     objects = BugManager()
+
     def __str__(self):
         return self.bug_title

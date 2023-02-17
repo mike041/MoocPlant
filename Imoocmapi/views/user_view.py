@@ -6,7 +6,7 @@ from django.http import HttpResponseRedirect
 
 
 def login(request):
-    if request.method is "POST":
+    if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
         if UserInfo.objects.filter(username__exact=username).filter(password__exact=password).count() == 1:

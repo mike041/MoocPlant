@@ -22,9 +22,14 @@ def addProject(request):
     '''
     if request.is_ajax():
         response_data = {
-            "msg":"添加成功"
+            "msg": "添加成功"
         }
         request_data = json.loads(request.body.decode('utf-8'))
+        project_name = request_data.get("project")
+        project_num = ProjectInfo.objects.get_project_num(project_name)
+        if project_num > 1:
+            response_data['msg'] = "项目已存在"
+            return HttpResponse(json.dumps(response_data))
         ProjectInfo.objects.create(**request_data)
         return HttpResponse(json.dumps(response_data))
     else:
@@ -44,5 +49,4 @@ def projectList(request, ajax=False):
     project_info = {
         "project_info": project_data
     }
-    print(project_info)
     return render(request, "project_list.html", project_info)
