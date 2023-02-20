@@ -92,11 +92,13 @@
                         <td><div id="bug_id_{{ foo.id }}"><a onclick="editstate({{ foo.id }})">{{ foo.state }}</a></div></td>
                         <td>{{ foo.start }}</td>
                         <td><a onclick=""> {{ foo.developer__username }}</a></td>
-                        <td>{% if foo.png %}
-                            {% for png in foo.png %}
-                                <img id="pimg" height="50px" width="50px" src="{{ png }}">
-                            {% endfor %}
-
+                        <td style="width:{{ foo.png_size }}px">
+                            {% if foo.png %}
+                                {% for png in foo.png %}
+                                    <div id="container" class="logoImg amplifyImg" style="display: inline">
+                                        <img onclick="BigBig(this.src, this.width, this.height);" data-target="#myModal" data-toggle="modal" style="width: 50px;" src={{ png }}>
+                                    </div>
+                                {% endfor %}
                         {% endif %}</td>
 
                     </tr>
@@ -105,11 +107,15 @@
 
                 </tbody>
             </table>
-            <div id="outerdiv" style="position:fixed;top:0;left:0;background:rgba(0,0,0,0.7);z-index:2;width:100%;height:100%;display:none;">
-                <div id="innerdiv" style="position:absolute;">
-                    <img id="bigimg" style="border:5px solid #fff;" src="" />
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-body" align="center">
+                        <img src="" id="image">
+                    </div>
                 </div>
             </div>
+
+
 
             <div class="am-btn-group am-btn-group-xs">
                 <button type="button" class="am-btn am-btn-default" onclick="location='/api/add_module/'"><span

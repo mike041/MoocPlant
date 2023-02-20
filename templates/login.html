@@ -6,22 +6,77 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>登录</title>
     <link href="{% static 'assets/css/login.css' %}" type="text/css" rel="stylesheet">
+    <script src="https://s3.pstatp.com/cdn/expire-1-M/jquery/3.3.1/jquery.min.js"></script>
+    <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://cdn.bootcss.com/amazeui/2.7.2/js/amazeui.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery.serializeJSON/2.9.0/jquery.serializejson.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js" type="text/javascript"
+            charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ext-language_tools.js" type="text/javascript"
+            charset="utf-8"></script>
+    <script src="//apps.bdimg.com/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+    <script src="https://cdn.bootcss.com/popper.js/1.12.5/umd/popper.min.js"></script>
+
+    <script src="{% static 'assets/js/app.js' %}"></script>
+    <script src="{% static 'assets/js/commons.js' %}"></script>
+<script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 </head>
 
 <body>
     <div id="loginDiv">
-        <form action="/login/" id="form" method="post">
-            {% csrf_token %}
-            <h1 style="text-align: center;color: aliceblue;">测试平台</h1>
-            <p>用户名:<input id="username" type="text"><label id="name_trip"></label></p>
+        <form id="login_form">
 
-            <p>密&#12288;码:<input id="password" type="password"><label id="password_trip"></label></p>
+            <h1 style="text-align: center;color: aliceblue;">测试平台</h1>
+            <div>
+                <p>用户名:<input type="text" class="form-control" id="username"
+                                   aria-describedby="inputSuccess3Status" name="username" placeholder="请输入用户名"
+                                   value=""></p>
+
+            <p>密&#12288;码:<input id="password" type="password" placeholder="请输入密码" value=""><label id="password_trip"></label></p>
+
+            </div>
 
             <div style="text-align: center;margin-top: 30px;">
-                <input type="submit" class="button" value="登录">
+                <button type="button" id="button" class="btn btn-default"
+                                    onclick="login()">点 击 提 交
+                            </button>&nbsp;
             </div>
         </form>
     </div>
 
 </body>
+<script type="text/javascript">
+    function login() {
+        var csrftoken = getCookie('csrftoken');
+        var data = {}
+        var username = document.getElementById('username').value;
+        var password = document.getElementById('password').value;
+        data["username"] = username
+        data["password"] = password
+        //var data = $('#login_form').serializeJSON();
+        $.ajax({
+            type: 'POST',
+            url:'/login/',
+            headers:{'X-CSRFToken': csrftoken},
+            data: JSON.stringify(data),
+            contentType: "application/json",
+            success: function (data) {
+                var data = JSON.parse(data);
+                if(data["code"] ==10000){
+                    var url = data["url"]
+                    var token = data["token"]
+                    var nick_name = data['nick_name']
+                    sessionStorage.setItem("nick_name", nick_name)
+                    $.cookie("token",token,{expires:1,path:"/"})
+                    location.href = url
+                }
+            }
+            ,
+            error: function () {
+                myAlert('Sorry，服务器可能开小差啦, 请重试!');
+            }
+            }
+        )
+    }
+</script>
 </html>

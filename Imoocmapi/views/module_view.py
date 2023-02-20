@@ -5,7 +5,10 @@ from django.shortcuts import render
 from Imoocmapi.models import ModuleInfo, ProjectInfo
 import json
 
+from Imoocmapi.views.user_view import check_login
 
+
+@check_login
 def addModule(request):
     '''
     :param request:
@@ -13,13 +16,13 @@ def addModule(request):
     '''
     if request.is_ajax():
         data = {
-            "msg":"成功"
+            "msg": "成功"
         }
         request_data = json.loads(request.body.decode('utf-8'))
         project_name = request_data.get("belong_project")
         module_name = request_data.get("module_name")
-        module_num = ModuleInfo.objects.get_module_num(project_name,module_name)
-        if module_num>1:
+        module_num = ModuleInfo.objects.get_module_num(project_name, module_name)
+        if module_num >= 1:
             data['msg'] = "模块已存在"
             return HttpResponse(json.dumps(data))
         belong_project = ProjectInfo.objects.get_project(project_id=request_data.get("belong_project"))
@@ -29,11 +32,12 @@ def addModule(request):
     else:
         project_name_list = ProjectInfo.objects.get_project_name_list()
         project_info = {
-            "project_name":project_name_list
+            "project_name": project_name_list
         }
-        return render(request, "add_module.html",project_info)
+        return render(request, "add_module.html", project_info)
 
 
+@check_login
 def moduleList(request):
     '''
     :param ajax:

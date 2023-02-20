@@ -11,20 +11,10 @@ from django.shortcuts import render
 
 
 from Imoocmapi.models import UserInfo, Bug, ProjectInfo
+from Imoocmapi.views.user_view import check_login
 
 
-
-
-
-def check_login(func):
-    def wrapper(request, *args, **kwargs):
-        if not request.session.get("login_status"):
-            return HttpResponseRedirect("/login/")
-        return func(request, *args, **kwargs)
-
-    return wrapper
-
-
+@check_login
 def index(request):
     """
     首页

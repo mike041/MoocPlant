@@ -5,6 +5,8 @@ import json
 from django.http import HttpResponse
 from django.shortcuts import render
 from rest_framework import serializers
+
+from .user_view import check_login
 from ..models import ProjectInfo
 from django.forms.models import model_to_dict
 
@@ -15,6 +17,7 @@ class SomeModelSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+@check_login
 def addProject(request):
     '''
     :param request:
@@ -25,17 +28,18 @@ def addProject(request):
             "msg": "添加成功"
         }
         request_data = json.loads(request.body.decode('utf-8'))
-        project_name = request_data.get("project")
+        project_name = request_data.get("project_name")
         project_num = ProjectInfo.objects.get_project_num(project_name)
-        if project_num > 1:
+        if project_num >= 1:
             response_data['msg'] = "项目已存在"
             return HttpResponse(json.dumps(response_data))
-        ProjectInfo.objects.create(**request_data)
+        ProjectInfo.objects.add_project(**request_data)
         return HttpResponse(json.dumps(response_data))
     else:
         return render(request, "add_project.html")
 
 
+@check_login
 def projectList(request, ajax=False):
     '''
     :param request:

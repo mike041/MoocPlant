@@ -30,7 +30,7 @@ class UserInfoManager(models.Manager):
         :param password:
         :return:
         """
-        return self.filter(username__exact=username, password__exact=password).count()
+        return self.filter(username=username, password=password).count()
 
     def get_develop_user(self):
         '''
@@ -43,6 +43,10 @@ class UserInfoManager(models.Manager):
 
     def get_user_by_user_name(self, user_name):
         return self.get(nick_name=user_name)
+
+    def get_user_nick_name(self,user_name):
+        nick_name = self.filter(username=user_name).values("nick_name").first()
+        return nick_name
 
 
 class ProjectInfoManager(models.Manager):
@@ -142,6 +146,15 @@ class VersionManager(models.Manager):
 
     def get_version(self,project_name,version):
         return self.get(Q(project_name__project_name=project_name)&Q(version=version))
+
+    def get_version_by_project_name(self,project_name,version):
+        '''
+        想过项目名字、versio获取该项目该版本是否存在
+        :param project_name:
+        :param version:
+        :return:
+        '''
+        return self.filter(Q(project_name__project_name=project_name)&Q(version=version)).count()
 
 
 class BugManager(models.Manager):

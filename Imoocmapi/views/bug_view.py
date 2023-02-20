@@ -3,6 +3,8 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import render
 import json
+
+from .user_view import check_login
 from ..models import Bug, ProjectInfo, ModuleInfo, Version, UserInfo
 from ..utils.tencent_cos import TencentCOS
 import os
@@ -65,10 +67,11 @@ def put_png(request):
                                         }))
 
 
+@check_login
 def bugList(request):
     platformItem = {"1": "IOS", "2": "Android", "3": "web", "4": "pc", "5": "pad"}
     start_level = {'1': '1星', '2': '2星', '3': '3星', '4': '4星'}
-    bug_state = {'1': '未解决', '2': '已解决', '3': '延期解决', '4': '不解决', '5': '关闭','6':'激活'}
+    bug_state = {'1': '未解决', '2': '已解决', '3': '延期解决', '4': '不解决', '5': '关闭', '6': '激活'}
     bug_list = Bug.objects.get_all_bug()
 
     for bug in bug_list:
@@ -79,16 +82,19 @@ def bugList(request):
         bug_png = bug['png']
         if bug_png is not None and bug_png != "":
             if "," in bug_png:
-                bug_png_list=bug_png.split(",")
+                bug_png_list = bug_png.split(",")
             else:
                 bug_png_list.append(bug_png)
             bug['png'] = bug_png_list
+            bug['png_size'] = 60 * len(bug_png_list)
     bug_info = {
         "bug_info": bug_list
     }
+
     return render(request, 'bug_list.html', bug_info)
 
 
+@check_login
 def addBug(request):
     if request.is_ajax():
         module_info = {
@@ -145,6 +151,7 @@ def addBug(request):
         }
         return render(request, 'add_bug.html', context=project)
 
+
 def edit_bug(request):
     '''
     更改bug状态
@@ -153,15 +160,12 @@ def edit_bug(request):
     '''
     if request.is_ajax():
         data = {
-            'msg':"更新成功",
-            'state':10000
+            'msg': "更新成功",
+            'state': 10000
         }
 
         request_data = json.loads(request.body.decode('utf-8'))
-        print(request_data)
         bug_id = request_data.get("bug_id")
         bug_state = request_data.get("state")
-        Bug.objects.update_bug(bug_id,bug_state)
+        Bug.objects.update_bug(bug_id, bug_state)
         return HttpResponse(json.dumps(data))
-
-
