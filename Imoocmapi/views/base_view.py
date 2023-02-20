@@ -8,7 +8,12 @@ from django.shortcuts import render
 # Create your views here.
 
 
+
+
 from Imoocmapi.models import UserInfo, Bug, ProjectInfo
+
+
+
 
 
 def check_login(func):
@@ -20,7 +25,6 @@ def check_login(func):
     return wrapper
 
 
-@check_login
 def index(request):
     """
     首页
@@ -34,6 +38,17 @@ def index(request):
     device_id = "00008101-00016C9E02F8001E"
     dict_data = {}
     return render(request, "index.html")
+
+
+
+
+
+
+
+
+
+
+
 
 
 def imPerformance(request):

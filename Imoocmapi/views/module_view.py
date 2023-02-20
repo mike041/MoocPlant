@@ -5,9 +5,10 @@ from django.shortcuts import render
 from Imoocmapi.models import ModuleInfo, ProjectInfo
 import json
 
-from Imoocmapi.views.base_view import check_login
+from Imoocmapi.views.user_view import check_login
 
 
+@check_login
 def addModule(request):
     '''
     :param request:
@@ -56,5 +57,4 @@ def moduleList(request):
     else:
         module_list = ModuleInfo.objects.get_all_module_name()
         module_info['module'] = module_list
-        print(module_info)
         return render(request, "module_list.html", module_info)
