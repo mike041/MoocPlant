@@ -84,7 +84,7 @@ class ProjectInfoManager(models.Manager):
         :param project_id:
         :return:
         """
-        return self.filter(project_name__exact=project_name).count()
+        return self.filter(project_name=project_name).count()
 
     def get_project_name_list(self):
         '''
@@ -142,6 +142,9 @@ class VersionManager(models.Manager):
 
     def get_version(self,project_name,version):
         return self.get(Q(project_name__project_name=project_name)&Q(version=version))
+
+    def get_project_version_number(self,project_name,version):
+        return self.filter(Q(project_name__project_name=project_name)&Q(version=version)).count()
 
 
 class BugManager(models.Manager):

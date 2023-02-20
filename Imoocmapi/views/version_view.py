@@ -14,9 +14,13 @@ def addVersion(request):
             "msg": "成功"
         }
         request_data = json.loads(request.body.decode('utf-8'))
-        print(request_data)
-        project_name = ProjectInfo.objects.get_project(project_id=request_data.get("project_name"))
-        request_data["project_name"] = project_name
+        project_name = request_data.get("project_name")
+        version = request_data.get("version")
+        version_num = Version.objects.get_project_version_number(project_name=project_name, version=version)
+        if version_num > 0:
+            data["msg"] = "版本已存在"
+            return HttpResponse(json.dumps(data))
+        request_data["project_name"] = ProjectInfo.objects.get_project_by_name(project_name)
         Version.objects.add_version(**request_data)
         return HttpResponse(json.dumps(data))
     else:

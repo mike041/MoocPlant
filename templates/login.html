@@ -1,24 +1,39 @@
-<!DOCTYPE html>
-<html lang="en">
-
+<!doctype html>
+<html class="no-js" lang="zh-CN">
 <head>
     {% load static %}
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap-fileinput/4.4.8/js/fileinput.js"></script>
+    <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap-fileinput/4.4.8/js/fileinput.min.js"></script>
+
+
+    <script src="https://cdn.bootcss.com/amazeui/2.7.2/js/amazeui.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery.serializeJSON/2.9.0/jquery.serializejson.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js"
+    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ext-language_tools.js" type="text/javascript" charset="utf-8"></script>
+    <script src="//apps.bdimg.com/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+    <script src="{% static 'assets/js/commons.js' %}"></script>
+
     <title>登录</title>
     <link href="{% static 'assets/css/login.css' %}" type="text/css" rel="stylesheet">
 </head>
 
 <body>
     <div id="loginDiv">
-        <form action="/login/" id="form" method="post">
-            {% csrf_token %}
-            <h1 style="text-align: center;color: aliceblue;">测试平台</h1>
-            <p>用户名:<input id="username" type="text"><label id="name_trip"></label></p>
+        <form id="login_form">
 
-            <p>密&#12288;码:<input id="password" type="password"><label id="password_trip"></label></p>
+            <h1 style="text-align: center;color: aliceblue;">测试平台</h1>
+            <div class="form-group">
+                <p>用户名:<input id="username" type="text"></p>
+
+                <p>密&#12288;码:<input id="password" type="password"></p>
+
+            </div>
 
             <div style="text-align: center;margin-top: 30px;">
-                <input type="submit" class="button" value="登录">
+                <button type="button" class="button" onclick="login()">登录</button>
             </div>
         </form>
     </div>

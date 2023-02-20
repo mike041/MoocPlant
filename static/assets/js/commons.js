@@ -624,3 +624,27 @@ function showImg(outerdiv, innerdiv, bigimg, _this){
     });
 }
 
+
+function login(){
+    var userinfo=$('#login_form').serializeJSON();
+    console.log(JSON.stringify(userinfo))
+    $.ajax({
+        type: 'post',
+        headers: {'X-CSRFToken': getCookie('csrftoken')},
+        url: '/login/',
+        data: JSON.stringify(userinfo),
+        contentType: "application/json",
+        success: function (data) {
+            data = JSON.parse(data)['status']
+            if (data === 10000) {
+                window.location.reload();
+            }
+            else {
+                myAlert(data['msg']);
+            }
+        },
+        error: function () {
+            myAlert('Sorry，服务器可能开小差啦, 请重试!');
+        }
+    });
+}
