@@ -25,7 +25,7 @@
 <body>
     <div id="loginDiv">
         <form id="login_form">
-
+            {% csrf_token %}
             <h1 style="text-align: center;color: aliceblue;">测试平台</h1>
             <div>
                 <p>用户名:<input type="text" class="form-control" id="username"
@@ -36,8 +36,8 @@
 
             </div>
 
-            <div style="text-align: center;margin-top: 30px;">
-                <button type="button" id="button" class="btn btn-default"
+            <div style="text-align: center;margin-top: 30px; margin-left: 50px">
+                <button type="button" id="button" class="button"
                                     onclick="login()">点 击 提 交
                             </button>&nbsp;
             </div>
@@ -51,32 +51,38 @@
         var data = {}
         var username = document.getElementById('username').value;
         var password = document.getElementById('password').value;
-        data["username"] = username
-        data["password"] = password
-        //var data = $('#login_form').serializeJSON();
-        $.ajax({
-            type: 'POST',
-            url:'/login/',
-            headers:{'X-CSRFToken': csrftoken},
-            data: JSON.stringify(data),
-            contentType: "application/json",
-            success: function (data) {
-                var data = JSON.parse(data);
-                if(data["code"] ==10000){
-                    var url = data["url"]
-                    var token = data["token"]
-                    var nick_name = data['nick_name']
-                    sessionStorage.setItem("nick_name", nick_name)
-                    $.cookie("token",token,{expires:1,path:"/"})
-                    location.href = url
+        if(username.length > 2 && password.length>6){
+            data["username"] = username
+            data["password"] = password
+            //var data = $('#login_form').serializeJSON();
+            $.ajax({
+                type: 'POST',
+                url:'/login/',
+                headers:{'X-CSRFToken': csrftoken},
+                data: JSON.stringify(data),
+                contentType: "application/json",
+                success: function (data) {
+                    var data = JSON.parse(data);
+                    if(data["code"] ==10000){
+                        var url = data["url"]
+                        var token = data["token"]
+                        var nick_name = data['nick_name']
+                        sessionStorage.setItem("nick_name", nick_name)
+                        $.cookie("token",token,{expires:1,path:"/"})
+                        location.href = url
+                    }
                 }
-            }
-            ,
-            error: function () {
-                myAlert('Sorry，服务器可能开小差啦, 请重试!');
-            }
-            }
-        )
+                ,
+                error: function () {
+                    alert('Sorry，服务器可能开小差啦, 请重试!');
+                }
+                }
+            )
+
+        }else {
+            alert("请输入正确的用户名或者密码")
+        }
+
     }
 </script>
 </html>

@@ -53,7 +53,7 @@
                 <li><a href="/bug_list/">Bug 列 表</a></li>
                 <li><a href="/add_bug/">新 增 bug</a></li>
             </ul>
-            <h3 class="am-icon-folder"><em></em> <a href="#">项目管理</a></h3>
+            <h3 class="am-icon-th-list"><em></em> <a href="#">项目管理</a></h3>
             <ul>
                 <li><a href="/project_list/">项 目 列 表</a></li>
                 <li><a href="/add_project/">新 增 项 目</a></li>
@@ -74,8 +74,9 @@
                 <li><a href="/im_performance/">IM压测</a></li>
                 <li><a href="/chat_performance/">聊天压测</a></li>
                 <li><a href="/im_chat/">IM和聊天</a></li>
+                <li><a href="/interface_performance/">接口压测</a></li>
             </ul>
-            <h3 class="am-icon-gears"><em></em> <a href="#">环境管理</a></h3>
+            <h3 class="am-icon-th-list"><em></em> <a href="#">环境管理</a></h3>
             <ul>
                 <li><a href="/env_list/">运 行 环 境</a></li>
             </ul>
@@ -93,6 +94,7 @@
         });
         var nick_name = sessionStorage.getItem("nick_name")
         $('#nick_name').text(nick_name)
+
         jQuery(".sideMenu").slide({
             titCell: "h3", //鼠标触发对象
             targetCell: "ul", //与titCell一一对应，第n个titCell控制第n个targetCell的显示隐藏
@@ -102,6 +104,7 @@
             defaultPlay: true,//默认是否执行效果（默认true）
             returnDefault: false //鼠标从.sideMen移走后返回默认状态（默认false）
         });
+
 
         function initFileInput(ctrlName) {
             var control = $('#' + ctrlName);

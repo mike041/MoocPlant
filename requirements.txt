@@ -6,4 +6,5 @@ typing_extensions==4.1.1
 
 PyMySQL~=1.0.2
 tidevice~=0.9.11
-PyJWT
+PyJWT==2.6.0
+redis==4.5.1

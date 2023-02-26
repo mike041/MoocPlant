@@ -1,25 +1,31 @@
 # coding=utf-8
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 
 from ..models import UserInfo
 from django.http import HttpResponseRedirect, HttpResponse
 import json
 import jwt
+from ..utils.common import handle_redis
+
 
 def check_login(func):
     def wrapper(request, *args, **kwargs):
-        token = request.COOKIES.get("token",None)
-        if token == 'null':
+        token = request.COOKIES.get("token", None)
+        if token == "null":
             return HttpResponseRedirect("/login/")
         else:
             try:
-                jwt.decode(token, "sercet", algorithms=['HS256'])
-                return func(request, *args, **kwargs)
+                user_data = jwt.decode(token, "sercet", algorithms=['HS256'])
+                user_key = user_data.get("username")
+                if handle_redis.get_value_str("token_" + user_key) is not None:
+                    return func(request, *args, **kwargs)
+                else:
+                    return HttpResponseRedirect("/login/")
+
             except jwt.InvalidTokenError:
                 return HttpResponseRedirect("/login/")
 
     return wrapper
-
 
 
 def login(request):
@@ -40,12 +46,13 @@ def login(request):
             token = jwt.encode(request_data, "sercet")
             data["token"] = token
             data["nick_name"] = nick_name
+            handle_redis.set_value("token_" + username, token)
             return HttpResponse(json.dumps(data))
         else:
             return render(request, "login.html")
     else:
-        token = request.COOKIES.get("token",None)
-        if token == 'null':
+        token = request.COOKIES.get("token", None)
+        if token == "null":
             return render(request, "login.html")
         else:
             try:
