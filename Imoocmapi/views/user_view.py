@@ -6,7 +6,6 @@ from django.http import HttpResponseRedirect, HttpResponse
 import json
 import jwt
 
-
 def check_login(func):
     def wrapper(request, *args, **kwargs):
         token = request.COOKIES.get("token",None)
@@ -24,14 +23,15 @@ def check_login(func):
 
 
 def login(request):
+    data = {
+        "code": 10000,
+        "msg": "登录成功",
+        "url": "/index/",
+        "token": "",
+        "nick_name": ""
+    }
     if request.method == 'POST':
-        data = {
-            "code": 10000,
-            "msg": "登录成功",
-            "url": "/index/",
-            "token": "",
-            "nick_name":""
-        }
+
         request_data = json.loads(request.body.decode("utf-8"))
         username = request_data.get("username")
         password = request_data.get("password")
@@ -44,15 +44,15 @@ def login(request):
         else:
             return render(request, "login.html")
     else:
-        token = request.COOKIES.get("token", None)
+        token = request.COOKIES.get("token",None)
         if token == 'null':
             return render(request, "login.html")
         else:
             try:
                 jwt.decode(token, "sercet", algorithms=['HS256'])
-                return HttpResponseRedirect("/")
+                return HttpResponse(json.dumps(data))
             except jwt.InvalidTokenError:
-                return HttpResponseRedirect("/login/")
+                return render(request, "login.html")
         return render(request, "login.html")
 
 
