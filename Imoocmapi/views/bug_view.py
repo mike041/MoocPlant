@@ -73,7 +73,7 @@ def bugList(request):
     start_level = {'1': '1星', '2': '2星', '3': '3星', '4': '4星'}
     bug_state = {'1': '未解决', '2': '已解决', '3': '延期解决', '4': '不解决', '5': '关闭', '6': '激活'}
     bug_list = Bug.objects.get_all_bug()
-
+    project_list = []
     for bug in bug_list:
         bug_png_list = []
         bug['plantform'] = platformItem[bug.get("plantform")]
@@ -87,8 +87,12 @@ def bugList(request):
                 bug_png_list.append(bug_png)
             bug['png'] = bug_png_list
             bug['png_size'] = 60 * len(bug_png_list)
+        if bug["project__project_name"] not in project_list:
+            project_list.append(bug["project__project_name"])
+
     bug_info = {
-        "bug_info": bug_list
+        "bug_info": bug_list,
+        "project_list": project_list
     }
 
     return render(request, 'bug_list.html', bug_info)

@@ -1,0 +1,561 @@
+<!doctype html>
+<html class="no-js" lang="zh-CN">
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{% block title %}{% endblock %}</title>
+    <meta name="keywords" content="index">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+
+    {% load static %}
+    <meta name="apple-mobile-web-app-title" content="测试管理平台"/>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" media="screen"/>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap-fileinput/4.4.8/css/fileinput.css"/>
+    <script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap-fileinput/4.4.8/js/fileinput.js"></script>
+    <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap-fileinput/4.4.8/js/fileinput.min.js"></script>
+<script src="https://cdn.bootcss.com/amazeui/2.7.2/js/amazeui.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery.serializeJSON/2.9.0/jquery.serializejson.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js" type="text/javascript"
+            charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ext-language_tools.js" type="text/javascript"
+            charset="utf-8"></script>
+    <script src="//apps.bdimg.com/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+    <script src="https://cdn.bootcss.com/popper.js/1.12.5/umd/popper.min.js"></script>
+<script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
+    <script src="{% static 'assets/js/app.js' %}"></script>
+    <script src="{% static 'assets/js/commons.js' %}"></script>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap-fileinput/4.4.8/css/fileinput.min.css"/>
+
+    <link rel="stylesheet" href="http://cdn.bootcss.com/amazeui/2.7.2/css/amazeui.min.css"/>
+    <link rel="stylesheet" href="{% static 'assets/css/admin.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/common.css' %}">
+
+
+
+</head>
+<body class="modal-open">
+<div class="am-cf admin-main">
+    <div class="nav-navicon admin-main admin-sidebar">
+        <div class="sideMenu am-icon-dashboard" style="color:#aeb2b7; margin: 10px 0 0 0;"> 欢迎您：<div id="nick_name" style="display: inline"></div> &nbsp;&nbsp;<a href='/log_out/' id="logout">注 销</a></div>
+        <div class="sideMenu">
+            <h3 class="am-icon-th-list"><em></em> <a href="#"> bug管理</a></h3>
+            <ul>
+                <li><a onclick=change_module('#bug_list','/bug_list/')>Bug 列 表</a></li>
+                <li><a onclick=change_module('#bug_list','/add_bug/')>新 增 bug</a></li>
+            </ul>
+            <h3 class="am-icon-th-list"><em></em> <a href="#">项目管理</a></h3>
+            <ul>
+                <li><a onclick=change_module("#project_list",'/project_list/')>项 目 列 表</a></li>
+                <li><a href="/add_project/">新 增 项 目</a></li>
+            </ul>
+
+            <h3 class="am-icon-th-list"><em></em> <a href="#"> 模块管理</a></h3>
+            <ul>
+                <li><a onclick=change_module("#module_version_list","/module_list/")>模 块 列 表</a></li>
+                <li><a href="/add_module/">新 增 模 块</a></li>
+            </ul>
+            <h3 class="am-icon-th-list"><em></em> <a href="#"> 版本管理</a></h3>
+            <ul>
+                <li><a onclick=change_module("#version_list","/version_list/")>版 本 列 表</a></li>
+                <li><a href="/add_version/">新 增 版 本</a></li>
+            </ul>
+            <h3 class="am-icon-th-list"><em></em> <a href="#"> 数据工具</a></h3>
+            <ul>
+                <li><a href="/im_performance/">IM压测</a></li>
+                <li><a href="/chat_performance/">聊天压测</a></li>
+                <li><a href="/im_chat/">IM和聊天</a></li>
+                <li><a href="/interface_performance/">接口压测</a></li>
+            </ul>
+            <h3 class="am-icon-th-list"><em></em> <a href="#">环境管理</a></h3>
+            <ul>
+                <li><a href="/env_list/">运 行 环 境</a></li>
+            </ul>
+    </div>
+        <div class="index">
+            <div class="admin-biaogelist" style="top: 0px">
+                <img src="{% static 'assets/img/index.jpg'%}" width="100%">
+            </div>
+
+        </div>
+    <div id="bug_list" style="display: none">
+        <div class="admin-biaogelist" style="top: 0px">
+            <div class="listbiaoti am-cf">
+                <ul class="am-icon-flag on"> bug列表</ul>
+                <dl class="am-icon-home" style="float: right;"> 当前位置： bug管理 > <a href="#">bug展示</a></dl>
+                <dl>
+                    <button type="button" class="am-btn am-btn-danger am-round am-btn-xs am-icon-plus"
+                            onclick="location='/add_bug/'">新增bug
+                    </button>
+
+                </dl>
+            </div>
+
+            <div class="am-btn-toolbars am-btn-toolbar am-kg am-cf">
+                <form id="pro_filter" method="post" action="/bug_list/">
+                    <ul>
+                        <li style="padding-top: 5px">
+                            <select name="project" class="am-input-zm am-input-xm"
+                                    onchange="auto_load('#pro_filter', '/api/add_case/', '#module', 'module')">
+                                <option value="{{ info.belong_project }}"
+                                        selected>{{ info.belong_project }}</option>
+                                {% for foo in project %}
+                                    {% ifnotequal info.belong_project foo.project_name %}
+                                        <option value="{{ foo.project_name }}">{{ foo.project_name }}</option>
+                                    {% endifnotequal %}
+
+                                {% endfor %}
+
+                                {% if info.belong_project != 'All' %}
+                                    <option value="All">All</option>
+                                {% endif %}
+                            </select>
+                        </li>
+
+                        <li style="padding-top: 5px">
+                            <select name="module" class=" am-input-zm am-input-xm" id="module">
+                                <option selected value="{{ info.belong_module }}">{{ info.belong_module }}</option>
+                            </select>
+                        </li>
+                        <li style="padding-top: 5px"><input value="{{ info.user }}" type="text" name="user"
+                                                            class="am-input-sm am-input-xm"
+                                                            placeholder="测试人员"/></li>
+                        <li>
+                            <button style="padding-top: 5px; margin-top: 9px"
+                                    class="am-btn am-radius am-btn-xs am-btn-success">搜索
+                            </button>
+                        </li>
+                    </ul>
+                </form>
+            </div>
+
+
+            <form class="am-form am-g" id='module_list' name="module_list" method="post" action="/api/run_batch_test/">
+                <table width="100%" class="am-table am-table-bordered am-table-radius am-table-striped">
+                    <thead>
+                    <tr class="am-success">
+                        <th class="table-check"><input type="checkbox" id="select_all"/></th>
+                        <th class="table-title">序号</th>
+                        <th class="table-type">项目</th>
+                        <th class="table-type">模块</th>
+                        <th class="table-type">版本</th>
+                        <th class="table-type">bug描述</th>
+                        <th class="table-type">平台</th>
+                        <th class="table-type">状态</th>
+                        <th class="table-type">几星</th>
+                        <th class="table-type">开发人员</th>
+                        <th class="table-type">图片</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    {% for foo in bug_info %}
+                        <tr>
+                            <td><label>
+                                <input type="checkbox" name="bug_{{ foo.id }}" value="{{ foo.id }}"/>
+                            </label></td>
+                            <td id="bug_num">{{ foo.id }}</td>
+                            <td><a href="#"
+                                   onclick="edit('{{ foo.id }}','{{ foo.project__project_name }}', '{{ foo.belong_project.project_name }}'
+                                           , '{{ foo.test_user }}', '{{ foo.simple_desc }}', '{{ foo.other_desc }}')">{{ foo.project__project_name }}</a>
+                            </td>
+                            <td>{{ foo.module__module_name }}</td>
+                            <td>{{ foo.version__version }}</td>
+                            <td style="width: 50%">{{ foo.bug_title }}</td>
+                            <td><a onclick=""> {{ foo.plantform }}</a></td>
+                            <td><div id="bug_id_{{ foo.id }}"><a onclick="editstate({{ foo.id }})">{{ foo.state }}</a></div></td>
+                            <td>{{ foo.start }}</td>
+                            <td><a onclick=""> {{ foo.developer__username }}</a></td>
+                            <td style="width:{{ foo.png_size }}px">
+                                {% if foo.png %}
+                                    {% for png in foo.png %}
+                                        <div id="container" class="logoImg amplifyImg" style="display: inline">
+                                            <img onclick="BigBig(this.src, this.width, this.height);" data-target="#myModal" data-toggle="modal" style="width: 50px;" src={{ png }}>
+                                        </div>
+                                    {% endfor %}
+                            {% endif %}</td>
+
+                        </tr>
+                    {% endfor %}
+
+
+                    </tbody>
+                </table>
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-body" align="center">
+                            <img src="" id="image">
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="am-btn-group am-btn-group-xs">
+                    <button type="button" class="am-btn am-btn-default" onclick="location='/api/add_module/'"><span
+                            class="am-icon-plus"></span> 新增
+                    </button>
+                </div>
+
+                <ul class="am-pagination am-fr">
+                    {{ page_list }}
+                </ul>
+
+
+                <hr/>
+
+            </form>
+        </div>
+    </div>
+    <div id="project_list" style="display: none">
+        <div class="admin-biaogelist" style="top: 0px">
+        <div class="listbiaoti am-cf">
+            <ul class="am-icon-flag on"> 项目列表</ul>
+            <dl class="am-icon-home" style="float: right;"> 当前位置： 项目管理 > <a href="#">项目展示</a></dl>
+            <dl>
+                <button type="button" class="am-btn am-btn-danger am-round am-btn-xs am-icon-plus"
+                        onclick="location='/add_project/'">新增项目
+                </button>
+            </dl>
+        </div>
+
+        <div class="am-btn-toolbars am-btn-toolbar am-kg am-cf">
+            <form id="pro_filter" method="post" action="/project_list/">
+                <ul>
+                    <li style="padding-top: 5px">
+                        <select name="project" class="am-input-zm am-input-xm">
+                            {% for foo in project_info %}
+                                <option value="{{ foo.project_name }}">{{ foo.project_name }}</option>
+                            {% endfor %}
+
+                            {% if info.belong_project != 'All' %}
+                                <option value="All">All</option>
+                            {% endif %}
+                        </select>
+                    </li>
+
+
+                    <li>
+                        <button style="padding-top: 5px; margin-top: 9px"
+                                class="am-btn am-radius am-btn-xs am-btn-success">搜索
+                        </button>
+                    </li>
+                </ul>
+            </form>
+        </div>
+        <form class="am-form am-g" id="project_list" name="project_list" method="post" action="/run_batch_test/">
+            <table width="100%" class="am-table am-table-bordered am-table-radius am-table-striped">
+                <thead>
+                <tr class="am-success">
+                    <th class="table-check"><input type="checkbox" id="select_all"/></th>
+                    <th class="table-title">序号</th>
+                    <th class="table-type">项目名称</th>
+                    <th class="table-title">项目描述</th>
+                    <th class="table-date am-hide-sm-only">创建时间</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for foo in project_info %}
+                    <tr>
+                        <td><input type="checkbox" name="project_{{ foo.id }}" value="{{ foo.id }}"/></td>
+                        <td>{{ forloop.counter }}</td>
+                        <td><a href="#"
+                               onclick="edit('{{ foo.id }}','{{ foo.project_name }}', '{{ foo.simple_desc }}'
+                                       , '{{ foo.test_user }}','{{ foo.dev_user }}', '{{ foo.publish_app }}'
+                                       , '{{ foo.simple_desc }}', '{{ foo.other_desc }}')">{{ foo.project_name }}</a>
+                        </td>
+                        <td>{{ foo.simple_desc }}</td>
+                        <td>{{ foo.create_time|date:"Y-m-d H:i:s" }}</td>
+
+
+
+                    </tr>
+                {% endfor %}
+
+
+                </tbody>
+            </table>
+
+            <div class="am-btn-group am-btn-group-xs">
+                <button type="button" class="am-btn am-btn-default" onclick="location='/add_project/'"><span
+                        class="am-icon-plus"></span> 新增
+                </button>
+            </div>
+
+            <ul class="am-pagination am-fr">
+                {{ page_list }}
+            </ul>
+            <hr/>
+        </form>
+    </div>
+    </div>
+    <div id="module_version_list" style="display: none">
+        <div class="admin-biaogelist" style="top: 0px">
+        <div class="listbiaoti am-cf">
+            <ul class="am-icon-flag on"> 模块列表</ul>
+            <dl class="am-icon-home" style="float: right;"> 当前位置： 模块管理 > <a href="#">模块展示</a></dl>
+            <dl>
+                <button type="button" class="am-btn am-btn-danger am-round am-btn-xs am-icon-plus"
+                        onclick="location='/add_module/'">新增模块
+                </button>
+
+            </dl>
+        </div>
+
+        <div class="am-btn-toolbars am-btn-toolbar am-kg am-cf">
+            <form id="pro_filter" method="post" action="/module_list/">
+                <ul>
+                    <li style="padding-top: 5px">
+                            <select name="project" class="am-input-zm am-input-xm"
+                                    onchange="auto_load_module('#pro_filter', '/module_list/','module')">
+                                {% for foo in module %}
+                                    {% ifchanged foo.belong_project__project_name %}
+                                         <option value="{{ foo.belong_project__project_name }}">{{ foo.belong_project__project_name }}</option>
+                                    {% endifchanged %}
+
+                                {% endfor %}
+                            </select>
+                    </li>
+
+
+                    <li style="padding-top: 5px">
+                        <select name="module" class=" am-input-zm am-input-xm" id="module">
+                            {% for foo in module %}
+                                    {% ifchanged foo.module_name %}
+                                         <option selected value="{{ foo.module_name }}">{{ foo.module_name }}</option>
+                                    {% endifchanged %}
+
+                                {% endfor %}
+
+                        </select>
+                    </li>
+                    <li>
+                        <button style="padding-top: 5px; margin-top: 9px"
+                                class="am-btn am-radius am-btn-xs am-btn-success">搜索
+                        </button>
+                    </li>
+                </ul>
+            </form>
+        </div>
+
+
+        <form class="am-form am-g" id='module_list' name="module_list" method="post" action="/api/run_batch_test/">
+            <table width="100%" class="am-table am-table-bordered am-table-radius am-table-striped">
+                <thead>
+                <tr class="am-success">
+                    <th class="table-check"><input type="checkbox" id="select_all"/></th>
+                    <th class="table-title">序号</th>
+                    <th class="table-type">模块名称</th>
+                    <th class="table-type">所属项目</th>
+                    <th class="table-date am-hide-sm-only">创建日期</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for foo in module %}
+                    <tr>
+                        <td><input type="checkbox" name="module_{{ foo.id }}" value="{{ foo.id }}"/></td>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ foo.module_name }}</td>
+                    <td>{{ foo.belong_project__project_name }}</td>
+                        <td>{{ foo.create_time|date:"Y-m-d H:i:s" }}</td>
+
+
+                    </tr>
+                {% endfor %}
+
+
+                </tbody>
+            </table>
+
+            <div class="am-btn-group am-btn-group-xs">
+                <button type="button" class="am-btn am-btn-default" onclick="location='/api/add_module/'"><span
+                        class="am-icon-plus"></span> 新增
+                </button>
+            </div>
+
+            <ul class="am-pagination am-fr">
+                {{ page_list }}
+            </ul>
+
+
+            <hr/>
+
+        </form>
+    </div>
+    </div>
+    <div id="version_list" style="display: none">
+        <div class="admin-biaogelist" style="top: 0px">
+        <div class="listbiaoti am-cf">
+            <ul class="am-icon-flag on"> 版本列表</ul>
+            <dl class="am-icon-home" style="float: right;"> 当前位置： 版本管理 > <a href="#">版本展示</a></dl>
+            <dl>
+                <button type="button" class="am-btn am-btn-danger am-round am-btn-xs am-icon-plus"
+                        onclick="location='/add_version/'">新增版本
+                </button>
+
+            </dl>
+        </div>
+
+        <div class="am-btn-toolbars am-btn-toolbar am-kg am-cf">
+            <form id="pro_filter" method="post" action="/version_list/">
+                <ul>
+                    <li style="padding-top: 5px">
+                        <select name="project" class="am-input-zm am-input-xm"
+                                onchange="auto_load('#pro_filter', '/add_version/', '#module', 'module')">
+                            <option value="{{ info.belong_project }}"
+                                    selected>{{ info.belong_project }}</option>
+                            {% for version in version_info %}
+                                    <option value="{{ version.version }}">{{ version.version }}</option>
+
+
+                            {% endfor %}
+
+                            {% if info.belong_project != 'All' %}
+                                <option value="All">All</option>
+                            {% endif %}
+                        </select>
+                    </li>
+                        <button style="padding-top: 5px; margin-top: 9px"
+                                class="am-btn am-radius am-btn-xs am-btn-success">搜索
+                        </button>
+                    </li>
+                </ul>
+            </form>
+        </div>
+
+
+        <form class="am-form am-g" id='module_list' name="module_list" method="post" action="/api/run_batch_test/">
+            <table width="100%" class="am-table am-table-bordered am-table-radius am-table-striped">
+                <thead>
+                <tr class="am-success">
+                    <th class="table-check"><input type="checkbox" id="select_all"/></th>
+                    <th class="table-title">序号</th>
+                    <th class="table-type">版本号</th>
+                    <th class="table-type">项目名称</th>
+                    <th class="table-type">描述</th>
+                    <th class="table-date am-hide-sm-only">创建日期</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for version in version_info %}
+                    <tr>
+                        <td><input type="checkbox" name="module_{{ version.id }}" value="{{ version.id }}"/></td>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ version.version }}</td>
+                        <td>{{ version.project_name__project_name }}</td>
+                        <td>{{ version.simple_desc }}</td>
+                        <td class="am-hide-sm-only">{{ version.create_time|date:"Y-m-d H:i:s" }}</td>
+
+                    </tr>
+                {% endfor %}
+
+
+                </tbody>
+            </table>
+
+            <ul class="am-pagination am-fr">
+                {{ page_list }}
+            </ul>
+
+
+            <hr/>
+
+        </form>
+    </div>
+    </div>
+
+
+
+
+    {% block content %}
+
+    {% endblock %}
+
+    <div class="am-modal am-modal-alert" tabindex="-1" id="my-alert">
+        <div class="am-modal-dialog">
+            <div class="am-modal-hd"></div>
+            <div class="am-modal-bd" id="my-alert_print">
+                Sorry，服务器可能开小差啦, 请重试!
+            </div>
+            <div class="am-modal-footer">
+                <span class="am-modal-btn">确定</span>
+            </div>
+        </div>
+    </div>
+    </div>
+
+</div>
+</body>
+
+<script type="text/javascript">
+    function change_module(element,url){
+        $(element).css("display","block")
+    }
+    $('#logout').click(function(){
+        $.cookie("token",null,{path:'/'})
+    });
+    var nick_name = sessionStorage.getItem("nick_name")
+    $('#nick_name').text(nick_name)
+
+    jQuery(".sideMenu").slide({
+        titCell: "h3", //鼠标触发对象
+        targetCell: "ul", //与titCell一一对应，第n个titCell控制第n个targetCell的显示隐藏
+        effect: "slideDown", //targetCell下拉效果
+        delayTime: 300, //效果时间
+        triggerTime: 150, //鼠标延迟触发时间（默认150）
+        defaultPlay: true,//默认是否执行效果（默认true）
+        returnDefault: false //鼠标从.sideMen移走后返回默认状态（默认false）
+    });
+
+
+    function initFileInput(ctrlName) {
+        var control = $('#' + ctrlName);
+        control.fileinput({
+            resizeImage: true,
+            resizePreference: 'width',
+            uploadAsync: false,                             //采用同步上传
+            language: 'zh', //设置语言
+            uploadUrl: '/api/upload_file/',
+            allowedFileExtensions: ['yml', 'yaml', 'json'],//接收的文件后缀
+            showUpload: true, //是否显示上传按钮
+            showRemove: false,
+            showCaption: true,//是否显示标题
+            browseClass: "btn btn-primary", //按钮样式
+            previewFileIcon: "<i class='glyphicon glyphicon-king'></i>",
+            maxFileCount: 10,
+            msgFilesTooMany: "选择文件超过了最大数量",
+            maxFileSize: 2000,
+            uploadExtraData:
+                function () {     //上传时要传输的其他参数
+                    project_name = $('#project option:selected').val();//选中的文本
+                    module_name = $('#upload_belong_module_id option:selected').val();//选中的文本
+                    return {"project": project_name, "module": module_name};
+                },
+            showClose: false,//显示右上角X关闭
+            overwriteInitial: false, //是否显示预览
+            dropZoneEnabled: false,//是否显示拖拽区域
+        });
+        control.on('fileerror', function (event, data, msg) {
+            myAlert(msg)
+        });
+        control.on("filebatchuploadsuccess", function (event, data) {
+            var obj = data.response;
+            $("#bulk_uploadcase").trigger('click');
+            if (obj.status.indexOf('/api/') !== -1) {
+                window.location.href = obj.status;
+            } else {
+                myAlert(obj.status);
+            }
+        });
+    }
+    initFileInput("uploadfile");
+</script>
+</html>

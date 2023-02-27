@@ -5,7 +5,7 @@
 
 
 
-    <div class="admin-biaogelist">
+    <div class="admin-biaogelist" style="top: 0px">
         <div class="listbiaoti am-cf">
             <ul class="am-icon-flag on"> bug列表</ul>
             <dl class="am-icon-home" style="float: right;"> 当前位置： bug管理 > <a href="#">bug展示</a></dl>
@@ -21,25 +21,18 @@
             <form id="pro_filter" method="post" action="/bug_list/">
                 <ul>
                     <li style="padding-top: 5px">
-                        <select name="project" class="am-input-zm am-input-xm"
-                                onchange="auto_load('#pro_filter', '/api/add_case/', '#module', 'module')">
-                            <option value="{{ info.belong_project }}"
-                                    selected>{{ info.belong_project }}</option>
-                            {% for foo in project %}
-                                {% ifnotequal info.belong_project foo.project_name %}
-                                    <option value="{{ foo.project_name }}">{{ foo.project_name }}</option>
-                                {% endifnotequal %}
-
-                            {% endfor %}
-
-                            {% if info.belong_project != 'All' %}
-                                <option value="All">All</option>
-                            {% endif %}
+                        <select name="project" id="project" class="am-input-zm am-input-xm"
+                                onchange="auto_load_module('#module', '/add_bug/','module')">
+                        {% for project_name in project_list %}
+                            <option value="{{ project_name }}"
+                                    selected>{{ project_name }}</option>
+                        {% endfor %}
+                        <option value="All">All</option>
                         </select>
                     </li>
 
                     <li style="padding-top: 5px">
-                        <select name="module" class=" am-input-zm am-input-xm" id="module">
+                        <select name="module" id="module" class=" am-input-zm am-input-xm" id="module">
                             <option selected value="{{ info.belong_module }}">{{ info.belong_module }}</option>
                         </select>
                     </li>

@@ -146,6 +146,35 @@ function auto_load_module(id, url,types) {
 
 }
 
+function show_project(location,url) {
+    data = {}
+    $.ajax({
+        type: 'post',
+        url: url,
+        data: JSON.stringify(data),
+        contentType: "application/json",
+        success: function (data){
+            var project_list = JSON.parse(data)["project_info"]
+            console.log(project_list)
+            var a = $(location)
+            var result = []
+            a.empty()
+            a.prepend("<option >请选择</option>")
+            for (var i = 0; i < project_list.length; i++) {
+                if (project_list[i]!== "") {
+                    var value = project_list[i]['project_name'];
+                    var num = result.indexOf(value)
+                    if (num > -1) {
+                        continue
+                    } else {
+                        result.push(value)
+                        a.prepend("<option value='" + value + "' >" + value + "</option>")
+                    }
+                }
+            }
+        }
+    })
+}
 function show_version(data){
     var version_list = JSON.parse(data)["version_list"]
     var a = $('#version')

@@ -40,7 +40,7 @@ def addProject(request):
 
 
 @check_login
-def projectList(request, ajax=False):
+def projectList(request):
     '''
     :param request:
     :return:
