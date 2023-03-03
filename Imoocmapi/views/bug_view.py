@@ -1,4 +1,5 @@
 # coding=utf-8
+import jwt
 from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -72,7 +73,12 @@ def bugList(request):
     platformItem = {"1": "IOS", "2": "Android", "3": "web", "4": "pc", "5": "pad"}
     start_level = {'1': '1星', '2': '2星', '3': '3星', '4': '4星'}
     bug_state = {'1': '未解决', '2': '已解决', '3': '延期解决', '4': '不解决', '5': '关闭', '6': '激活'}
-    bug_list = Bug.objects.get_all_bug()
+    if request.is_ajax():
+        data = json.loads(request.body.decode('utf-8'))
+        bug_list = Bug.objects.search_bug(**data)
+    else:
+        bug_list = Bug.objects.get_all_bug()
+
     project_list = []
     for bug in bug_list:
         bug_png_list = []
@@ -94,8 +100,12 @@ def bugList(request):
         "bug_info": bug_list,
         "project_list": project_list
     }
+    if request.is_ajax():
+        print(bug_info)
+        return HttpResponse(json.dumps(bug_info))
+    else:
+        return render(request, 'bug_list.html', bug_info)
 
-    return render(request, 'bug_list.html', bug_info)
 
 
 @check_login
@@ -126,11 +136,14 @@ def addBug(request):
             }
 
             developer_name = request_data.get("developer")
+            token = request.COOKIES.get("token")
+            user_data = jwt.decode(token, "sercet", algorithms=['HS256'])
+            tester = user_data.get("username")
             project_object = ProjectInfo.objects.get_project_by_name(project_name=project_name)
             module_object = ModuleInfo.objects.get_module(project_name=project_name, module_name=module_name)
             version_object = Version.objects.get_version(project_name=project_name, version=version)
-            developer_object = UserInfo.objects.get_user_by_user_name(user_name=developer_name)
-            buger_object = UserInfo.objects.get_user_by_user_name(developer_name)
+            developer_object = UserInfo.objects.get_user_by_user_name(nick_name=developer_name)
+            buger_object = UserInfo.objects.get_user_by_user_name(user_name=tester)
             request_data['project'] = project_object
             request_data['module'] = module_object
             request_data['version'] = version_object

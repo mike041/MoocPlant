@@ -18,31 +18,31 @@
         </div>
 
         <div class="am-btn-toolbars am-btn-toolbar am-kg am-cf">
-            <form id="pro_filter" method="post" action="/bug_list/">
+            <form id="pro_filter">
+
                 <ul>
                     <li style="padding-top: 5px">
                         <select name="project" id="project" class="am-input-zm am-input-xm"
-                                onchange="auto_load_module('#module', '/add_bug/','module')">
+                                onchange="select_module()">
                         {% for project_name in project_list %}
                             <option value="{{ project_name }}"
                                     selected>{{ project_name }}</option>
                         {% endfor %}
-                        <option value="All">All</option>
+
                         </select>
                     </li>
 
                     <li style="padding-top: 5px">
                         <select name="module" id="module" class=" am-input-zm am-input-xm" id="module">
-                            <option selected value="{{ info.belong_module }}">{{ info.belong_module }}</option>
+                            <option selected value="All">All</option>
                         </select>
                     </li>
-                    <li style="padding-top: 5px"><input value="{{ info.user }}" type="text" name="user"
+                    <li style="padding-top: 5px"><input value="" type="text" name="user"
                                                         class="am-input-sm am-input-xm"
-                                                        placeholder="测试人员"/></li>
+                                                        placeholder="开发人员"/></li>
                     <li>
-                        <button style="padding-top: 5px; margin-top: 9px"
-                                class="am-btn am-radius am-btn-xs am-btn-success">搜索
-                        </button>
+
+                        <input type="button" class="am-btn am-radius am-btn-xs am-btn-success" style="padding-top: 5px; margin-top: 9px" onclick="search_bug()" value="搜索">
                     </li>
                 </ul>
             </form>
@@ -50,8 +50,8 @@
 
 
         <form class="am-form am-g" id='module_list' name="module_list" method="post" action="/api/run_batch_test/">
-            <table width="100%" class="am-table am-table-bordered am-table-radius am-table-striped">
-                <thead>
+            <table width="100%" class="am-table am-table-bordered am-table-radius am-table-striped" id="bug_list_row">
+                <thead id="table_head">
                 <tr class="am-success">
                     <th class="table-check"><input type="checkbox" id="select_all"/></th>
                     <th class="table-title">序号</th>
@@ -63,10 +63,12 @@
                     <th class="table-type">状态</th>
                     <th class="table-type">几星</th>
                     <th class="table-type">开发人员</th>
+                    <th class="table-type">测试人员</th>
                     <th class="table-type">图片</th>
+
                 </tr>
                 </thead>
-                <tbody>
+                <tbody id="table_body">
 
                 {% for foo in bug_info %}
                     <tr>
@@ -84,8 +86,9 @@
                         <td><a onclick=""> {{ foo.plantform }}</a></td>
                         <td><div id="bug_id_{{ foo.id }}"><a onclick="editstate({{ foo.id }})">{{ foo.state }}</a></div></td>
                         <td>{{ foo.start }}</td>
-                        <td><a onclick=""> {{ foo.developer__username }}</a></td>
-                        <td style="width:{{ foo.png_size }}px">
+                        <td><a onclick=""> {{ foo.developer__nick_name }}</a></td>
+                    <td><a onclick=""> {{ foo.buger__nick_name }}</a></td>
+                        <td id="png_id" style="width:{{ foo.png_size }}px">
                             {% if foo.png %}
                                 {% for png in foo.png %}
                                     <div id="container" class="logoImg amplifyImg" style="display: inline">
