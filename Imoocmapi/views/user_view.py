@@ -16,11 +16,11 @@ def check_login(func):
         else:
             try:
                 user_data = jwt.decode(token, "sercet", algorithms=['HS256'])
-                user_key = user_data.get("username")
-                if handle_redis.get_value_str("token_" + user_key) is not None:
-                    return func(request, *args, **kwargs)
-                else:
-                    return HttpResponseRedirect("/login/")
+                #user_key = user_data.get("username")
+                #if handle_redis.get_value_str("token_" + user_key) is not None:
+                return func(request, *args, **kwargs)
+                #else:
+                #    return HttpResponseRedirect("/login/")
 
             except jwt.InvalidTokenError:
                 return HttpResponseRedirect("/login/")
@@ -42,11 +42,12 @@ def login(request):
         username = request_data.get("username")
         password = request_data.get("password")
         if UserInfo.objects.get_user_count(username, password) == 1:
-            nick_name = UserInfo.objects.get_user_nick_name(username).get("nick_name")
+            user_info = UserInfo.objects.get_user_nick_name(username)
+            request_data["user_type"] = user_info.get("user_type")
             token = jwt.encode(request_data, "sercet")
             data["token"] = token
-            data["nick_name"] = nick_name
-            handle_redis.set_value("token_" + username, token)
+            data["nick_name"] = user_info.get("nick_name")
+            #handle_redis.set_value("token_" + username, token)
             return HttpResponse(json.dumps(data))
         else:
             return render(request, "login.html")

@@ -144,7 +144,7 @@ class Bug(BaseTable):
     plantform = models.CharField(verbose_name="bug所属平台", choices=platform_choices, max_length=12)
     state = models.CharField(verbose_name="bug状态", choices=bug_state, max_length=12)
     pic = models.ImageField(verbose_name="bug图片", upload_to="images/bug", blank=True)
-    png = models.CharField(verbose_name="图片地址", max_length=200, null=True)
+    png = models.CharField(verbose_name="图片地址", max_length=500, null=True)
     push = models.BooleanField(verbose_name="是否推送", choices=choices_push)
     objects = BugManager()
 

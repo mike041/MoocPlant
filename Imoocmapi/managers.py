@@ -48,8 +48,8 @@ class UserInfoManager(models.Manager):
             return self.get(username=user_name)
 
     def get_user_nick_name(self,user_name):
-        nick_name = self.filter(username=user_name).values("nick_name").first()
-        return nick_name
+        result = self.filter(username=user_name).values("nick_name","user_type").first()
+        return result
 
 
 class ProjectInfoManager(models.Manager):
@@ -194,16 +194,22 @@ class BugManager(models.Manager):
         :param args:
         :return:
         """
-        project_name,module_name,developer_name = args.values()
-        print(project_name,module_name,developer_name)
-        if module_name != "" and developer_name != "" and module_name !="All" and developer_name !="All":
-            bug_list = self.filter(Q(project__project_name=project_name)&Q(module__module_name=module_name)&Q(developer__nick_name=developer_name))
-        elif module_name != "All" and developer_name == "":
-            bug_list = self.filter(Q(project__project_name=project_name)&Q(module__module_name=module_name))
-        elif module_name =="All" and developer_name == "":
-            bug_list = self.filter(Q(project__project_name=project_name))
-        elif module_name == "All" and developer_name !="":
-            bug_list = self.filter(Q(project__project_name=project_name)&Q(developer__nick_name=developer_name))
+        #self.filter(**args)
+        print(args)
+        if "buger" in args.keys() and "only_me" in args.keys():
+            bug_list = self.filter(buger__username=args["buger"])
+        if "only_me" in args.keys() and "buger" not in args.keys():
+            bug_list = self.filter(developer__username=args["developer"])
+        if "only_me" not in args.keys():
+            project_name,module_name,developer_name = args.values()
+            if module_name != "" and developer_name != "" and module_name !="All" and developer_name !="All":
+                bug_list = self.filter(Q(project__project_name=project_name)&Q(module__module_name=module_name))
+            elif module_name != "All" and developer_name == "":
+                bug_list = self.filter(Q(project__project_name=project_name)&Q(module__module_name=module_name))
+            elif module_name =="All" and developer_name == "":
+                bug_list = self.filter(Q(project__project_name=project_name))
+            elif module_name == "All" and developer_name !="":
+                bug_list = self.filter(Q(project__project_name=project_name)&Q(developer__nick_name=developer_name))
         return list(bug_list.values("id", "project__project_name", "module__module_name", "version__version", "bug_title",
                         "plantform", "state", "start", "developer__username","buger__nick_name","png"))
 

@@ -70,11 +70,20 @@ def put_png(request):
 
 @check_login
 def bugList(request):
-    platformItem = {"1": "IOS", "2": "Android", "3": "web", "4": "pc", "5": "pad"}
+    platformItem = {"1": "IOS", "2": "Android", "3": "web", "4": "pc", "5": "pad","6":"服务端"}
     start_level = {'1': '1星', '2': '2星', '3': '3星', '4': '4星'}
     bug_state = {'1': '未解决', '2': '已解决', '3': '延期解决', '4': '不解决', '5': '关闭', '6': '激活'}
     if request.is_ajax():
         data = json.loads(request.body.decode('utf-8'))
+        token = request.COOKIES.get("token", None)
+        user_data = jwt.decode(token, "sercet", algorithms=['HS256'])
+        user_type = user_data.get("user_type", None)
+        username = user_data.get("username", None)
+        if "only_me" in data.keys():
+            if user_type == 3:
+                data["buger"] = username
+            else:
+                data["developer"] = username
         bug_list = Bug.objects.search_bug(**data)
     else:
         bug_list = Bug.objects.get_all_bug()
@@ -101,7 +110,6 @@ def bugList(request):
         "project_list": project_list
     }
     if request.is_ajax():
-        print(bug_info)
         return HttpResponse(json.dumps(bug_info))
     else:
         return render(request, 'bug_list.html', bug_info)

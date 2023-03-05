@@ -275,6 +275,7 @@ function search_bug(){
     var data = a.serializeJSON()
     var table_body = $('#table_body')
     table_body.children("tr").remove()
+    console.log(data)
     var png_list;
     $.ajax({
         type: 'post',
