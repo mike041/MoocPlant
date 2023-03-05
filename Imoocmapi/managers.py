@@ -41,8 +41,11 @@ class UserInfoManager(models.Manager):
         nick_name_data = list([nick_name for nick_name in nick_name_list])
         return nick_name_data
 
-    def get_user_by_user_name(self, user_name):
-        return self.get(nick_name=user_name)
+    def get_user_by_user_name(self, user_name=None,nick_name=None):
+        if user_name is None:
+            return self.get(nick_name=nick_name)
+        else:
+            return self.get(username=user_name)
 
     def get_user_nick_name(self,user_name):
         nick_name = self.filter(username=user_name).values("nick_name").first()
@@ -172,7 +175,7 @@ class BugManager(models.Manager):
         '''
         bug_list = list(
             self.values("id", "project__project_name", "module__module_name", "version__version", "bug_title",
-                        "plantform", "state", "start", "developer__username","png"))
+                        "plantform", "state", "start", "developer__nick_name","buger__nick_name","png"))
         # self.values("id","project__")
         return bug_list
 
@@ -184,6 +187,25 @@ class BugManager(models.Manager):
         '''
         bug = self.filter(id=bug_id)
         bug.update(state=bug_state)
+
+    def search_bug(self,**args):
+        """
+        根据项目、模块查找bug
+        :param args:
+        :return:
+        """
+        project_name,module_name,developer_name = args.values()
+        print(project_name,module_name,developer_name)
+        if module_name != "" and developer_name != "" and module_name !="All" and developer_name !="All":
+            bug_list = self.filter(Q(project__project_name=project_name)&Q(module__module_name=module_name)&Q(developer__nick_name=developer_name))
+        elif module_name != "All" and developer_name == "":
+            bug_list = self.filter(Q(project__project_name=project_name)&Q(module__module_name=module_name))
+        elif module_name =="All" and developer_name == "":
+            bug_list = self.filter(Q(project__project_name=project_name))
+        elif module_name == "All" and developer_name !="":
+            bug_list = self.filter(Q(project__project_name=project_name)&Q(developer__nick_name=developer_name))
+        return list(bug_list.values("id", "project__project_name", "module__module_name", "version__version", "bug_title",
+                        "plantform", "state", "start", "developer__username","buger__nick_name","png"))
 
 
 class TestCaseSuiteInfoManager(models.Manager):

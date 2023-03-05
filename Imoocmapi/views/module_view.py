@@ -58,3 +58,4 @@ def moduleList(request):
         module_list = ModuleInfo.objects.get_all_module_name()
         module_info['module'] = module_list
         return render(request, "module_list.html", module_info)
+

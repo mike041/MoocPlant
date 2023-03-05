@@ -146,6 +146,35 @@ function auto_load_module(id, url,types) {
 
 }
 
+function show_project(location,url) {
+    data = {}
+    $.ajax({
+        type: 'post',
+        url: url,
+        data: JSON.stringify(data),
+        contentType: "application/json",
+        success: function (data){
+            var project_list = JSON.parse(data)["project_info"]
+            console.log(project_list)
+            var a = $(location)
+            var result = []
+            a.empty()
+            a.prepend("<option >请选择</option>")
+            for (var i = 0; i < project_list.length; i++) {
+                if (project_list[i]!== "") {
+                    var value = project_list[i]['project_name'];
+                    var num = result.indexOf(value)
+                    if (num > -1) {
+                        continue
+                    } else {
+                        result.push(value)
+                        a.prepend("<option value='" + value + "' >" + value + "</option>")
+                    }
+                }
+            }
+        }
+    })
+}
 function show_version(data){
     var version_list = JSON.parse(data)["version_list"]
     var a = $('#version')
@@ -216,6 +245,61 @@ function add_module(id,url){
 
 }
 
+function select_module(){
+    const csrftoken = getCookie('csrftoken')
+    var a = $('#project');
+    var module = $('#module')
+    module.empty();
+    var data = a.serializeJSON()
+    $.ajax({
+        type: 'post',
+        headers:{"X-CSRFToken":csrftoken},
+        url: '/module_list/',
+        data: JSON.stringify(data),
+        contentType: "application/json",
+        success: function (data) {
+            module.append("<option selected value=\"All\">All</option>")
+            var module_list = JSON.parse(data)["module"]
+            for(var i=0;i<module_list.length;i++){
+                module.append("<option value='"+module_list[i]['module_name']+"'>"+module_list[i]['module_name']+"</option>")
+            }
+        }
+    })
+
+}
+
+function search_bug(){
+
+    const csrftoken = getCookie('csrftoken')
+    var a = $('#pro_filter');
+    var data = a.serializeJSON()
+    var table_body = $('#table_body')
+    table_body.children("tr").remove()
+    var png_list;
+    $.ajax({
+        type: 'post',
+        headers:{"X-CSRFToken":csrftoken},
+        url: '/bug_list/',
+        data: JSON.stringify(data),
+        contentType: "application/json",
+        success: function (data) {
+            data = JSON.parse(data)["bug_info"]
+            for(var i=0;i<data.length;i++){
+                table_body.prepend('<tr><td><label><input type="checkbox" name="bug_'+data[i]["id"]+'" value="'+data[i]["id"]+'"/></label></td><td id="bug_num">'+data[i]["id"]+'</td><td><a href="#" onclick="">'+data[i]["project__project_name"]+'</a></td>' +
+                    '<td>'+data[i]["module__module_name"]+'</td><td>'+data[i]["version__version"]+'</td>' +
+                    '<td style="width: 50%">'+data[i]["bug_title"]+'</td><td><a onclick=""> '+data[i]["plantform"]+'</a></td><td><div id='+data[i]["id"]+'><a onclick="editstate(data[i]["id"])">'+data[i]["state"]+'</a></div></td>'+
+                    '<td>'+data[i]["start"]+'</td><td><a onclick=""> '+data[i]["developer__username"]+'</a></td><td><a onclick=""> '+data[i]["buger__nick_name"]+'</a></td><td id="png_url_'+data[i]["id"]+'" style="width:"'+data[i]["png_size"]+'"px"></td></tr>')
+                png_list = $('#png_url_'+data[i]["id"])
+                if(data[i]['png']!=null){
+                    for(var png_url=0;png_url<data[i]['png'].length;png_url++){
+                        png_list.append('<div id="container" class="logoImg amplifyImg" style="display: inline"><img onclick="BigBig(this.src, this.width, this.height);" data-target="#myModal" data-toggle="modal" style="width: 50px;" src="'+data[i]['png'][png_url]+'"></div>')
+                    }
+                }
+
+            }
+        }
+    })
+}
 
 
 function update_data_ajax(id, url) {
