@@ -10,7 +10,6 @@ from ..models import Bug, ProjectInfo, ModuleInfo, Version, UserInfo
 from ..utils.tencent_cos import TencentCOS
 import os
 import datetime
-from django.contrib.sessions.models import Session
 
 
 def put_png(request):
@@ -19,7 +18,7 @@ def put_png(request):
     :return:
     '''
     if request.is_ajax():
-        upload_image = request.FILES.get("file")
+        upload_image = request.FILES.get("files")
         media_root = settings.MEDIA_ROOT
         if not upload_image:
             return HttpResponse(json.dumps({
@@ -59,12 +58,13 @@ def put_png(request):
         # 上传的文件：绝对路径
         local_file = file_path + '/' + file_full_name
         # 将原始文件名作为key传给COS
-        key = 'moocplant/' + file_name_list[0] + '.' + file_extension
+        key = 'mooc plant/' + file_full_name
         # 调用COS上传文件，返回url
         upload = TencentCOS().upload_cos(local_file, key)
+        file_list = [upload]
         return HttpResponse(json.dumps({'success': 1,
                                         'message': "上传成功！",
-                                        'url': upload
+                                        'data': file_list
                                         }))
 
 
@@ -97,9 +97,10 @@ def bugList(request):
         bug_png = bug['png']
         if bug_png is not None and bug_png != "":
             if "," in bug_png:
-                bug_png_list = bug_png.split(",")
+                bug_png_list = eval(bug_png)
             else:
                 bug_png_list.append(bug_png)
+
             bug['png'] = bug_png_list
             bug['png_size'] = 60 * len(bug_png_list)
         if bug["project__project_name"] not in project_list:
@@ -142,7 +143,6 @@ def addBug(request):
             data = {
                 "msg": "添加成功"
             }
-
             developer_name = request_data.get("developer")
             token = request.COOKIES.get("token")
             user_data = jwt.decode(token, "sercet", algorithms=['HS256'])

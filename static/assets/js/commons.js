@@ -113,6 +113,14 @@ function auto_load(id, url, target, type) {
 function auto_load_module(id, url,types) {
     const csrftoken = getCookie('csrftoken');
     var data = $(id).serializeJSON();
+    var url_list = [];
+    var png_list = $("#aaa").children()
+    console.log(png_list.length);
+    for (var i = 0; i < png_list.length; i++) {
+        url_list.push(png_list[i].getAttribute("src"));
+    }
+    console.log(url_list)
+    data["png"] = url_list
     if(types == 'module'){
         data['module'] = '请选择'
         data['version'] = '请选择'
@@ -120,7 +128,6 @@ function auto_load_module(id, url,types) {
     if(types =='versions'){
         data['version'] = '请选择'
     }
-    console.log(data)
     $.ajax({
         type: 'post',
         headers: {'X-CSRFToken': csrftoken},
@@ -674,6 +681,10 @@ function BigBig(src, width, height) {
             });
         }
 
+function showimage(source) {
+    $("#ShowImage_Form #img_show").html("<image src='" + source + "' class='carousel-inner img-responsive img-rounded' style='cursor: pointer;'/>");
+    $("#ShowImage_Form").modal("show");
+}
 
 function login(){
     var userinfo=$('#login_form').serializeJSON();

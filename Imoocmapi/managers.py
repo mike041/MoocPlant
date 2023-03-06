@@ -195,21 +195,48 @@ class BugManager(models.Manager):
         :return:
         """
         #self.filter(**args)
-        print(args)
+        bug_version = args.get("version_list")
+        args.pop("version_list")
         if "buger" in args.keys() and "only_me" in args.keys():
-            bug_list = self.filter(buger__username=args["buger"])
+            if bug_version == "All":
+                bug_version =99
+                bug_list = self.filter(Q(buger__username=args["buger"])&~Q(version__version=bug_version))
+            else:
+                bug_list = self.filter(Q(buger__username=args["buger"]) & Q(version__version=bug_version))
         if "only_me" in args.keys() and "buger" not in args.keys():
-            bug_list = self.filter(developer__username=args["developer"])
+            if bug_version != "All":
+                bug_list = self.filter(Q(developer__username=args["developer"])&Q(version__version=bug_version))
+            else:
+                bug_version = 99
+                bug_list = self.filter(Q(developer__username=args["developer"])&~Q(version__version=bug_version))
         if "only_me" not in args.keys():
             project_name,module_name,developer_name = args.values()
             if module_name != "" and developer_name != "" and module_name !="All" and developer_name !="All":
-                bug_list = self.filter(Q(project__project_name=project_name)&Q(module__module_name=module_name))
+                if bug_version !="All":
+                    bug_list = self.filter(Q(project__project_name=project_name)&Q(module__module_name=module_name)&Q(version=bug_version))
+                else:
+                    bug_version = 99
+                    bug_list = self.filter(Q(project__project_name=project_name) & Q(module__module_name=module_name)&~Q(version=bug_version))
             elif module_name != "All" and developer_name == "":
-                bug_list = self.filter(Q(project__project_name=project_name)&Q(module__module_name=module_name))
+                if bug_version != "All":
+                    bug_list = self.filter(Q(project__project_name=project_name)&Q(module__module_name=module_name)&Q(version=bug_version))
+                else:
+                    bug_version = 99
+                    bug_list = self.filter(Q(project__project_name=project_name) & Q(module__module_name=module_name)&~Q(version=bug_version))
             elif module_name =="All" and developer_name == "":
-                bug_list = self.filter(Q(project__project_name=project_name))
+                if bug_version !="All":
+                    bug_list = self.filter(Q(project__project_name=project_name)&Q(version=bug_version))
+                else:
+                    bug_version = 99
+                    bug_list = self.filter(Q(project__project_name=project_name)&~Q(version=bug_version))
             elif module_name == "All" and developer_name !="":
-                bug_list = self.filter(Q(project__project_name=project_name)&Q(developer__nick_name=developer_name))
+                if bug_version !="All":
+                    bug_list = self.filter(Q(project__project_name=project_name)&Q(developer__nick_name=developer_name)&Q(version=bug_version))
+                else:
+                    bug_version = 99
+                    bug_list = self.filter(
+                        Q(project__project_name=project_name) & Q(developer__nick_name=developer_name) & ~Q(
+                            version=bug_version))
         return list(bug_list.values("id", "project__project_name", "module__module_name", "version__version", "bug_title",
                         "plantform", "state", "start", "developer__username","buger__nick_name","png"))
 

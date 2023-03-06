@@ -15,21 +15,23 @@
                     <div class="form-group  has-feedback">
                         <label class="control-label col-md-1 text-primary" for="project_name">项目名称：</label>
                         <div class="col-md-5">
-                            <select name="project" class="form-control" onchange="auto_load_module('#add_bug', '/add_bug/','module')">
-                            <option >请选择</option>
-                            {% for project in project_list %}
+                            <select name="project" class="form-control"
+                                    onchange="auto_load_module('#add_bug', '/add_bug/','module')">
+                                <option>请选择</option>
+                                {% for project in project_list %}
                                     <option value="{{ project.project_name }}">{{ project.project_name }}</option>
-                            {% endfor %}
+                                {% endfor %}
 
-                        </select>
+                            </select>
                         </div>
                     </div>
 
                     <div class="form-group  has-feedback">
                         <label class="control-label col-md-1 text-primary" for="dev_user">模块：</label>
                         <div class="col-md-5">
-                            <select name="module" class="form-control" onchange="auto_load_module('#add_bug','/add_bug/','versions')" id="module">
-                                <option >请选择</option>
+                            <select name="module" class="form-control"
+                                    onchange="auto_load_module('#add_bug','/add_bug/','versions')" id="module">
+                                <option>请选择</option>
                             </select>
                         </div>
                     </div>
@@ -37,88 +39,91 @@
                         <label class="control-label col-md-1 text-primary" for="dev_user">版本：</label>
                         <div class="col-md-5">
                             <select name="version" class="form-control" id="version">
-                                <option >请选择</option>
+                                <option>请选择</option>
                             </select>
                         </div>
                     </div>
-                <div class="form-group  has-feedback">
+                    <div class="form-group  has-feedback">
                         <label class="control-label col-md-1 text-primary" for="dev_user">开发者：</label>
                         <div class="col-md-5">
                             <select name="developer" class="form-control" id="developer">
-                                <option >请选择</option>
+                                <option>请选择</option>
                                 {% for developer in developer_list %}
                                     <option value="{{ developer.nick_name }}">{{ developer.nick_name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
                     </div>
-                <div class="form-group  has-feedback">
+                    <div class="form-group  has-feedback">
                         <label class="control-label col-md-1 text-primary" for="dev_user">几星：</label>
                         <div class="col-md-5">
                             <select name="start" class="form-control" onchange="" id="start">
-                                <option >请选择</option>
-                                <option value='1' >1星</option>
-                                <option value='2' >2星</option>
-                                <option value='3' >3星</option>
-                                <option value='4' >4星</option>
+                                <option>请选择</option>
+                                <option value='1'>1星</option>
+                                <option value='2'>2星</option>
+                                <option value='3'>3星</option>
+                                <option value='4'>4星</option>
                             </select>
                         </div>
                     </div>
-                <div class="form-group  has-feedback">
+                    <div class="form-group  has-feedback">
                         <label class="control-label col-md-1 text-primary" for="dev_user">平台：</label>
                         <div class="col-md-5">
                             <select name="plantform" class="form-control" onchange="" id="plantform">
-                                <option >请选择</option>
-                                <option value='1' >ios</option>
-                                <option value='2' >安卓</option>
-                                <option value='3' >web</option>
-                                <option value='4' >pc</option>
-                                <option value='5' >pad</option>
-                                <option value='6' >服务端</option>
+                                <option>请选择</option>
+                                <option value='1'>ios</option>
+                                <option value='2'>安卓</option>
+                                <option value='3'>web</option>
+                                <option value='4'>pc</option>
+                                <option value='5'>pad</option>
+                                <option value='6'>服务端</option>
 
                             </select>
                         </div>
                     </div>
-                <div class="form-group  has-feedback">
+                    <div class="form-group  has-feedback">
                         <label class="control-label col-md-1 text-primary" for="dev_user">状态：</label>
                         <div class="col-md-5">
                             <select name="state" class="form-control" onchange="" id="state">
-                                <option >请选择</option>
-                                <option value='1' >未解决</option>
-                                <option value='2' >已解决</option>
-                                <option value='3' >延期解决</option>
-                                <option value='4' >不解决</option>
-                                <option value='5' >延期</option>
-                                <option value='6' >激活</option>
+                                <option>请选择</option>
+                                <option value='1'>未解决</option>
+                                <option value='2'>已解决</option>
+                                <option value='3'>延期解决</option>
+                                <option value='4'>不解决</option>
+                                <option value='5'>延期</option>
+                                <option value='6'>激活</option>
                             </select>
                         </div>
                     </div>
-                <div class="form-group  has-feedback">
+                    <div class="form-group  has-feedback">
                         <label class="control-label col-md-1 text-primary" for="dev_user">是否推送：</label>
                         <div class="col-md-5">
                             <select name="push" class="form-control" onchange="" id="push">
-                                <option >请选择</option>
-                                <option value='0' >推送</option>
-                                <option value='1' >不推送</option>
+                                <option>请选择</option>
+                                <option value='0'>推送</option>
+                                <option value='1'>不推送</option>
                             </select>
                         </div>
                     </div>
-                <div class="form-group  has-feedback">
+                    <div class="form-group  has-feedback">
                         <label class="control-label col-md-1 text-primary" for="simple_desc">bug描述：</label>
                         <div class="col-md-5">
                             <textarea class="form-control" id="bug_title" name="bug_title"
-                                       aria-describedby="inputSuccess3Status" placeholder="请输入bug描述" value=""></textarea>
+                                      aria-describedby="inputSuccess3Status" placeholder="请输入bug描述"
+                                      value=""></textarea>
                         </div>
                     </div>
 
-                <div class="form-group  has-feedback">
-                    <label class="control-label col-md-1 text-primary" for="simple_desc">图片上传：</label>
-                    <div class="col-md-5">
-　　                      <input id="file-1" name="file" type="file" multiple class="form-control" data-overwrite-initial="false" data-min-file-count="1"/>
+                    <div class="form-group  has-feedback">
+                        <label class="control-label col-md-1 text-primary" for="simple_desc">图片上传：</label>
+                        <!--<div class="col-md-5">
+                            　　 <input id="file-1" name="file" type="file" multiple class="form-control"
+                                      data-overwrite-initial="false" data-min-file-count="1" onpaste="fileinput()"/>
 
+                        </div>-->
+                        <div class="col-md-5" id="aaa" name="aaa" contentEditable="true" style="height:200px;width:40%;border:1px solid #ccc;margin-left: 15px"></div>
+                        <!--<input id="png" name="png" type="text" value=""/>-->
                     </div>
-                    <input id="png" name="png" type="text" value=""/>
-                </div>
                     <div class="am-form-group am-cf">
                         <div class="you" style="margin-left: 8%;">
                             <button type="button" class="am-btn am-btn-success am-radius" id="send"
@@ -127,6 +132,8 @@
 
                         </div>
                     </div>
+
+
                 </form>
 
 
@@ -135,42 +142,63 @@
     </div>
     <script type="text/javascript">
         const csrftoken = getCookie('csrftoken');
-        $("#file-1").fileinput({
-            ajaxSettings:{
-                headers:{
-                    'X-CSRFToken': csrftoken
+        // 上传图片
+        // 处理粘贴事件
+        $("#aaa").on('paste', function (eventObj) {
+            // 处理粘贴事件
+            var event = eventObj.originalEvent;
+            var imageRe = new RegExp(/image\/.*/);
+            var fileList = $.map(event.clipboardData.items, function (o) {
+                if (!imageRe.test(o.type)) {
+                    return
                 }
-            },
-        　　uploadUrl: '/put_png/', // 这个是点击上传时候的上传接口
-        　　allowedFileExtensions : ['jpg', 'png','gif','jpeg'],//允许的文件类型
-        　　overwriteInitial: false,
-            language: 'zh',
-        　　maxFileSize: 2500,//文件的最大大小 单位是k
-        　　maxFileCount: 10,//最多文件数量
-        　　previewSettings: {//设置预览图片时候的大小
-                    image: {width: "100px", height: "100px"},
-                },
-        　　slugCallback: function(filename) {
-        　　　　return filename;
-        　　}
-
-        }).on('filecleared',function(){//点击移除按钮时触发
-
-
-        })
-
-        .on('fileuploaded', function (event, data, previewId, index) {//文件上传完成后触发
-            var png = $('#png')
-            var png_value = $('#png').val()
-            var png_url  = data['response']['url'];
-            if(png_value !=''){
-                png_value=png_value+','+png_url;
-            }else {
-                png_value = png_url
+                var blob = o.getAsFile();
+                return blob;
+            });
+            if (fileList.length <= 0) {
+                return
             }
-            png.val(png_value)
+            upload(fileList);
 
-    //
+            //阻止默认行为即不让剪贴板内容在div中显示出来
+            event.preventDefault();
         });
+
+        function upload(fileList) {
+
+            for (var i = 0, l = fileList.length; i < l; i++) {
+                var fd = new FormData();
+                var f = fileList[i];
+                fd.append('files', f);
+                var editor = document.getElementById("aaa");
+                $.ajax({
+                    url: "/put_png/",
+                    type: 'POST',
+                    dataType: 'json',
+                    data: fd,
+                    processData: false,
+                    contentType: false,
+                    xhrFields: {withCredentials: true},
+                    headers: {
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Credentials': 'true',
+                        'X-CSRFToken': csrftoken
+                    },
+                    success: function (res) {
+                        var len = res.data.length;
+                        for (var i = 0; i < len; i++) {
+                            var img = document.createElement('img');
+
+                            img.setAttribute("style", "width:10%;");
+                            img.src = res.data[i]; //设置上传完图片之后展示的图片
+                            editor.appendChild(img);
+                        }
+                    },
+                    error: function () {
+                        alert("上传图片错误");
+                    }
+                });
+            }
+        }
     </script>
 {% endblock %}
