@@ -258,6 +258,7 @@ function select_module(){
     var module = $('#module')
     module.empty();
     var data = a.serializeJSON()
+    show_version_by_project(data)
     $.ajax({
         type: 'post',
         headers:{"X-CSRFToken":csrftoken},
@@ -275,14 +276,67 @@ function select_module(){
 
 }
 
-function search_bug(){
+function show_version_by_project(project_name) {
+    const csrftoken = getCookie('csrftoken')
+    var version = $('#search_versions')
+    var version_list = null;
+    version.children().remove();
+    $.ajax({
+        type:'post',
+        headers:{"X-CSRFToken":csrftoken},
+        url: '/version_list/',
+        data: JSON.stringify(project_name),
+        contentType: "application/json",
+        success: function (data){
+            version_list = JSON.parse(data)["versions"]
+            version.append("<option value='All' selected>All</option>")
+            for(var i=0;i<version_list.length;i++){
+                version.append("<option value='"+version_list[i]['version']+"'>"+version_list[i]['version']+"</option>")
+            }
+        }
+    })
 
+}
+
+function editstate(bug_id,edit_type){
+    if(edit_type="developer"){
+        const csrftoken = getCookie('csrftoken')
+        var developer = $('#developer_id_'+bug_id)
+        developer.children().remove()
+        $.ajax({
+            type: "POST",
+            url: "/develop_list/",
+            headers:{"X-CSRFToken":csrftoken},
+            data:"",
+            contentType: "application/json",
+            success: function(data){
+                data = JSON.parse(data)
+                console.log(data)
+            }
+        })
+
+
+    }else{
+        var bug = $('#bug_id_'+bug_id)
+        bug.children().remove()
+        bug.prepend('<select name="state_'+bug_id+'"  class="form-control" onchange="update_bug('+bug_id+')" id="state_'+bug_id+'">\n' +
+            '                                <option >请选择</option>\n' +
+            '                                <option value="1" >未解决</option>\n' +
+            '                                <option value="2" >已解决</option>\n' +
+            '                                <option value="3" >延期解决</option>\n' +
+            '                                <option value="4" >不解决</option>\n' +
+            '                                <option value="5" >延期</option>\n' +
+            '                                <option value="6" >激活</option>\n' +
+            '                            </select>')
+    }
+}
+
+function search_bug(){
     const csrftoken = getCookie('csrftoken')
     var a = $('#pro_filter');
     var data = a.serializeJSON()
     var table_body = $('#table_body')
     table_body.children("tr").remove()
-    console.log(data)
     var png_list;
     $.ajax({
         type: 'post',
@@ -293,14 +347,16 @@ function search_bug(){
         success: function (data) {
             data = JSON.parse(data)["bug_info"]
             for(var i=0;i<data.length;i++){
-                table_body.prepend('<tr><td><label><input type="checkbox" name="bug_'+data[i]["id"]+'" value="'+data[i]["id"]+'"/></label></td><td id="bug_num">'+data[i]["id"]+'</td><td><a href="#" onclick="">'+data[i]["project__project_name"]+'</a></td>' +
+                var bug_id = data[i]["id"]
+                table_body.prepend('<tr><td><label><input type="checkbox" name="bug_'+bug_id+'" value="'+data[i]["id"]+'"/></label></td><td id="bug_num">'+data[i]["id"]+'</td><td><a href="#" onclick="">'+data[i]["project__project_name"]+'</a></td>' +
                     '<td>'+data[i]["module__module_name"]+'</td><td>'+data[i]["version__version"]+'</td>' +
-                    '<td style="width: 50%">'+data[i]["bug_title"]+'</td><td><a onclick=""> '+data[i]["plantform"]+'</a></td><td><div id='+data[i]["id"]+'><a onclick="editstate(data[i]["id"])">'+data[i]["state"]+'</a></div></td>'+
-                    '<td>'+data[i]["start"]+'</td><td><a onclick=""> '+data[i]["developer__username"]+'</a></td><td><a onclick=""> '+data[i]["buger__nick_name"]+'</a></td><td id="png_url_'+data[i]["id"]+'" style="width:"'+data[i]["png_size"]+'"px"></td></tr>')
+                    '<td style="width: 50%">'+data[i]["bug_title"]+'</td><td><a onclick=""> '+data[i]["plantform"]+'</a></td><td><div id=bug_id_'+data[i]["id"]+'><a onclick="editstate('+bug_id+')">'+data[i]["state"]+'</a></div></td>'+
+                    '<td>'+data[i]["start"]+'</td><td><a onclick=""> '+data[i]["developer__nick_name"]+'</a></td><td><a onclick=""> '+data[i]["buger__nick_name"]+'</a></td><td id="png_url_'+data[i]["id"]+'" style="width:"'+data[i]["png_size"]+'"px"></td></tr>')
                 png_list = $('#png_url_'+data[i]["id"])
+
                 if(data[i]['png']!=null){
                     for(var png_url=0;png_url<data[i]['png'].length;png_url++){
-                        png_list.append('<div id="container" class="logoImg amplifyImg" style="display: inline"><img onclick="BigBig(this.src, this.width, this.height);" data-target="#myModal" data-toggle="modal" style="width: 50px;" src="'+data[i]['png'][png_url]+'"></div>')
+                        png_list.append('<div id="container" class="logoImg amplifyImg" style="display: inline"><img onclick="BigBig(this.src, this.width, this.height);" data-target="#myModal" data-toggle="modal" style="width: 50px;" src="'+data[i]['png'][png_url]+'"/></div>')
                     }
                 }
 
@@ -631,26 +687,13 @@ function init_acs(language, theme, editor) {
 
 }
 
-function editstate(bug_id){
-    var bug = $('#bug_id_'+bug_id)
-    bug.children().remove()
-    bug.prepend('<select name="state"  class="form-control" onchange="update_bug('+bug_id+')" id="state">\n' +
-        '                                <option >请选择</option>\n' +
-        '                                <option value=\'1\' >未解决</option>\n' +
-        '                                <option value=\'2\' >已解决</option>\n' +
-        '                                <option value=\'3\' >延期解决</option>\n' +
-        '                                <option value=\'4\' >不解决</option>\n' +
-        '                                <option value=\'5\' >延期</option>\n' +
-        '                                <option value=\'6\' >激活</option>\n' +
-        '                            </select>')
 
-}
 
 function update_bug(bug_id){
     const csrftoken = getCookie('csrftoken');
-    var data = $('#state').serializeJSON();
+    var data = $('#state_'+bug_id).serializeJSON();
     data['bug_id'] = bug_id
-    console.log(data['bug_id'])
+    console.log(data)
     $.ajax({
         type: 'post',
         headers: {'X-CSRFToken': csrftoken},
@@ -663,7 +706,8 @@ function update_bug(bug_id){
                 myAlert(data['msg']);
             }
             else {
-                window.location.reload();
+                //window.location.reload();
+                search_bug()
             }
         },
         error: function () {

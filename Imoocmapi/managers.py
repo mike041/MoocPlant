@@ -188,15 +188,15 @@ class BugManager(models.Manager):
         bug = self.filter(id=bug_id)
         bug.update(state=bug_state)
 
-    def search_bug(self,**args):
+    def search_bug(self,args):
         """
         根据项目、模块查找bug
         :param args:
         :return:
         """
         #self.filter(**args)
-        bug_version = args.get("version_list")
-        args.pop("version_list")
+        bug_version = args.get("search_versions")
+        args.pop("search_versions")
         if "buger" in args.keys() and "only_me" in args.keys():
             if bug_version == "All":
                 bug_version =99
@@ -212,7 +212,7 @@ class BugManager(models.Manager):
         if "only_me" not in args.keys():
             project_name,module_name,developer_name = args.values()
             if module_name != "" and developer_name != "" and module_name !="All" and developer_name !="All":
-                if bug_version !="All":
+                if bug_version != "All":
                     bug_list = self.filter(Q(project__project_name=project_name)&Q(module__module_name=module_name)&Q(version=bug_version))
                 else:
                     bug_version = 99
@@ -225,20 +225,20 @@ class BugManager(models.Manager):
                     bug_list = self.filter(Q(project__project_name=project_name) & Q(module__module_name=module_name)&~Q(version=bug_version))
             elif module_name =="All" and developer_name == "":
                 if bug_version !="All":
-                    bug_list = self.filter(Q(project__project_name=project_name)&Q(version=bug_version))
+                    bug_list = self.filter(Q(project__project_name=project_name)&Q(version__version=bug_version))
                 else:
                     bug_version = 99
                     bug_list = self.filter(Q(project__project_name=project_name)&~Q(version=bug_version))
             elif module_name == "All" and developer_name !="":
                 if bug_version !="All":
-                    bug_list = self.filter(Q(project__project_name=project_name)&Q(developer__nick_name=developer_name)&Q(version=bug_version))
+                    bug_list = self.filter(Q(project__project_name=project_name)&Q(developer__nick_name=developer_name)&Q(version__version=bug_version))
                 else:
                     bug_version = 99
                     bug_list = self.filter(
                         Q(project__project_name=project_name) & Q(developer__nick_name=developer_name) & ~Q(
                             version=bug_version))
         return list(bug_list.values("id", "project__project_name", "module__module_name", "version__version", "bug_title",
-                        "plantform", "state", "start", "developer__username","buger__nick_name","png"))
+                        "plantform", "state", "start", "developer__nick_name","buger__nick_name","png"))
 
 
 class TestCaseSuiteInfoManager(models.Manager):

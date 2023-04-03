@@ -79,12 +79,13 @@ def bugList(request):
         user_data = jwt.decode(token, "sercet", algorithms=['HS256'])
         user_type = user_data.get("user_type", None)
         username = user_data.get("username", None)
+        data["search_versions"] = data.get("search_versions", None)
         if "only_me" in data.keys():
             if user_type == 3:
                 data["buger"] = username
             else:
                 data["developer"] = username
-        bug_list = Bug.objects.search_bug(**data)
+        bug_list = Bug.objects.search_bug(data)
     else:
         bug_list = Bug.objects.get_all_bug()
 
@@ -95,17 +96,12 @@ def bugList(request):
         bug['state'] = bug_state[bug.get('state')]
         bug['start'] = start_level[bug.get("start")]
         bug_png = bug['png']
-        if bug_png is not None and bug_png != "":
-            if "," in bug_png:
-                bug_png_list = eval(bug_png)
-            else:
-                bug_png_list.append(bug_png)
-
+        if bug_png is not None and bug_png !="":
+            bug_png_list = eval(bug_png)
             bug['png'] = bug_png_list
             bug['png_size'] = 60 * len(bug_png_list)
         if bug["project__project_name"] not in project_list:
             project_list.append(bug["project__project_name"])
-
     bug_info = {
         "bug_info": bug_list,
         "project_list": project_list
@@ -183,6 +179,7 @@ def edit_bug(request):
     :param request:
     :return:
     '''
+    print(request.body.decode("utf-8"))
     if request.is_ajax():
         data = {
             'msg': "更新成功",
@@ -191,6 +188,6 @@ def edit_bug(request):
 
         request_data = json.loads(request.body.decode('utf-8'))
         bug_id = request_data.get("bug_id")
-        bug_state = request_data.get("state")
+        bug_state = request_data.get("state_"+str(bug_id))
         Bug.objects.update_bug(bug_id, bug_state)
         return HttpResponse(json.dumps(data))

@@ -42,7 +42,7 @@
                                                         class="am-input-sm am-input-xm"
                                                         placeholder="开发人员"/></li>
                 <li style="padding-top: 5px">
-                        <select name="version_list" id="version_list" class=" am-input-zm am-input-xm" id="version_list">
+                        <select name="search_versions" id="search_versions" class=" am-input-zm am-input-xm">
                             <option selected value="All">All</option>
                         </select>
                     </li>
@@ -94,11 +94,11 @@
                         <td style="width: 50%">{{ foo.bug_title }}</td>
                         <td><a onclick=""> {{ foo.plantform }}</a></td>
                         <td>
-                            <div id="bug_id_{{ foo.id }}"><a onclick="editstate({{ foo.id }})">{{ foo.state }}</a></div>
+                            <div id="bug_id_{{ foo.id }}"><a onclick="editstate({{ foo.id }},'state')">{{ foo.state }}</a></div>
                         </td>
                         <td>{{ foo.start }}</td>
                         <td><a onclick=""> {{ foo.developer__nick_name }}</a></td>
-                        <td><a onclick=""> {{ foo.buger__nick_name }}</a></td>
+                        <td><div id="developer_id_{{ foo.id }}"><a onclick="editstate({{ foo.id }},'developer')"> {{ foo.buger__nick_name }}</a></div></td>
                         <td id="png_id" style="width:{{ foo.png_size }}px">
                             {% if foo.png %}
                                 {% for png in foo.png %}

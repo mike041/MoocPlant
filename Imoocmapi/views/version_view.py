@@ -42,8 +42,21 @@ def versionList(request):
     :param request:
     :return:
     '''
-    version_list = Version.objects.get_all_version()
-    version_info = {
-        "version_info": version_list
-    }
-    return render(request, "version_list.html", version_info)
+    if request.is_ajax():
+        data = {
+            "msg": "成功",
+            "versions": None
+        }
+        request_data = json.loads(request.body.decode('utf-8'))
+        project_name = request_data.get('project')
+        version_list = Version.objects.get_project_version(project_name)
+        data["versions"] = version_list
+        return HttpResponse(json.dumps(data))
+    else:
+        version_list = Version.objects.get_all_version()
+        version_info = {
+            "version_info": version_list
+        }
+        return render(request, "version_list.html", version_info)
+
+

@@ -16,10 +16,10 @@ def check_login(func):
         else:
             try:
                 user_data = jwt.decode(token, "sercet", algorithms=['HS256'])
-                #user_key = user_data.get("username")
-                #if handle_redis.get_value_str("token_" + user_key) is not None:
+                # user_key = user_data.get("username")
+                # if handle_redis.get_value_str("token_" + user_key) is not None:
                 return func(request, *args, **kwargs)
-                #else:
+                # else:
                 #    return HttpResponseRedirect("/login/")
 
             except jwt.InvalidTokenError:
@@ -37,7 +37,6 @@ def login(request):
         "nick_name": ""
     }
     if request.method == 'POST':
-
         request_data = json.loads(request.body.decode("utf-8"))
         username = request_data.get("username")
         password = request_data.get("password")
@@ -47,10 +46,14 @@ def login(request):
             token = jwt.encode(request_data, "sercet")
             data["token"] = token
             data["nick_name"] = user_info.get("nick_name")
-            #handle_redis.set_value("token_" + username, token)
+            # handle_redis.set_value("token_" + username, token)
             return HttpResponse(json.dumps(data))
         else:
-            return render(request, "login.html")
+            data["code"] = 10001
+            data["msg"] = "用户名或密码错误"
+            return HttpResponse(json.dumps(data))
+            # data["msg"] = "请重新登录用户米"
+            # return render(request, "login.html")
     else:
         token = request.COOKIES.get("token", None)
         if token == "null":
@@ -82,3 +85,15 @@ def index(request):
     device_id = "00008101-00016C9E02F8001E"
     dict_data = {}
     return render(request, "index.html")
+
+
+@check_login
+def get_developer(request):
+    if request.is_ajax():
+        data = {
+            "developer_list": None,
+            "msg": ""
+        }
+        developer_list = UserInfo.objects.get_develop_user()
+        data["developer_list"] = developer_list
+        return HttpResponse(json.dumps(data))
