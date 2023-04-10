@@ -5,7 +5,7 @@ from django.db.models.sql.query import LOOKUP_SEP
 from django.db.models.deletion import Collector
 from django.db.models.fields.related import ForeignObjectRel
 #from django.forms.forms import pretty_name
-from django.utils import formats,six
+from django.utils import formats
 import six
 from django.utils.html import escape
 from django.utils.safestring import mark_safe

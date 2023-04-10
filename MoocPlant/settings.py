@@ -81,7 +81,19 @@ WSGI_APPLICATION = 'MoocPlant.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
+#线上
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',    # 默认
+#         'NAME': 'moocplant',   # 连接的数据库
+#         'HOST': '127.0.0.1',   # mysql的ip地址
+#         'PORT': 3306,  # mysql的端口
+#         'USER': 'root',   # mysql的用户名
+#         'PASSWORD': 'Yzm8hiKMhL830!Mhxz*I5m'  # mysql的密码
+#     }
+# }
 
+#测试
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',    # 默认
@@ -89,9 +101,10 @@ DATABASES = {
         'HOST': '127.0.0.1',   # mysql的ip地址
         'PORT': 3306,  # mysql的端口
         'USER': 'root',   # mysql的用户名
-        'PASSWORD': 'Yzm8hiKMhL830!Mhxz*I5m'  # mysql的密码
+        'PASSWORD': '123456'  # mysql的密码
     }
 }
+
 
 
 # Password validation

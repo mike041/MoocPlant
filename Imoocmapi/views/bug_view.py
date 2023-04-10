@@ -70,7 +70,7 @@ def put_png(request):
 
 @check_login
 def bugList(request):
-    platformItem = {"1": "IOS", "2": "Android", "3": "web", "4": "pc", "5": "pad","6":"服务端"}
+    platformItem = {"1": "IOS", "2": "Android", "3": "web", "4": "pc", "5": "pad", "6": "服务端"}
     start_level = {'1': '1星', '2': '2星', '3': '3星', '4': '4星'}
     bug_state = {'1': '未解决', '2': '已解决', '3': '延期解决', '4': '不解决', '5': '关闭', '6': '激活'}
     if request.is_ajax():
@@ -96,7 +96,7 @@ def bugList(request):
         bug['state'] = bug_state[bug.get('state')]
         bug['start'] = start_level[bug.get("start")]
         bug_png = bug['png']
-        if bug_png is not None and bug_png !="":
+        if bug_png is not None and bug_png != "":
             bug_png_list = eval(bug_png)
             bug['png'] = bug_png_list
             bug['png_size'] = 60 * len(bug_png_list)
@@ -112,7 +112,6 @@ def bugList(request):
         return render(request, 'bug_list.html', bug_info)
 
 
-
 @check_login
 def addBug(request):
     if request.is_ajax():
@@ -126,7 +125,14 @@ def addBug(request):
         module_name = request_data.get("module")
         version = request_data.get("version")
         if module_name == "请选择":
-            return HttpResponse(json.dumps(module_info))
+            versionandmodule = {
+                "module_list": None,
+                "version_list": None
+            }
+            version_list = Version.objects.get_project_version(project_name)
+            versionandmodule["version_list"] = version_list
+            versionandmodule["module_list"] = module_list
+            return HttpResponse(json.dumps(versionandmodule))
         elif version == "请选择":
             version_info = {
                 "version_list": None
@@ -154,6 +160,7 @@ def addBug(request):
             request_data['developer'] = developer_object
             request_data['buger'] = buger_object
             Bug.objects.add_bug(**request_data)
+            # todo  新增推送
             return HttpResponse(json.dumps(data))
             '''
             except:
@@ -187,6 +194,6 @@ def edit_bug(request):
 
         request_data = json.loads(request.body.decode('utf-8'))
         bug_id = request_data.get("bug_id")
-        bug_state = request_data.get("state_"+str(bug_id))
+        bug_state = request_data.get("state_" + str(bug_id))
         Bug.objects.update_bug(bug_id, bug_state)
         return HttpResponse(json.dumps(data))

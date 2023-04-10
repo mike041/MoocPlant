@@ -3,7 +3,7 @@
 {% load static %}
 {% block content %}
 
-    <div class=" admin-content" >
+    <div class=" admin-content">
 
         <div class="admin-biaogelist" style="top: 0px">
             <div class="listbiaoti am-cf">
@@ -29,8 +29,7 @@
                     <div class="form-group  has-feedback">
                         <label class="control-label col-md-1 text-primary" for="dev_user">模块：</label>
                         <div class="col-md-5">
-                            <select name="module" class="form-control"
-                                    onchange="auto_load_module('#add_bug','/add_bug/','versions')" id="module">
+                            <select name="module" class="form-control" id="module">
                                 <option>请选择</option>
                             </select>
                         </div>
@@ -90,7 +89,7 @@
                                 <option value='2'>已解决</option>
                                 <option value='3'>延期解决</option>
                                 <option value='4'>不解决</option>
-                                <option value='5'>延期</option>
+                                <option value='5'>关闭</option>
                                 <option value='6'>激活</option>
                             </select>
                         </div>
@@ -121,7 +120,8 @@
                                       data-overwrite-initial="false" data-min-file-count="1" onpaste="fileinput()"/>
 
                         </div>-->
-                        <div class="col-md-5" id="aaa" name="aaa" contentEditable="true" style="height:200px;width:40%;border:1px solid #ccc;margin-left: 15px"></div>
+                        <div class="col-md-5" id="aaa" name="aaa" contentEditable="true"
+                             style="height:200px;width:40%;border:1px solid #ccc;margin-left: 15px"></div>
                         <!--<input id="png" name="png" type="text" value=""/>-->
                     </div>
                     <div class="am-form-group am-cf">
