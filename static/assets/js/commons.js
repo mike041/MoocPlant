@@ -53,8 +53,7 @@ function info_ajax(id, url) {
                 } else {
                     myAlert(data);
                 }
-            }
-            else {
+            } else {
                 window.location.reload();
             }
         }
@@ -68,7 +67,7 @@ function info_ajax(id, url) {
 
 function auto_load(id, url, target, type) {
     var data = $(id).serializeJSON();
-    if (id === '#form_message' || id ==='#belong_message' || id === '#pro_filter') {
+    if (id === '#form_message' || id === '#belong_message' || id === '#pro_filter') {
         data = {
             "test": {
                 "name": data,
@@ -110,7 +109,7 @@ function auto_load(id, url, target, type) {
 
 }
 
-function auto_load_module(id, url,types) {
+function auto_load_module(id, url, types) {
     const csrftoken = getCookie('csrftoken');
     var data = $(id).serializeJSON();
     var url_list = [];
@@ -119,11 +118,11 @@ function auto_load_module(id, url,types) {
         url_list.push(png_list[i].getAttribute("src"));
     }
     data["png"] = url_list
-    if(types == 'module'){
+    if (types == 'module') {
         data['module'] = '请选择'
         data['version'] = '请选择'
     }
-    if(types =='versions'){
+    if (types == 'versions') {
         data['version'] = '请选择'
     }
     $.ajax({
@@ -133,11 +132,12 @@ function auto_load_module(id, url,types) {
         data: JSON.stringify(data),
         contentType: "application/json",
         success: function (data) {
-            if(types =="module"){
+            if (types == "module") {
                 show_module(data)
-            }else if(types=="versions"){
                 show_version(data)
-            }else {
+            } else if (types == "versions") {
+                show_version(data)
+            } else {
                 var msg = JSON.parse(data)
                 myAlert(msg['msg']);
             }
@@ -151,21 +151,21 @@ function auto_load_module(id, url,types) {
 
 }
 
-function show_project(location,url) {
+function show_project(location, url) {
     data = {}
     $.ajax({
         type: 'post',
         url: url,
         data: JSON.stringify(data),
         contentType: "application/json",
-        success: function (data){
+        success: function (data) {
             var project_list = JSON.parse(data)["project_info"]
             var a = $(location)
             var result = []
             a.empty()
             a.prepend("<option >请选择</option>")
             for (var i = 0; i < project_list.length; i++) {
-                if (project_list[i]!== "") {
+                if (project_list[i] !== "") {
                     var value = project_list[i]['project_name'];
                     var num = result.indexOf(value)
                     if (num > -1) {
@@ -179,13 +179,14 @@ function show_project(location,url) {
         }
     })
 }
-function show_version(data){
+
+function show_version(data) {
     var version_list = JSON.parse(data)["version_list"]
     var a = $('#version')
     var result = []
     a.empty()
     a.prepend("<option >请选择</option>")
-    for (var i =0;i<version_list.length;i++) {
+    for (var i = 0; i < version_list.length; i++) {
         if (version_list[i] !== "") {
             var value = version_list[i]['version'];
             var num = result.indexOf(value)
@@ -202,7 +203,7 @@ function show_version(data){
 
 function show_module(module_info) {
     //module_info = module_info.split('replaceFlag');
-    module_info = JSON.parse(module_info)['module']
+    var module_list = JSON.parse(module_info)['module_list']
     var version = $('#version')
     version.empty();
     //version.options.length=0;
@@ -211,13 +212,13 @@ function show_module(module_info) {
     var a = $('#module');
     var result = []
     a.empty();
-    for (var i = 0; i < module_info.length; i++) {
-        if (module_info[i] !== "") {
-            var value = module_info[i]['module_name'];
+    for (var i = 0; i < module_list.length; i++) {
+        if (module_list[i] !== "") {
+            var value = module_list[i]['module_name'];
             var num = result.indexOf(value)
-            if (num>-1){
+            if (num > -1) {
                 continue
-            }else{
+            } else {
                 result.push(value)
                 a.prepend("<option value='" + value + "' >" + value + "</option>")
             }
@@ -228,7 +229,7 @@ function show_module(module_info) {
 
 }
 
-function add_module(id,url){
+function add_module(id, url) {
     const csrftoken = getCookie('csrftoken');
     var data = $(id).serializeJSON();
     $.ajax({
@@ -249,7 +250,7 @@ function add_module(id,url){
 
 }
 
-function select_module(){
+function select_module() {
     const csrftoken = getCookie('csrftoken')
     var a = $('#project');
     var module = $('#module')
@@ -258,15 +259,15 @@ function select_module(){
     show_version_by_project(data)
     $.ajax({
         type: 'post',
-        headers:{"X-CSRFToken":csrftoken},
+        headers: {"X-CSRFToken": csrftoken},
         url: '/module_list/',
         data: JSON.stringify(data),
         contentType: "application/json",
         success: function (data) {
             module.append("<option selected value=\"All\">All</option>")
             var module_list = JSON.parse(data)["module"]
-            for(var i=0;i<module_list.length;i++){
-                module.append("<option value='"+module_list[i]['module_name']+"'>"+module_list[i]['module_name']+"</option>")
+            for (var i = 0; i < module_list.length; i++) {
+                module.append("<option value='" + module_list[i]['module_name'] + "'>" + module_list[i]['module_name'] + "</option>")
             }
         }
     })
@@ -279,48 +280,48 @@ function show_version_by_project(project_name) {
     var version_list = null;
     version.children().remove();
     $.ajax({
-        type:'post',
-        headers:{"X-CSRFToken":csrftoken},
+        type: 'post',
+        headers: {"X-CSRFToken": csrftoken},
         url: '/version_list/',
         data: JSON.stringify(project_name),
         contentType: "application/json",
-        success: function (data){
+        success: function (data) {
             version_list = JSON.parse(data)["versions"]
             version.append("<option value='All' selected>All</option>")
-            for(var i=0;i<version_list.length;i++){
-                version.append("<option value='"+version_list[i]['version']+"'>"+version_list[i]['version']+"</option>")
+            for (var i = 0; i < version_list.length; i++) {
+                version.append("<option value='" + version_list[i]['version'] + "'>" + version_list[i]['version'] + "</option>")
             }
         }
     })
 
 }
 
-function editstate(bug_id,edit_type){
-    if(edit_type=="developer" || edit_type==1){
+function editstate(bug_id, edit_type) {
+    if (edit_type == "developer" || edit_type == 1) {
         const csrftoken = getCookie('csrftoken')
-        var developer = $('#developer_id_'+bug_id)
+        var developer = $('#developer_id_' + bug_id)
         developer.children().remove()
         $.ajax({
             type: "POST",
             url: "/develop_list/",
-            headers:{"X-CSRFToken":csrftoken},
-            data:"",
+            headers: {"X-CSRFToken": csrftoken},
+            data: "",
             contentType: "application/json",
-            success: function(data){
+            success: function (data) {
                 data = JSON.parse(data)['developer_list']
-                developer.prepend('<select name="developer_list" class="form-control" id="developer_list" onchange="update_bug('+bug_id+')" ></select>')
+                developer.prepend('<select name="developer_list" class="form-control" id="developer_list" onchange="update_bug(' + bug_id + ')" ></select>')
                 var debeloper_list = $('#developer_list')
-                for(var i=0;i<data.length;i++){
-                    debeloper_list.append("<option value='"+data[i]['id']+"'>"+data[i]['nick_name']+"</option>")
+                for (var i = 0; i < data.length; i++) {
+                    debeloper_list.append("<option value='" + data[i]['id'] + "'>" + data[i]['nick_name'] + "</option>")
                 }
             }
         })
 
 
-    }else{
-        var bug = $('#bug_id_'+bug_id)
+    } else {
+        var bug = $('#bug_id_' + bug_id)
         bug.children().remove()
-        bug.prepend('<select name="state_'+bug_id+'"  class="form-control" onchange="update_bug('+bug_id+')" id="state_'+bug_id+'">\n' +
+        bug.prepend('<select name="state_' + bug_id + '"  class="form-control" onchange="update_bug(' + bug_id + ')" id="state_' + bug_id + '">\n' +
             '                                <option >请选择</option>\n' +
             '                                <option value="1" >未解决</option>\n' +
             '                                <option value="2" >已解决</option>\n' +
@@ -332,7 +333,7 @@ function editstate(bug_id,edit_type){
     }
 }
 
-function search_bug(){
+function search_bug() {
     const csrftoken = getCookie('csrftoken')
     var a = $('#pro_filter');
     var data = a.serializeJSON()
@@ -341,23 +342,23 @@ function search_bug(){
     var png_list;
     $.ajax({
         type: 'post',
-        headers:{"X-CSRFToken":csrftoken},
+        headers: {"X-CSRFToken": csrftoken},
         url: '/bug_list/',
         data: JSON.stringify(data),
         contentType: "application/json",
         success: function (data) {
             data = JSON.parse(data)["bug_info"]
-            for(var i=0;i<data.length;i++){
+            for (var i = 0; i < data.length; i++) {
                 var bug_id = data[i]["id"]
-                table_body.prepend('<tr><td><label><input type="checkbox" name="bug_'+bug_id+'" value="'+data[i]["id"]+'"/></label></td><td id="bug_num">'+data[i]["id"]+'</td><td><a href="#" onclick="">'+data[i]["project__project_name"]+'</a></td>' +
-                    '<td>'+data[i]["module__module_name"]+'</td><td>'+data[i]["version__version"]+'</td>' +
-                    '<td style="width: 50%">'+data[i]["bug_title"]+'</td><td><a onclick=""> '+data[i]["plantform"]+'</a></td><td><div id=bug_id_'+data[i]["id"]+'><a onclick="editstate('+bug_id+')">'+data[i]["state"]+'</a></div></td>'+
-                    '<td>'+data[i]["start"]+'</td><td><div id="developer_id_'+bug_id+'"><a onclick="editstate('+bug_id+',1)">'+data[i]["developer__nick_name"]+'</a></div></td><td>'+data[i]["buger__nick_name"]+'</td><td id="png_url_'+data[i]["id"]+'" style="width:"'+data[i]["png_size"]+'"px"></td></tr>')
-                png_list = $('#png_url_'+data[i]["id"])
+                table_body.prepend('<tr><td><label><input type="checkbox" name="bug_' + bug_id + '" value="' + data[i]["id"] + '"/></label></td><td id="bug_num">' + data[i]["id"] + '</td><td><a href="#" onclick="">' + data[i]["project__project_name"] + '</a></td>' +
+                    '<td>' + data[i]["module__module_name"] + '</td><td>' + data[i]["version__version"] + '</td>' +
+                    '<td style="width: 50%">' + data[i]["bug_title"] + '</td><td><a onclick=""> ' + data[i]["plantform"] + '</a></td><td><div id=bug_id_' + data[i]["id"] + '><a onclick="editstate(' + bug_id + ')">' + data[i]["state"] + '</a></div></td>' +
+                    '<td>' + data[i]["start"] + '</td><td><div id="developer_id_' + bug_id + '"><a onclick="editstate(' + bug_id + ',1)">' + data[i]["developer__nick_name"] + '</a></div></td><td>' + data[i]["buger__nick_name"] + '</td><td id="png_url_' + data[i]["id"] + '" style="width:"' + data[i]["png_size"] + '"px"></td></tr>')
+                png_list = $('#png_url_' + data[i]["id"])
 
-                if(data[i]['png']!=null){
-                    for(var png_url=0;png_url<data[i]['png'].length;png_url++){
-                        png_list.append('<div id="container" class="logoImg amplifyImg" style="display: inline"><img onclick="BigBig(this.src, this.width, this.height);" data-target="#myModal" data-toggle="modal" style="width: 50px;" src="'+data[i]['png'][png_url]+'"/></div>')
+                if (data[i]['png'] != null) {
+                    for (var png_url = 0; png_url < data[i]['png'].length; png_url++) {
+                        png_list.append('<div id="container" class="logoImg amplifyImg" style="display: inline"><img onclick="BigBig(this.src, this.width, this.height);" data-target="#myModal" data-toggle="modal" style="width: 50px;" src="' + data[i]['png'][png_url] + '"/></div>')
                     }
                 }
 
@@ -377,8 +378,7 @@ function update_data_ajax(id, url) {
         success: function (data) {
             if (data !== 'ok') {
                 myAlert(data);
-            }
-            else {
+            } else {
                 window.location.reload();
             }
         },
@@ -401,8 +401,7 @@ function del_data_ajax(id, url) {
         success: function (data) {
             if (data !== 'ok') {
                 myAlert(data);
-            }
-            else {
+            } else {
                 window.location.reload();
             }
         },
@@ -425,8 +424,7 @@ function copy_data_ajax(id, url) {
         success: function (data) {
             if (data !== 'ok') {
                 myAlert(data);
-            }
-            else {
+            } else {
                 window.location.reload();
             }
         },
@@ -445,9 +443,8 @@ function case_ajax(type, editor) {
     var request_data = null;
     if (dataType.DataType === 'json') {
         try {
-            request_data  = eval('(' + editor.session.getValue() + ')');
-        }
-        catch (err) {
+            request_data = eval('(' + editor.session.getValue() + ')');
+        } catch (err) {
             myAlert('Json格式输入有误！');
             return
         }
@@ -510,7 +507,7 @@ function case_ajax(type, editor) {
 }
 
 
-function bug_ajax(){
+function bug_ajax() {
     var projectId = "test"
 }
 
@@ -524,8 +521,7 @@ function config_ajax(type) {
     if (dataType.DataType === 'json') {
         try {
             request_data = eval('(' + editor.session.getValue() + ')');
-        }
-        catch (err) {
+        } catch (err) {
             myAlert('Json格式输入有误！');
             return
         }
@@ -689,12 +685,11 @@ function init_acs(language, theme, editor) {
 }
 
 
-
-function update_bug(bug_id){
+function update_bug(bug_id) {
     const csrftoken = getCookie('csrftoken');
-    var data = $('#state_'+bug_id).serializeJSON();
+    var data = $('#state_' + bug_id).serializeJSON();
     data['bug_id'] = bug_id
-    data['developer_id'] =$('#developer_list').serializeJSON()['developer_list'];
+    data['developer_id'] = $('#developer_list').serializeJSON()['developer_list'];
     $.ajax({
         type: 'post',
         headers: {'X-CSRFToken': csrftoken},
@@ -705,8 +700,7 @@ function update_bug(bug_id){
             data = JSON.parse(data)['state']
             if (data !== 10000) {
                 myAlert(data['msg']);
-            }
-            else {
+            } else {
                 //window.location.reload();
                 search_bug()
             }
@@ -716,23 +710,24 @@ function update_bug(bug_id){
         }
     });
 }
+
 function BigBig(src, width, height) {
-            $('#myModal').on('show.bs.modal', function () {
-                var modal = $(this);
-                modal.find('.modal-dialog').css({'margin-left':(document.body.clientWidth - width*1)/3 + 'px'})
-                modal.find('.modal-body #image').attr("src", src)
-                    .attr("width", width*10)
-                    .attr("height", height*10);
-            });
-        }
+    $('#myModal').on('show.bs.modal', function () {
+        var modal = $(this);
+        modal.find('.modal-dialog').css({'margin-left': (document.body.clientWidth - width * 1) / 3 + 'px'})
+        modal.find('.modal-body #image').attr("src", src)
+            .attr("width", width * 10)
+            .attr("height", height * 10);
+    });
+}
 
 function showimage(source) {
     $("#ShowImage_Form #img_show").html("<image src='" + source + "' class='carousel-inner img-responsive img-rounded' style='cursor: pointer;'/>");
     $("#ShowImage_Form").modal("show");
 }
 
-function login(){
-    var userinfo=$('#login_form').serializeJSON();
+function login() {
+    var userinfo = $('#login_form').serializeJSON();
     $.ajax({
         type: 'post',
         headers: {'X-CSRFToken': getCookie('csrftoken')},
@@ -743,8 +738,7 @@ function login(){
             data = JSON.parse(data)['status']
             if (data === 10000) {
                 window.location.reload();
-            }
-            else {
+            } else {
                 myAlert(data['msg']);
             }
         },
