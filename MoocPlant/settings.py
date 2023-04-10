@@ -133,6 +133,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static/'),
+    os.path.join(BASE_DIR, 'xadmin/static/'),
 )
 OSS_SECRET_ID = "AKIDRksnW2JSN4bv1ukOgqxtb8VjmbFiz2FO"
 OSS_SECRET_KEY = "6B6qPkz66xeBYlnjU3QbaP0Um3GI8jCW"
