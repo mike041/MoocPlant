@@ -24,10 +24,10 @@
                     <li style="padding-top: 5px">
                         <select name="project" id="project" class="am-input-zm am-input-xm"
                                 onchange="select_module()">
-                        <option value="All">All</option>
+                        <option value="All" selected>All</option>
                             {% for project_name in project_list %}
                                 <option value="{{ project_name }}"
-                                        selected>{{ project_name }}</option>
+                                        >{{ project_name }}</option>
                             {% endfor %}
 
                         </select>
