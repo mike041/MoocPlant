@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-92%*-$#kz(cua!nm&ku#4=5&b!m2(4br7r&_wnr=rl_(srme5)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -89,7 +89,7 @@ DATABASES = {
         'HOST': '127.0.0.1',   # mysql的ip地址
         'PORT': 3306,  # mysql的端口
         'USER': 'root',   # mysql的用户名
-        'PASSWORD': 'test1234'  # mysql的密码
+        'PASSWORD': 'Yzm8hiKMhL830!Mhxz*I5m'  # mysql的密码
     }
 }
 
