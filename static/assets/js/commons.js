@@ -115,11 +115,9 @@ function auto_load_module(id, url,types) {
     var data = $(id).serializeJSON();
     var url_list = [];
     var png_list = $("#aaa").children()
-    console.log(png_list.length);
     for (var i = 0; i < png_list.length; i++) {
         url_list.push(png_list[i].getAttribute("src"));
     }
-    console.log(url_list)
     data["png"] = url_list
     if(types == 'module'){
         data['module'] = '请选择'
@@ -162,7 +160,6 @@ function show_project(location,url) {
         contentType: "application/json",
         success: function (data){
             var project_list = JSON.parse(data)["project_info"]
-            console.log(project_list)
             var a = $(location)
             var result = []
             a.empty()
@@ -311,7 +308,6 @@ function editstate(bug_id,edit_type){
             contentType: "application/json",
             success: function(data){
                 data = JSON.parse(data)
-                console.log(data)
             }
         })
 
@@ -693,7 +689,6 @@ function update_bug(bug_id){
     const csrftoken = getCookie('csrftoken');
     var data = $('#state_'+bug_id).serializeJSON();
     data['bug_id'] = bug_id
-    console.log(data)
     $.ajax({
         type: 'post',
         headers: {'X-CSRFToken': csrftoken},
@@ -732,7 +727,6 @@ function showimage(source) {
 
 function login(){
     var userinfo=$('#login_form').serializeJSON();
-    console.log(JSON.stringify(userinfo))
     $.ajax({
         type: 'post',
         headers: {'X-CSRFToken': getCookie('csrftoken')},
