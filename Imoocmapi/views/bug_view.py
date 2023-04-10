@@ -184,9 +184,12 @@ def edit_bug(request):
             'msg': "更新成功",
             'state': 10000
         }
-
         request_data = json.loads(request.body.decode('utf-8'))
         bug_id = request_data.get("bug_id")
-        bug_state = request_data.get("state_"+str(bug_id))
-        Bug.objects.update_bug(bug_id, bug_state)
+        if "developer_id" in request_data.keys():
+            developer_nick_name = request_data.get("developer_id")
+            Bug.objects.update_bug(bug_id=bug_id, developer=developer_nick_name)
+        else:
+            bug_state = request_data.get("state_"+str(bug_id))
+            Bug.objects.update_bug(bug_id=bug_id, bug_state=bug_state)
         return HttpResponse(json.dumps(data))

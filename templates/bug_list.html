@@ -97,8 +97,8 @@
                             <div id="bug_id_{{ foo.id }}"><a onclick="editstate({{ foo.id }},'state')">{{ foo.state }}</a></div>
                         </td>
                         <td>{{ foo.start }}</td>
-                        <td><a onclick=""> {{ foo.developer__nick_name }}</a></td>
-                        <td><div id="developer_id_{{ foo.id }}"><a onclick="editstate({{ foo.id }},'developer')"> {{ foo.buger__nick_name }}</a></div></td>
+                        <td><div id="developer_id_{{ foo.id }}"><a onclick="editstate({{ foo.id }},'developer')"> {{ foo.developer__nick_name }}</a></div></td>
+                        <td> {{ foo.buger__nick_name }}</td>
                         <td id="png_id" style="width:{{ foo.png_size }}px">
                             {% if foo.png %}
                                 {% for png in foo.png %}

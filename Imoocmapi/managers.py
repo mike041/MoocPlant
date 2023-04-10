@@ -37,7 +37,7 @@ class UserInfoManager(models.Manager):
         获取所有开发人员
         :return:
         '''
-        nick_name_list = self.filter(user_type=2).values("nick_name")
+        nick_name_list = self.filter(user_type=2).values("id","nick_name")
         nick_name_data = list([nick_name for nick_name in nick_name_list])
         return nick_name_data
 
@@ -181,15 +181,17 @@ class BugManager(models.Manager):
         # self.values("id","project__")
         return bug_list
 
-    def update_bug(self,bug_id,bug_state):
+    def update_bug(self,bug_id,bug_state=None,developer=None):
         '''
         更新bug
         :param bug_id:
         :return:
         '''
         bug = self.filter(id=bug_id)
-        bug.update(state=bug_state)
-
+        if bug_state is not None:
+            bug.update(state=bug_state)
+        else:
+            bug.update(developer=int(developer))
     def search_bug(self,args):
         """
         根据项目、模块查找bug

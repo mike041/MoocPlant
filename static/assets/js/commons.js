@@ -296,7 +296,7 @@ function show_version_by_project(project_name) {
 }
 
 function editstate(bug_id,edit_type){
-    if(edit_type=="developer"){
+    if(edit_type=="developer" || edit_type==1){
         const csrftoken = getCookie('csrftoken')
         var developer = $('#developer_id_'+bug_id)
         developer.children().remove()
@@ -307,7 +307,12 @@ function editstate(bug_id,edit_type){
             data:"",
             contentType: "application/json",
             success: function(data){
-                data = JSON.parse(data)
+                data = JSON.parse(data)['developer_list']
+                developer.prepend('<select name="developer_list" class="form-control" id="developer_list" onchange="update_bug('+bug_id+')" ></select>')
+                var debeloper_list = $('#developer_list')
+                for(var i=0;i<data.length;i++){
+                    debeloper_list.append("<option value='"+data[i]['id']+"'>"+data[i]['nick_name']+"</option>")
+                }
             }
         })
 
@@ -347,7 +352,7 @@ function search_bug(){
                 table_body.prepend('<tr><td><label><input type="checkbox" name="bug_'+bug_id+'" value="'+data[i]["id"]+'"/></label></td><td id="bug_num">'+data[i]["id"]+'</td><td><a href="#" onclick="">'+data[i]["project__project_name"]+'</a></td>' +
                     '<td>'+data[i]["module__module_name"]+'</td><td>'+data[i]["version__version"]+'</td>' +
                     '<td style="width: 50%">'+data[i]["bug_title"]+'</td><td><a onclick=""> '+data[i]["plantform"]+'</a></td><td><div id=bug_id_'+data[i]["id"]+'><a onclick="editstate('+bug_id+')">'+data[i]["state"]+'</a></div></td>'+
-                    '<td>'+data[i]["start"]+'</td><td><a onclick=""> '+data[i]["developer__nick_name"]+'</a></td><td><a onclick=""> '+data[i]["buger__nick_name"]+'</a></td><td id="png_url_'+data[i]["id"]+'" style="width:"'+data[i]["png_size"]+'"px"></td></tr>')
+                    '<td>'+data[i]["start"]+'</td><td><div id="developer_id_'+bug_id+'"><a onclick="editstate('+bug_id+',1)">'+data[i]["developer__nick_name"]+'</a></div></td><td>'+data[i]["buger__nick_name"]+'</td><td id="png_url_'+data[i]["id"]+'" style="width:"'+data[i]["png_size"]+'"px"></td></tr>')
                 png_list = $('#png_url_'+data[i]["id"])
 
                 if(data[i]['png']!=null){
@@ -689,6 +694,7 @@ function update_bug(bug_id){
     const csrftoken = getCookie('csrftoken');
     var data = $('#state_'+bug_id).serializeJSON();
     data['bug_id'] = bug_id
+    data['developer_id'] =$('#developer_list').serializeJSON()['developer_list'];
     $.ajax({
         type: 'post',
         headers: {'X-CSRFToken': csrftoken},
