@@ -173,9 +173,11 @@ class BugManager(models.Manager):
         展示所有bug
         :return:
         '''
-        bug_list = list(
-            self.values("id", "project__project_name", "module__module_name", "version__version", "bug_title",
+        bug_list_object = self.filter(~Q(state=5))
+        #bug_list.values()
+        bug_list = list(bug_list_object.values("id", "project__project_name", "module__module_name", "version__version", "bug_title",
                         "plantform", "state", "start", "developer__nick_name","buger__nick_name","png"))
+            #self.values())
         # self.values("id","project__")
         return bug_list
 

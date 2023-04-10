@@ -179,7 +179,6 @@ def edit_bug(request):
     :param request:
     :return:
     '''
-    print(request.body.decode("utf-8"))
     if request.is_ajax():
         data = {
             'msg': "更新成功",

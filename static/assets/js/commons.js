@@ -299,7 +299,7 @@ function show_version_by_project(project_name) {
 }
 
 function editstate(bug_id,edit_type){
-    if(edit_type="developer"){
+    if(edit_type=="developer"){
         const csrftoken = getCookie('csrftoken')
         var developer = $('#developer_id_'+bug_id)
         developer.children().remove()
@@ -325,7 +325,7 @@ function editstate(bug_id,edit_type){
             '                                <option value="2" >已解决</option>\n' +
             '                                <option value="3" >延期解决</option>\n' +
             '                                <option value="4" >不解决</option>\n' +
-            '                                <option value="5" >延期</option>\n' +
+            '                                <option value="5" >关闭</option>\n' +
             '                                <option value="6" >激活</option>\n' +
             '                            </select>')
     }
