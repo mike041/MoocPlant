@@ -33,6 +33,7 @@ urlpatterns = [
                   path('add_module/', module_view.addModule),
                   path('im_performance/', base_view.imPerformance),
                   path('chat_performance/', base_view.chatPerformance),
+                  path('interface_performance/',base_view.interfacePerformance),
                   path('im_chat/', base_view.imChat),
                   path('add_version/', version_view.addVersion),
                   path('version_list/', version_view.versionList),

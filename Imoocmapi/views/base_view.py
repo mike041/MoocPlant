@@ -70,6 +70,14 @@ def chatPerformance(request):
     return render(request, "chat_performance.html")
 
 
+def interfacePerformance(request):
+    """
+    接口压测
+    :param request:
+    :return:
+    """
+    return render(request,"interfacePerformance.html")
+
 def imChat(request):
     '''
     :param request:

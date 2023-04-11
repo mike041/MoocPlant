@@ -2,10 +2,10 @@
 {% block title %}环境管理{% endblock %}
 {% load static %}
 {% block content %}
-    <div class="admin-biaogelist">
+    <div class="admin-biaogelist" style="top: 0px">
         <div class="listbiaoti am-cf">
-            <ul class="am-icon-flag on"> 版本管理</ul>
-            <dl class="am-icon-home" style="float: right;"> 当前位置： 系统设置 > <a href="#">版本管理</a></dl>
+            <ul class="am-icon-flag on"> 接口测试</ul>
+            <dl class="am-icon-home" style="float: right;"> 当前位置： 系统设置 > <a href="#">接口测试</a></dl>
         </div>
         <form class="am-form am-g">
             <table width="100%" class="am-table am-table-bordered am-table-radius am-table-striped">
@@ -13,9 +13,11 @@
                 <tr class="am-success">
                     <th class="table-check"><input type="checkbox" id="select_all"/></th>
                     <th class="table-title">序号</th>
-                    <th class="table-type">版本名称(版本号)</th>
-                    <th class="table-type">项目名称</th>
-                    <th class="table-type">版本描述</th>
+                    <th class="table-type">项目</th>
+                    <th class="table-type">模块</th>
+                    <th class="table-type">接口</th>
+                    <th class="table-type">请求方式</th>
+                    <th class="table-type">运行</th>
                 </tr>
                 </thead>
                 <tbody>

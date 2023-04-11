@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from rest_framework import serializers
 
-from .user_view import check_login
+from .user_view import check_login, get_username
 from ..models import ProjectInfo
 from django.forms.models import model_to_dict
 
@@ -46,10 +46,8 @@ def projectList(request):
     :return:
     '''
 
-    # projects = ProjectInfo.objects.values("id","project_name")
-    # project_data = list([project for project in projects])
-    project_data = ProjectInfo.objects.get_project_name_list()
-
+    user_name = get_username(request)
+    project_data = ProjectInfo.objects.get_project_by_username(user_name)
     project_info = {
         "project_info": project_data
     }

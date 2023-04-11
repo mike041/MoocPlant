@@ -2,4 +2,17 @@
 {% block title %}模块信息{% endblock %}
 {% load static %}
 {% block content %}
+    <div class="admin-biaogelist" style="top: 0px">
+        <div class="listbiaoti am-cf">
+            <ul class="am-icon-flag on"> 新增接口</ul>
+            <dl class="am-icon-home" style="float: right;"> 当前位置： 新增接口 ></dl>
+        </div>
+        <form class="am-form am-g">
+            <p>大兄弟，别着急，还没开始!
+            <ul class="am-pagination am-fr">
+                {{ page_list }}
+            </ul>
+            <hr/>
+        </form>
+    </div>
 {% endblock %}

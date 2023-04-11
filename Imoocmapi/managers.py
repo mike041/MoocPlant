@@ -69,6 +69,11 @@ class UserInfoManager(models.Manager):
         result = self.filter(username=username).values("mind_uid").first()
         return result
 
+    def get_project_id_by_username(self,username):
+        result = self.filter(username=username)
+        return result
+
+
 
 class ProjectInfoManager(models.Manager):
     """
@@ -119,6 +124,14 @@ class ProjectInfoManager(models.Manager):
         projects = self.values("id", "project_name", "simple_desc", "create_time")
         project_data = list([project for project in projects])
         return project_data
+
+    def get_project_by_username(self, username):
+        """
+        根据用户名获取项目
+        :return:
+        """
+        user_info = self.filter(user__username=username).values("project_name")
+        return user_info
 
 
 class ModuleInfoManager(models.Manager):
