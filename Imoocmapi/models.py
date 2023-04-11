@@ -15,6 +15,17 @@ class BaseTable(models.Model):
         db_table = 'BaseTable'
 
 
+class UserInfoType(BaseTable):
+    class Meta:
+        verbose_name = '用户类型'
+        db_table = "UserInfoType"
+
+    user_type = models.CharField(verbose_name='用户类型名字', max_length=10)
+
+    def __str__(self):
+        return self.user_type
+
+
 class ProjectInfo(BaseTable):
     class Meta:
         verbose_name = '项目信息'
@@ -29,17 +40,6 @@ class ProjectInfo(BaseTable):
         return self.project_name
 
 
-class UserInfoType(BaseTable):
-    class Meta:
-        verbose_name = '用户类型'
-        db_table = "UserInfoType"
-
-    user_type = models.CharField(verbose_name='用户类型名字', max_length=10)
-
-    def __str__(self):
-        return self.user_type
-
-
 class UserInfo(BaseTable):
     class Meta:
         verbose_name = '用户信息'
@@ -52,7 +52,7 @@ class UserInfo(BaseTable):
     status = models.IntegerField(verbose_name='用户状态', default=1)
     user_type = models.ForeignKey(UserInfoType, on_delete=models.CASCADE, max_length=10, default=2)
     mind_uid = models.CharField(verbose_name='mind用户id', max_length=50, null=True, blank=True)
-    project = models.ForeignKey(ProjectInfo, related_name="user", on_delete=models.CASCADE, max_length=10, blank=True, null=True)
+    project_name = models.ForeignKey(ProjectInfo, verbose_name="项目", on_delete=models.CASCADE, null=True)
     objects = UserInfoManager()
 
     def __str__(self):

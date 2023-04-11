@@ -180,12 +180,26 @@ def addBug(request):
             '''
 
     else:
-        project_list = ProjectInfo.objects.get_project_name_list()
-        developer_list = UserInfo.objects.get_develop_user()
+        token = request.COOKIES.get("token", None)
+        user_data = jwt.decode(token, "sercet", algorithms=['HS256'])
+        username = user_data.get("username", None)
+        # todo 修改新增bug逻辑
+        project_name = UserInfo.objects.get_project_name(username)
+
+        developer_list = UserInfo.objects.get_develop_user(project_name)
+        version_list = Version.objects.get_project_version(project_name)
+        module_list = ModuleInfo.objects.get_module_name(project_name)
         project = {
-            "project_list": project_list,
-            "developer_list": developer_list
+            "project": project_name,
+            "developer_list": developer_list,
+            "module_list": module_list,
+            "version_list": version_list,
         }
+        print(developer_list)
+        print('========================================================')
+        print(module_list)
+        print('========================================================')
+        print(version_list)
         return render(request, 'add_bug.html', context=project)
 
 

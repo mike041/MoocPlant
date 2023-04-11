@@ -32,12 +32,12 @@ class UserInfoManager(models.Manager):
         """
         return self.filter(username=username, password=password).count()
 
-    def get_develop_user(self):
+    def get_develop_user(self, project_name):
         '''
         获取所有开发人员
         :return:
         '''
-        nick_name_list = self.filter(user_type=2).values("id", "nick_name")
+        nick_name_list = self.filter(user_type=2, project_name=project_name).values("id", "nick_name")
         nick_name_data = list([nick_name for nick_name in nick_name_list])
         return nick_name_data
 
@@ -60,19 +60,23 @@ class UserInfoManager(models.Manager):
         result = self.filter(nick_name=user_name).values("mind_uid").first()
         return result
 
-    def get_mind_id_by_username(self, username):
+    def get_mind_id_by_username(self, user_name):
         '''
         根据username获取mind uid
-        :param username:
+        :param user_name:
         :return:
         '''
-        result = self.filter(username=username).values("mind_uid").first()
+        result = self.filter(username=user_name).values("mind_uid").first()
         return result
 
-    def get_project_id_by_username(self,username):
-        result = self.filter(username=username)
-        return result
-
+    def get_project_name(self, user_name):
+        '''
+        根据username获取project_name
+        :param user_name:
+        :return:
+        '''
+        project_name = self.get(username=user_name).project_name
+        return project_name
 
 
 class ProjectInfoManager(models.Manager):
@@ -124,14 +128,6 @@ class ProjectInfoManager(models.Manager):
         projects = self.values("id", "project_name", "simple_desc", "create_time")
         project_data = list([project for project in projects])
         return project_data
-
-    def get_project_by_username(self, username):
-        """
-        根据用户名获取项目
-        :return:
-        """
-        user_info = self.filter(user__username=username).values("project_name")
-        return user_info
 
 
 class ModuleInfoManager(models.Manager):

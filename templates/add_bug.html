@@ -15,13 +15,8 @@
                     <div class="form-group  has-feedback">
                         <label class="control-label col-md-1 text-primary" for="project_name">项目名称：</label>
                         <div class="col-md-5">
-                            <select name="project" class="form-control" required
-                                    onchange="auto_load_module('#add_bug', '/add_bug/','module')">
-                                <option>请选择</option>
-                                {% for project in project_list %}
-                                    <option value="{{ project.project_name }}">{{ project.project_name }}</option>
-                                {% endfor %}
-
+                            <select name="project" class="form-control">
+                                <option value="{{ project.project_name }}">{{ project.project_name }}</option>
                             </select>
                         </div>
                     </div>
@@ -29,23 +24,29 @@
                     <div class="form-group  has-feedback">
                         <label class="control-label col-md-1 text-primary" for="dev_user">模块：</label>
                         <div class="col-md-5">
-                            <select name="module" class="form-control" id="module" required>
+                            <select name="module" class="form-control" id="module">
                                 <option>请选择</option>
+                                {% for module in module_list %}
+                                    <option value="{{ module.module_name }}">{{ module.module_name }}</option>
+                                {% endfor %}
                             </select>
                         </div>
                     </div>
                     <div class="form-group  has-feedback">
                         <label class="control-label col-md-1 text-primary" for="dev_user">版本：</label>
                         <div class="col-md-5">
-                            <select name="version" class="form-control" id="version" required>
+                            <select name="version" class="form-control" id="version">
                                 <option>请选择</option>
+                                {% for version in version_list %}
+                                    <option value="{{ version.version }}">{{ version.version }}</option>
+                                {% endfor %}
                             </select>
                         </div>
                     </div>
                     <div class="form-group  has-feedback">
                         <label class="control-label col-md-1 text-primary" for="dev_user">开发者：</label>
                         <div class="col-md-5">
-                            <select name="developer" class="form-control" id="developer" required>
+                            <select name="developer" class="form-control" id="developer">
                                 <option>请选择</option>
                                 {% for developer in developer_list %}
                                     <option value="{{ developer.nick_name }}">{{ developer.nick_name }}</option>
@@ -56,7 +57,7 @@
                     <div class="form-group  has-feedback">
                         <label class="control-label col-md-1 text-primary" for="dev_user">几星：</label>
                         <div class="col-md-5">
-                            <select name="start" class="form-control" onchange="" id="start" required>
+                            <select name="start" class="form-control" onchange="" id="start">
                                 <option>请选择</option>
                                 <option value='1'>1星</option>
                                 <option value='2' selected>2星</option>
@@ -68,7 +69,7 @@
                     <div class="form-group  has-feedback">
                         <label class="control-label col-md-1 text-primary" for="dev_user">平台：</label>
                         <div class="col-md-5">
-                            <select name="plantform" class="form-control" onchange="" id="plantform" required>
+                            <select name="plantform" class="form-control" onchange="" id="plantform">
                                 <option>请选择</option>
                                 <option value='1'>ios</option>
                                 <option value='2'>安卓</option>
@@ -83,7 +84,7 @@
                     <div class="form-group  has-feedback">
                         <label class="control-label col-md-1 text-primary" for="dev_user">状态：</label>
                         <div class="col-md-5">
-                            <select name="state" class="form-control" onchange="" id="state" required>
+                            <select name="state" class="form-control" onchange="" id="state">
                                 <option>请选择</option>
                                 <option value='1' selected>未解决</option>
                                 <option value='2'>已解决</option>
