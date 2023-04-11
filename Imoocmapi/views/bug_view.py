@@ -165,10 +165,8 @@ def addBug(request):
 
             mind_uid = UserInfo.objects.get_mind_id(developer_name)['mind_uid']
             notice = f'**{tester}** 新建了bug **{request_data["bug_title"]}**'
-            print(request_data['png'])
             if request_data['png']:
                 for png in request_data['png']:
-                    print(png)
                     notice = notice + f' ![]({png})'
             send_notice(notice, mind_uid)
 
@@ -224,7 +222,6 @@ def edit_bug(request):
         if bug.png != '[]':
             pngs = bug.png.replace('[', '').replace(']', '').replace('\'', '')
             for png in pngs.split(','):
-                print(png)
                 notice = notice + f' ![]({png})'
 
         send_notice(notice, mind_uid)

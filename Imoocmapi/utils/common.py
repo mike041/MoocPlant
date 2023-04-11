@@ -49,7 +49,6 @@ def send_notice(text, channel=''):
         "channel": f"@{channel}",
         "username": "bug提醒"}
     # data = {"text": f"{text}", "username": "bug提醒"}
-    print(text)
     payload = json.dumps(data)
     headers = {
         'Content-Type': 'application/json'
