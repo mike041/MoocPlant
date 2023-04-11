@@ -19,8 +19,8 @@ class UserAdmin(object):
     # 搜索字段
     search_fields = ['username', 'email','user_type']
     # 显示字段
-    list_display = ['id', 'username', 'email', 'status','nick_name','user_type']
-    list_editable =['nick_name', 'email', 'user_type']
+    list_display = ['id', 'username', 'email', 'status','nick_name','user_type','mind_uid']
+    list_editable =['nick_name', 'email', 'user_type','mind_uid']
 
 class UserInfoTypeAdmin(object):
     search_fields = [ 'user_type']

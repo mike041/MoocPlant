@@ -51,6 +51,16 @@ class UserInfoManager(models.Manager):
         result = self.filter(username=user_name).values("nick_name","user_type").first()
         return result
 
+    def get_mind_id(self,user_name):
+        '''
+        根据用户名获取mind uid
+        :param user_name:
+        :return:
+        '''
+        result = self.filter(nick_name=user_name).values("mind_uid").first()
+        return result
+
+
 
 class ProjectInfoManager(models.Manager):
     """
