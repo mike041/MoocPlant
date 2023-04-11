@@ -16,7 +16,6 @@ class BaseTable(models.Model):
 
 
 class UserInfoType(BaseTable):
-
     class Meta:
         verbose_name = '用户类型'
         db_table = "UserInfoType"
@@ -34,11 +33,13 @@ class UserInfo(BaseTable):
 
     username = models.CharField(verbose_name='用户名', max_length=20, unique=True, null=False)
     password = models.CharField(verbose_name='密码', max_length=20, null=False)
-    nick_name = models.CharField(verbose_name="昵称", max_length=20,unique=True,default='test')
+    nick_name = models.CharField(verbose_name="昵称", max_length=20, unique=True, default='test')
     email = models.EmailField(verbose_name='邮箱', null=False, unique=True)
     status = models.IntegerField(verbose_name='用户状态', default=1)
-    user_type = models.ForeignKey(UserInfoType, on_delete=models.CASCADE,max_length=10,default=2)
+    user_type = models.ForeignKey(UserInfoType, on_delete=models.CASCADE, max_length=10, default=2)
+    mind_uid = models.CharField(verbose_name='mind用户id', max_length=50, null=True, blank=True)
     objects = UserInfoManager()
+
     def __str__(self):
         return self.username
 
