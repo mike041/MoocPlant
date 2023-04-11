@@ -15,13 +15,8 @@
                     <div class="form-group  has-feedback">
                         <label class="control-label col-md-1 text-primary" for="project_name">项目名称：</label>
                         <div class="col-md-5">
-                            <select name="project" class="form-control"
-                                    onchange="auto_load_module('#add_bug', '/add_bug/','module')">
-                                <option>请选择</option>
-                                {% for project in project_list %}
-                                    <option value="{{ project.project_name }}">{{ project.project_name }}</option>
-                                {% endfor %}
-
+                            <select name="project" class="form-control">
+                                <option value="{{ project.project_name }}">{{ project.project_name }}</option>
                             </select>
                         </div>
                     </div>
@@ -31,6 +26,9 @@
                         <div class="col-md-5">
                             <select name="module" class="form-control" id="module">
                                 <option>请选择</option>
+                                {% for module in module_list %}
+                                    <option value="{{ module.module_name }}">{{ module.module_name }}</option>
+                                {% endfor %}
                             </select>
                         </div>
                     </div>
@@ -39,6 +37,9 @@
                         <div class="col-md-5">
                             <select name="version" class="form-control" id="version">
                                 <option>请选择</option>
+                                {% for version in version_list %}
+                                    <option value="{{ version.version }}">{{ version.version }}</option>
+                                {% endfor %}
                             </select>
                         </div>
                     </div>

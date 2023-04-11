@@ -26,6 +26,20 @@ class UserInfoType(BaseTable):
         return self.user_type
 
 
+class ProjectInfo(BaseTable):
+    class Meta:
+        verbose_name = '项目信息'
+        db_table = 'ProjectInfo'
+
+    project_name = models.CharField('项目名称', max_length=50, unique=True, null=False)
+    # version = models.ForeignKey(Version, verbose_name='版本', on_delete=models.CASCADE, default="1.0")
+    simple_desc = models.CharField('简要描述', max_length=100, null=True)
+    objects = ProjectInfoManager()
+
+    def __str__(self):
+        return self.project_name
+
+
 class UserInfo(BaseTable):
     class Meta:
         verbose_name = '用户信息'
@@ -38,6 +52,7 @@ class UserInfo(BaseTable):
     status = models.IntegerField(verbose_name='用户状态', default=1)
     user_type = models.ForeignKey(UserInfoType, on_delete=models.CASCADE, max_length=10, default=2)
     mind_uid = models.CharField(verbose_name='mind用户id', max_length=50, null=True, blank=True)
+    project_name = models.ForeignKey(ProjectInfo, verbose_name="项目", on_delete=models.CASCADE, null=True)
     objects = UserInfoManager()
 
     def __str__(self):
@@ -56,20 +71,6 @@ class EnvInfo(BaseTable):
     groupId = models.CharField(max_length=50, verbose_name="组id", null=False)
     testPhone = models.TextField(max_length=10000, verbose_name="测试账号", null=False)
     simple_desc = models.CharField(max_length=50, null=False)
-
-
-class ProjectInfo(BaseTable):
-    class Meta:
-        verbose_name = '项目信息'
-        db_table = 'ProjectInfo'
-
-    project_name = models.CharField('项目名称', max_length=50, unique=True, null=False)
-    # version = models.ForeignKey(Version, verbose_name='版本', on_delete=models.CASCADE, default="1.0")
-    simple_desc = models.CharField('简要描述', max_length=100, null=True)
-    objects = ProjectInfoManager()
-
-    def __str__(self):
-        return self.project_name
 
 
 class Version(BaseTable):
