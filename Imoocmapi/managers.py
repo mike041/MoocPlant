@@ -37,21 +37,21 @@ class UserInfoManager(models.Manager):
         获取所有开发人员
         :return:
         '''
-        nick_name_list = self.filter(user_type=2).values("id","nick_name")
+        nick_name_list = self.filter(user_type=2).values("id", "nick_name")
         nick_name_data = list([nick_name for nick_name in nick_name_list])
         return nick_name_data
 
-    def get_user_by_user_name(self, user_name=None,nick_name=None):
+    def get_user_by_user_name(self, user_name=None, nick_name=None):
         if user_name is None:
             return self.get(nick_name=nick_name)
         else:
             return self.get(username=user_name)
 
-    def get_user_nick_name(self,user_name):
-        result = self.filter(username=user_name).values("nick_name","user_type").first()
+    def get_user_nick_name(self, user_name):
+        result = self.filter(username=user_name).values("nick_name", "user_type").first()
         return result
 
-    def get_mind_id(self,user_name):
+    def get_mind_id(self, user_name):
         '''
         根据用户名获取mind uid
         :param user_name:
@@ -60,6 +60,14 @@ class UserInfoManager(models.Manager):
         result = self.filter(nick_name=user_name).values("mind_uid").first()
         return result
 
+    def get_mind_id_by_username(self, username):
+        '''
+        根据username获取mind uid
+        :param username:
+        :return:
+        '''
+        result = self.filter(username=username).values("mind_uid").first()
+        return result
 
 
 class ProjectInfoManager(models.Manager):
@@ -78,7 +86,7 @@ class ProjectInfoManager(models.Manager):
     def get_project(self, project_id):
         return self.get(id=project_id)
 
-    def get_project_by_name(self,project_name):
+    def get_project_by_name(self, project_name):
         return self.get(project_name=project_name)
 
     def update_project(self, project_id, **kwargs):
@@ -135,7 +143,7 @@ class ModuleInfoManager(models.Manager):
         module_name_list = [module for module in module_list]
         return module_name_list  # 62355068
 
-    def get_module_num(self,project_name,module_name):
+    def get_module_num(self, project_name, module_name):
         return self.filter(Q(belong_project=project_name) & Q(module_name=module_name)).count()
 
 
@@ -157,17 +165,17 @@ class VersionManager(models.Manager):
         version_name_list = [version for version in version_list]
         return version_name_list  # 62355068
 
-    def get_version(self,project_name,version):
-        return self.get(Q(project_name__project_name=project_name)&Q(version=version))
+    def get_version(self, project_name, version):
+        return self.get(Q(project_name__project_name=project_name) & Q(version=version))
 
-    def get_version_by_project_name(self,project_name,version):
+    def get_version_by_project_name(self, project_name, version):
         '''
         想过项目名字、versio获取该项目该版本是否存在
         :param project_name:
         :param version:
         :return:
         '''
-        return self.filter(Q(project_name__project_name=project_name)&Q(version=version)).count()
+        return self.filter(Q(project_name__project_name=project_name) & Q(version=version)).count()
 
 
 class BugManager(models.Manager):
@@ -184,14 +192,16 @@ class BugManager(models.Manager):
         :return:
         '''
         bug_list_object = self.filter(~Q(state=5))
-        #bug_list.values()
-        bug_list = list(bug_list_object.values("id", "project__project_name", "module__module_name", "version__version", "bug_title",
-                        "plantform", "state", "start", "developer__nick_name","buger__nick_name","png"))
-            #self.values())
+        # bug_list.values()
+        bug_list = list(bug_list_object.values("id", "project__project_name", "module__module_name", "version__version",
+                                               "bug_title",
+                                               "plantform", "state", "start", "developer__nick_name",
+                                               "buger__nick_name", "png"))
+        # self.values())
         # self.values("id","project__")
         return bug_list
 
-    def update_bug(self,bug_id,bug_state=None,developer=None):
+    def update_bug(self, bug_id, bug_state=None, developer=None):
         '''
         更新bug
         :param bug_id:
@@ -202,64 +212,76 @@ class BugManager(models.Manager):
             bug.update(state=bug_state)
         else:
             bug.update(developer=int(developer))
-    def search_bug(self,args):
+
+    def search_bug(self, args):
         """
         根据项目、模块查找bug
         :param args:
         :return:
         """
-        #self.filter(**args)
+        # self.filter(**args)
         bug_version = args.get("search_versions")
         args.pop("search_versions")
 
         if "buger" in args.keys() and "only_me" in args.keys():
             if bug_version == "All":
-                bug_version =99
-                bug_list = self.filter(Q(buger__username=args["buger"])&~Q(version__version=bug_version))
+                bug_version = 99
+                bug_list = self.filter(Q(buger__username=args["buger"]) & ~Q(version__version=bug_version))
             else:
                 bug_list = self.filter(Q(buger__username=args["buger"]) & Q(version__version=bug_version))
         if "only_me" in args.keys() and "buger" not in args.keys():
             if bug_version != "All":
-                bug_list = self.filter(Q(developer__username=args["developer"])&Q(version__version=bug_version))
+                bug_list = self.filter(Q(developer__username=args["developer"]) & Q(version__version=bug_version))
             else:
                 bug_version = 99
-                bug_list = self.filter(Q(developer__username=args["developer"])&~Q(version__version=bug_version))
+                bug_list = self.filter(Q(developer__username=args["developer"]) & ~Q(version__version=bug_version))
         if "only_me" not in args.keys():
-            project_name,module_name,developer_name = args.values()
-            if project_name !="All":
-                if module_name != "" and developer_name != "" and module_name !="All" and developer_name !="All":
+            project_name, module_name, developer_name = args.values()
+            if project_name != "All":
+                if module_name != "" and developer_name != "" and module_name != "All" and developer_name != "All":
                     if bug_version != "All":
-                        bug_list = self.filter(Q(project__project_name=project_name)&Q(module__module_name=module_name)&Q(version=bug_version))
+                        bug_list = self.filter(
+                            Q(project__project_name=project_name) & Q(module__module_name=module_name) & Q(
+                                version=bug_version))
                     else:
                         bug_version = 99
-                        bug_list = self.filter(Q(project__project_name=project_name) & Q(module__module_name=module_name)&~Q(version=bug_version))
+                        bug_list = self.filter(
+                            Q(project__project_name=project_name) & Q(module__module_name=module_name) & ~Q(
+                                version=bug_version))
                 elif module_name != "All" and developer_name == "":
                     if bug_version != "All":
-                        bug_list = self.filter(Q(project__project_name=project_name)&Q(module__module_name=module_name)&Q(version=bug_version))
+                        bug_list = self.filter(
+                            Q(project__project_name=project_name) & Q(module__module_name=module_name) & Q(
+                                version=bug_version))
                     else:
                         bug_version = 99
-                        bug_list = self.filter(Q(project__project_name=project_name) & Q(module__module_name=module_name)&~Q(version=bug_version))
-                elif module_name =="All" and developer_name == "":
-                    if bug_version !="All":
-                        bug_list = self.filter(Q(project__project_name=project_name)&Q(version__version=bug_version))
+                        bug_list = self.filter(
+                            Q(project__project_name=project_name) & Q(module__module_name=module_name) & ~Q(
+                                version=bug_version))
+                elif module_name == "All" and developer_name == "":
+                    if bug_version != "All":
+                        bug_list = self.filter(Q(project__project_name=project_name) & Q(version__version=bug_version))
                     else:
                         bug_version = 99
-                        bug_list = self.filter(Q(project__project_name=project_name)&~Q(version=bug_version))
-                elif module_name == "All" and developer_name !="":
-                    if bug_version !="All":
-                        bug_list = self.filter(Q(project__project_name=project_name)&Q(developer__nick_name=developer_name)&Q(version__version=bug_version))
+                        bug_list = self.filter(Q(project__project_name=project_name) & ~Q(version=bug_version))
+                elif module_name == "All" and developer_name != "":
+                    if bug_version != "All":
+                        bug_list = self.filter(
+                            Q(project__project_name=project_name) & Q(developer__nick_name=developer_name) & Q(
+                                version__version=bug_version))
                     else:
                         bug_version = 99
                         bug_list = self.filter(
                             Q(project__project_name=project_name) & Q(developer__nick_name=developer_name) & ~Q(
                                 version=bug_version))
             else:
-                if developer_name !="" and project_name == "All":
+                if developer_name != "" and project_name == "All":
                     bug_list = self.filter(developer__nick_name=developer_name)
                 else:
                     bug_list = self.filter(~Q(state=5))
-        return list(bug_list.values("id", "project__project_name", "module__module_name", "version__version", "bug_title",
-                        "plantform", "state", "start", "developer__nick_name","buger__nick_name","png"))
+        return list(
+            bug_list.values("id", "project__project_name", "module__module_name", "version__version", "bug_title",
+                            "plantform", "state", "start", "developer__nick_name", "buger__nick_name", "png"))
 
 
 class TestCaseSuiteInfoManager(models.Manager):

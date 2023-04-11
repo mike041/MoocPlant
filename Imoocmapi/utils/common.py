@@ -4,7 +4,10 @@
 @Time    :   2022/12/26 21:35
 @Author  :   Mushishi 
 """
+import json
+
 import redis
+import requests
 
 
 class HandleRedis(object):
@@ -36,6 +39,22 @@ class HandleRedis(object):
             self.connect.rpush(key, *value)
         if isinstance(value, dict):
             self.connect.hmset(key, value)
+
+
+def send_notice(text, channel=''):
+    # mind推送
+    url = "https://mind.im30.net/api/hooks/mq6bi815w7gxdqufs1grmkwadw"
+    data = {
+        "text": f"{text}",
+        "channel": f"@{channel}",
+        "username": "bug提醒"}
+    # data = {"text": f"{text}", "username": "bug提醒"}
+    print(text)
+    payload = json.dumps(data)
+    headers = {
+        'Content-Type': 'application/json'
+    }
+    res = requests.request("POST", url, headers=headers, data=payload)
 
 
 handle_redis = HandleRedis()

@@ -7,6 +7,7 @@ import json
 
 from .user_view import check_login
 from ..models import Bug, ProjectInfo, ModuleInfo, Version, UserInfo
+from ..utils.common import send_notice
 from ..utils.tencent_cos import TencentCOS
 import os
 import datetime
@@ -160,7 +161,17 @@ def addBug(request):
             request_data['developer'] = developer_object
             request_data['buger'] = buger_object
             Bug.objects.add_bug(**request_data)
-            # todo  新增推送
+            # 发送Mind推送
+
+            mind_uid = UserInfo.objects.get_mind_id(developer_name)['mind_uid']
+            notice = f'**{tester}** 新建了bug **{request_data["bug_title"]}**'
+            print(request_data['png'])
+            if request_data['png']:
+                for png in request_data['png']:
+                    print(png)
+                    notice = notice + f' ![]({png})'
+            send_notice(notice, mind_uid)
+
             return HttpResponse(json.dumps(data))
             '''
             except:
@@ -186,6 +197,7 @@ def edit_bug(request):
     :param request:
     :return:
     '''
+    bug_state_data = {'1': '未解决', '2': '已解决', '3': '延期解决', '4': '不解决', '5': '关闭', '6': '激活'}
     if request.is_ajax():
         data = {
             'msg': "更新成功",
@@ -196,4 +208,25 @@ def edit_bug(request):
         bug_id = request_data.get("bug_id")
         bug_state = request_data.get("state_" + str(bug_id))
         Bug.objects.update_bug(bug_id, bug_state)
-        return HttpResponse(json.dumps(data))
+        bug = Bug.objects.get(id=bug_id)
+
+        # 发送Mind推送
+        token = request.COOKIES.get("token")
+        user_data = jwt.decode(token, "sercet", algorithms=['HS256'])
+        operator = user_data.get("username")
+        if bug_state == '1' or bug_state == '3' or bug_state == '6':
+            user_name = bug.developer
+
+        elif bug_state == '2' or bug_state == '4':
+            user_name = bug.buger
+        mind_uid = UserInfo.objects.get_mind_id_by_username(user_name)['mind_uid']
+        notice = f'**{operator}** 将bug: **{bug.bug_title}** 置为 **{bug_state_data.get(bug_state)}**'
+        if bug.png != '[]':
+            pngs = bug.png.replace('[', '').replace(']', '').replace('\'', '')
+            for png in pngs.split(','):
+                print(png)
+                notice = notice + f' ![]({png})'
+
+        send_notice(notice, mind_uid)
+
+    return HttpResponse(json.dumps(data))
