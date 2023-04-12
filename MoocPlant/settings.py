@@ -89,7 +89,7 @@ DATABASES = {
         'HOST': '127.0.0.1',   # mysql的ip地址
         'PORT': 3306,  # mysql的端口
         'USER': 'root',   # mysql的用户名
-        'PASSWORD': 'Yzm8hiKMhL830!Mhxz*I5m'  # mysql的密码
+        'PASSWORD': 'test1234'  # mysql的密码
     }
 }
 
