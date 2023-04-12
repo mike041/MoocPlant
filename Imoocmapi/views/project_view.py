@@ -46,8 +46,9 @@ def projectList(request):
     :return:
     '''
 
-    user_name = get_username(request)
-    project_data = ProjectInfo.objects.get_project_by_username(user_name)
+    # projects = ProjectInfo.objects.values("id","project_name")
+    # project_data = list([project for project in projects])
+    project_data = ProjectInfo.objects.get_project_name_list()
     project_info = {
         "project_info": project_data
     }

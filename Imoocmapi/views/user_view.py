@@ -28,6 +28,10 @@ def check_login(func):
     return wrapper
 
 
+def chech_user_auth(func):
+    pass
+
+
 def login(request):
     data = {
         "code": 10000,
@@ -102,3 +106,15 @@ def get_developer(request):
         developer_list = UserInfo.objects.get_develop_user(project_name)
         data["developer_list"] = developer_list
         return HttpResponse(json.dumps(data))
+
+
+def get_username(request):
+    """
+    根据用户获取项目信息
+    :param request:
+    :return:
+    """
+    token = request.COOKIES.get("token", None)
+    user_data = jwt.decode(token, "sercet", algorithms=['HS256'])
+    user_key = user_data.get("username")
+    return user_key
