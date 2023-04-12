@@ -714,10 +714,10 @@ function update_bug(bug_id) {
 function BigBig(src, width, height) {
     $('#myModal').on('show.bs.modal', function () {
         var modal = $(this);
-        modal.find('.modal-dialog').css({'margin-left': (document.body.clientWidth - width * 1) / 3 + 'px'})
+        modal.find('.modal-dialog').css({'margin-left': (document.body.clientWidth - width * 1) / 6 + 'px'})
         modal.find('.modal-body #image').attr("src", src)
-            .attr("width", width * 25)
-            .attr("height", height * 25);
+            .attr("width", width * 23)
+            .attr("height", height * 23);
     });
 }
 
