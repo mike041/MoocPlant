@@ -164,7 +164,7 @@ def addBug(request):
             # 发送Mind推送
 
             mind_uid = UserInfo.objects.get_mind_id(developer_name)['mind_uid']
-            notice = f'**{tester}** 新建了bug **{request_data["bug_title"]}**'
+            notice = f'**{tester}** 新建了bug **{request_data["bug_title"]}**  http://test.im30.lan/bug_list/'
             if request_data['png']:
                 for png in request_data['png']:
                     notice = notice + f' ![]({png})'
@@ -217,11 +217,11 @@ def edit_bug(request):
             developer_nick_name = request_data.get("developer_id")
             Bug.objects.update_bug(bug_id=bug_id, developer=developer_nick_name)
         else:
-            bug_state = request_data.get("state_"+str(bug_id))
+            bug_state = request_data.get("state_" + str(bug_id))
             Bug.objects.update_bug(bug_id=bug_id, bug_state=bug_state)
 
         bug = Bug.objects.get(id=bug_id)
-        bug_state=bug.state
+        bug_state = bug.state
         # 发送Mind推送
         token = request.COOKIES.get("token")
         user_data = jwt.decode(token, "sercet", algorithms=['HS256'])
@@ -234,7 +234,7 @@ def edit_bug(request):
         else:
             return HttpResponse(json.dumps(data))
         mind_uid = UserInfo.objects.get_mind_id_by_username(user_name)['mind_uid']
-        notice = f'**{operator}** 将bug: **{bug.bug_title}** 置为 **{bug_state_data.get(bug_state)}**'
+        notice = f'**{operator}** 将bug: **{bug.bug_title}** 置为 **{bug_state_data.get(bug_state)}**  http://test.im30.lan/bug_list/'
         if bug.png != '[]':
             pngs = bug.png.replace('[', '').replace(']', '').replace('\'', '')
             for png in pngs.split(','):
