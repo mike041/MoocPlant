@@ -25,7 +25,7 @@ urlpatterns = [
                   path('xadmin/', xadmin.site.urls),
                   re_path(r'^favicon\.ico$', RedirectView.as_view(url='/static/assets/img/favicon.ico')),
                   path('login/', user_view.login),
-                  path('', user_view.index),
+                  path('', bug_view.bugList),
                   path('index/', user_view.index),
                   path('project_list/', project_view.projectList),
                   path('add_project/', project_view.addProject),

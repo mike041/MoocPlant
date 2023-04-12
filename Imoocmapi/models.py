@@ -40,6 +40,17 @@ class ProjectInfo(BaseTable):
         return self.project_name
 
 
+class UserGroup(BaseTable):
+    class Meta:
+        verbose_name = '用户组'
+        db_table = 'UserGroup'
+
+    group_name = models.CharField(verbose_name='用户组名', max_length=20)
+
+    def __str__(self):
+        return self.group_name
+
+
 class UserInfo(BaseTable):
     class Meta:
         verbose_name = '用户信息'
@@ -57,6 +68,15 @@ class UserInfo(BaseTable):
 
     def __str__(self):
         return self.username
+
+
+class UserPermission(BaseTable):
+    class Meta:
+        verbose_name = '用户权限表'
+        db_table = 'UserPermission'
+
+    user_id = models.ForeignKey(UserInfo, verbose_name="用户id", on_delete=models.CASCADE)
+    system_model = models.CharField(verbose_name='系统功能模块名', max_length=50)
 
 
 class EnvInfo(BaseTable):

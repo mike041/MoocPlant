@@ -350,7 +350,7 @@ function search_bug() {
             data = JSON.parse(data)["bug_info"]
             for (var i = 0; i < data.length; i++) {
                 var bug_id = data[i]["id"]
-                table_body.prepend('<tr><td><label><input type="checkbox" name="bug_' + bug_id + '" value="' + data[i]["id"] + '"/></label></td><td id="bug_num">' + data[i]["id"] + '</td><td><a href="#" onclick="">' + data[i]["project__project_name"] + '</a></td>' +
+                table_body.append('<tr><td><label><input type="checkbox" name="bug_' + bug_id + '" value="' + data[i]["id"] + '"/></label></td><td id="bug_num">' + data[i]["id"] + '</td><td><a href="#" onclick="">' + data[i]["project__project_name"] + '</a></td>' +
                     '<td>' + data[i]["module__module_name"] + '</td><td>' + data[i]["version__version"] + '</td>' +
                     '<td style="width: 50%">' + data[i]["bug_title"] + '</td><td><a onclick=""> ' + data[i]["plantform"] + '</a></td><td><div id=bug_id_' + data[i]["id"] + '><a onclick="editstate(' + bug_id + ')">' + data[i]["state"] + '</a></div></td>' +
                     '<td>' + data[i]["start"] + '</td><td><div id="developer_id_' + bug_id + '"><a onclick="editstate(' + bug_id + ',1)">' + data[i]["developer__nick_name"] + '</a></div></td><td>' + data[i]["buger__nick_name"] + '</td><td id="png_url_' + data[i]["id"] + '" style="width:"' + data[i]["png_size"] + '"px"></td></tr>')

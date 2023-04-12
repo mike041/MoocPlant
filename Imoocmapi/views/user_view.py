@@ -101,7 +101,8 @@ def get_developer(request):
         token = request.COOKIES.get("token", None)
         user_data = jwt.decode(token, "sercet", algorithms=['HS256'])
         username = user_data.get("username", None)
-        project_name = UserInfo.objects.filter(username=username).values('project_name')['project_name']
+        #project_name = UserInfo.objects.filter(username=username).values('project_name')['project_name']
+        project_name = UserInfo.objects.get_project_name(username)
 
         developer_list = UserInfo.objects.get_develop_user(project_name)
         data["developer_list"] = developer_list

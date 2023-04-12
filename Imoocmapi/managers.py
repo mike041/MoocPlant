@@ -205,7 +205,7 @@ class BugManager(models.Manager):
         bug_list = list(bug_list_object.values("id", "project__project_name", "module__module_name", "version__version",
                                                "bug_title",
                                                "plantform", "state", "start", "developer__nick_name",
-                                               "buger__nick_name", "png"))
+                                               "buger__nick_name", "png").order_by("-id"))
         # self.values())
         # self.values("id","project__")
         return bug_list
@@ -290,7 +290,7 @@ class BugManager(models.Manager):
                     bug_list = self.filter(~Q(state=5))
         return list(
             bug_list.values("id", "project__project_name", "module__module_name", "version__version", "bug_title",
-                            "plantform", "state", "start", "developer__nick_name", "buger__nick_name", "png"))
+                            "plantform", "state", "start", "developer__nick_name", "buger__nick_name", "png").order_by("-id"))
 
 
 class TestCaseSuiteInfoManager(models.Manager):

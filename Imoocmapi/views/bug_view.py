@@ -213,10 +213,15 @@ def edit_bug(request):
 
         request_data = json.loads(request.body.decode('utf-8'))
         bug_id = request_data.get("bug_id")
-        bug_state = request_data.get("state_" + str(bug_id))
-        Bug.objects.update_bug(bug_id, bug_state)
-        bug = Bug.objects.get(id=bug_id)
+        if "developer_id" in request_data.keys():
+            developer_nick_name = request_data.get("developer_id")
+            Bug.objects.update_bug(bug_id=bug_id, developer=developer_nick_name)
+        else:
+            bug_state = request_data.get("state_"+str(bug_id))
+            Bug.objects.update_bug(bug_id=bug_id, bug_state=bug_state)
 
+        bug = Bug.objects.get(id=bug_id)
+        bug_state=bug.state
         # 发送Mind推送
         token = request.COOKIES.get("token")
         user_data = jwt.decode(token, "sercet", algorithms=['HS256'])
@@ -226,6 +231,8 @@ def edit_bug(request):
 
         elif bug_state == '2' or bug_state == '4':
             user_name = bug.buger
+        else:
+            return HttpResponse(json.dumps(data))
         mind_uid = UserInfo.objects.get_mind_id_by_username(user_name)['mind_uid']
         notice = f'**{operator}** 将bug: **{bug.bug_title}** 置为 **{bug_state_data.get(bug_state)}**'
         if bug.png != '[]':
