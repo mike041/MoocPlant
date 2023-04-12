@@ -716,8 +716,8 @@ function BigBig(src, width, height) {
         var modal = $(this);
         modal.find('.modal-dialog').css({'margin-left': (document.body.clientWidth - width * 1) / 3 + 'px'})
         modal.find('.modal-body #image').attr("src", src)
-            .attr("width", width * 10)
-            .attr("height", height * 10);
+            .attr("width", width * 15)
+            .attr("height", height * 15);
     });
 }
 
