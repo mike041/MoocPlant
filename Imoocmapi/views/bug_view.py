@@ -195,11 +195,6 @@ def addBug(request):
             "module_list": module_list,
             "version_list": version_list,
         }
-        print(developer_list)
-        print('========================================================')
-        print(module_list)
-        print('========================================================')
-        print(version_list)
         return render(request, 'add_bug.html', context=project)
 
 

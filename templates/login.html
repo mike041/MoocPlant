@@ -65,7 +65,7 @@
                         var url = data["url"]
                         var token = data["token"]
                         var nick_name = data['nick_name']
-                        sessionStorage.setItem("nick_name", nick_name)
+                        localStorage.setItem("nick_name", nick_name)
                         $.cookie("token",token,{expires:1,path:"/"})
                         location.href = url
                     }else{

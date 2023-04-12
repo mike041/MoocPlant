@@ -99,7 +99,7 @@
         $('#logout').click(function(){
             $.cookie("token",null,{path:'/'})
         });
-        var nick_name = sessionStorage.getItem("nick_name")
+        var nick_name = localStorage.getItem("nick_name")
         $('#nick_name').text(nick_name)
 
         jQuery(".sideMenu").slide({
