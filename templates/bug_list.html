@@ -59,7 +59,7 @@
 
 
         <form class="am-form am-g" id='module_list' name="module_list" method="post" action="/api/run_batch_test/">
-            <table width="100%" class="am-table am-table-bordered am-table-radius am-table-striped" id="bug_list_row">
+            <table width="100%" class="am-table am-table-bordered am-table-radius am-table-striped" id="bug_list_row" style="table-layout: fixed;">
                 <thead id="table_head">
                 <tr class="am-success">
                     <th class="table-check"><input type="checkbox" id="select_all"/></th>
@@ -67,7 +67,7 @@
                     <th class="table-type">项目</th>
                     <th class="table-type">模块</th>
                     <th class="table-type">版本</th>
-                    <th class="table-type">bug描述</th>
+                    <th class="table-type" style="width: 800px">bug描述</th>
                     <th class="table-type">平台</th>
                     <th class="table-type">状态</th>
                     <th class="table-type">几星</th>
@@ -91,7 +91,7 @@
                         </td>
                         <td>{{ foo.module__module_name }}</td>
                         <td>{{ foo.version__version }}</td>
-                        <td style="width: 50%">{{ foo.bug_title }}</td>
+                        <td style="white-space: pre-wrap;overflow: auto;">{{ foo.bug_title }}</td>
                         <td><a onclick=""> {{ foo.plantform }}</a></td>
                         <td>
                             <div id="bug_id_{{ foo.id }}"><a onclick="editstate({{ foo.id }},'state')">{{ foo.state }}</a></div>
