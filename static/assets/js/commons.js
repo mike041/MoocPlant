@@ -352,7 +352,7 @@ function search_bug() {
                 var bug_id = data[i]["id"]
                 table_body.append('<tr><td><label><input type="checkbox" name="bug_' + bug_id + '" value="' + data[i]["id"] + '"/></label></td><td id="bug_num">' + data[i]["id"] + '</td><td><a href="#" onclick="">' + data[i]["project__project_name"] + '</a></td>' +
                     '<td>' + data[i]["module__module_name"] + '</td><td>' + data[i]["version__version"] + '</td>' +
-                    '<td style="width: 50%">' + data[i]["bug_title"] + '</td><td><a onclick=""> ' + data[i]["plantform"] + '</a></td><td><div id=bug_id_' + data[i]["id"] + '><a onclick="editstate(' + bug_id + ')">' + data[i]["state"] + '</a></div></td>' +
+                    '<td style="white-space: pre-wrap;overflow: auto;">' + data[i]["bug_title"] + '</td><td><a onclick=""> ' + data[i]["plantform"] + '</a></td><td><div id=bug_id_' + data[i]["id"] + '><a onclick="editstate(' + bug_id + ')">' + data[i]["state"] + '</a></div></td>' +
                     '<td>' + data[i]["start"] + '</td><td><div id="developer_id_' + bug_id + '"><a onclick="editstate(' + bug_id + ',1)">' + data[i]["developer__nick_name"] + '</a></div></td><td>' + data[i]["buger__nick_name"] + '</td><td id="png_url_' + data[i]["id"] + '" style="width:"' + data[i]["png_size"] + '"px"></td></tr>')
                 png_list = $('#png_url_' + data[i]["id"])
 
@@ -712,12 +712,21 @@ function update_bug(bug_id) {
 }
 
 function BigBig(src, width, height) {
+    var img_size = src.split("#")[1]
+    if (img_size !=undefined) {
+        var img_width = img_size.split("*")[0]
+        var img_height = img_size.split("*")[1]
+    }else{
+        var img_width = width * 20
+        var img_height = height * 20
+    }
+
     $('#myModal').on('show.bs.modal', function () {
         var modal = $(this);
-        modal.find('.modal-dialog').css({'margin-left': (document.body.clientWidth - width * 1) / 6 + 'px'})
+        modal.find('.modal-dialog').css({'margin-left': (document.body.clientWidth - img_width) / 2 + 'px'})
         modal.find('.modal-body #image').attr("src", src)
-            .attr("width", width * 23)
-            .attr("height", height * 23);
+            .attr("width", img_width)
+            .attr("height", img_height);
     });
 }
 

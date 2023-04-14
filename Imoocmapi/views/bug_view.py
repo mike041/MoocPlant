@@ -11,6 +11,9 @@ from ..utils.common import send_notice
 from ..utils.tencent_cos import TencentCOS
 import os
 import datetime
+from PIL import Image
+from io import BytesIO
+import requests
 
 
 def put_png(request):
@@ -58,10 +61,13 @@ def put_png(request):
         url = os.path.join(settings.MEDIA_URL, 'images/bug', file_full_name)
         # 上传的文件：绝对路径
         local_file = file_path + '/' + file_full_name
-        # 将原始文件名作为key传给COS
+        img = Image.open(local_file)
+        img_size = img.size
+        width = str(img_size[0])
+        height = str(img_size[1])        # 将原始文件名作为key传给COS
         key = 'mooc plant/' + file_full_name
         # 调用COS上传文件，返回url
-        upload = TencentCOS().upload_cos(local_file, key)
+        upload = TencentCOS().upload_cos(local_file, key)+"#"+width+"*"+height
         file_list = [upload]
         return HttpResponse(json.dumps({'success': 1,
                                         'message': "上传成功！",
