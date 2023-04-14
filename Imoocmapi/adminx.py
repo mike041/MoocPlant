@@ -2,7 +2,7 @@
 # import xadmin
 import xadmin
 from xadmin import views
-from Imoocmapi.models import UserInfo, ProjectInfo, Version, ModuleInfo, Bug, UserInfoType
+from Imoocmapi.models import UserInfo, ProjectInfo, Version, ModuleInfo, Bug, UserInfoType, UserPermission
 
 
 class GlobalSettings(object):
@@ -27,7 +27,9 @@ class UserInfoTypeAdmin(object):
     # 显示字段
     list_display = [ 'id','user_type']
 
-
+class UserPermissionAdmin(object):
+    search_fields =['user_id','system_model','system_url']
+    list_display = ['id','user_id','system_model','system_url']
 class ProjectAdmin(object):
     search_fields = ['project_name']
     list_display = ['id', 'project_name']
@@ -53,6 +55,7 @@ xadmin.site.register(Version, VersionAdmin)
 xadmin.site.register(ModuleInfo, ModuleAdmin)
 xadmin.site.register(Bug,BugAdmin)
 xadmin.site.register(UserInfoType, UserInfoTypeAdmin)
+xadmin.site.register(UserPermission,UserPermissionAdmin)
 
 xadmin.site.register(views.CommAdminView, GlobalSettings)
 xadmin.site.register(views.BaseAdminView, BaseSettings)

@@ -79,6 +79,21 @@ class UserInfoManager(models.Manager):
         return project_name
 
 
+class UserPermissionManager(models.Manager):
+    """
+    用户权限自定义管理器
+    """
+
+    def get_user_permission(self, username):
+        '''
+        获取用户权限
+        :return:
+        '''
+        system_url_list = self.filter(user_id__username=username).values("system_url")
+        url_data = list([system_url for system_url in system_url_list])
+        return url_data
+
+
 class ProjectInfoManager(models.Manager):
     """
     项目信息表操作自定义管理器
@@ -231,19 +246,31 @@ class BugManager(models.Manager):
         # self.filter(**args)
         bug_version = args.get("search_versions")
         args.pop("search_versions")
-
+        '''
+        if "buger" in args.keys():
+            buger = args.get("buger")
+            args.pop("buger")
+        #{'project': 'All', 'module': 'All', 'developer': '', 'search_versions': 'All', 'only_me': '0'}
+        project_name, module_name, developer_name, bug_version, only_me = args.values()
+        
+        if project_name == 'All':
+            self.filter()
+        '''
         if "buger" in args.keys() and "only_me" in args.keys():
             if bug_version == "All":
                 bug_version = 99
-                bug_list = self.filter(Q(buger__username=args["buger"]) & ~Q(version__version=bug_version))
+                bug_list = self.filter(
+                    Q(buger__username=args["buger"]) & ~Q(version__version=bug_version) & ~Q(state=5))
             else:
-                bug_list = self.filter(Q(buger__username=args["buger"]) & Q(version__version=bug_version))
+                bug_list = self.filter(Q(buger__username=args["buger"]) & Q(version__version=bug_version) & ~Q(state=5))
         if "only_me" in args.keys() and "buger" not in args.keys():
             if bug_version != "All":
-                bug_list = self.filter(Q(developer__username=args["developer"]) & Q(version__version=bug_version))
+                bug_list = self.filter(
+                    Q(developer__username=args["developer"]) & Q(version__version=bug_version) & ~Q(state=5))
             else:
                 bug_version = 99
-                bug_list = self.filter(Q(developer__username=args["developer"]) & ~Q(version__version=bug_version))
+                bug_list = self.filter(
+                    Q(developer__username=args["developer"]) & ~Q(version__version=bug_version) & ~Q(state=5))
         if "only_me" not in args.keys():
             project_name, module_name, developer_name = args.values()
             if project_name != "All":
@@ -251,38 +278,40 @@ class BugManager(models.Manager):
                     if bug_version != "All":
                         bug_list = self.filter(
                             Q(project__project_name=project_name) & Q(module__module_name=module_name) & Q(
-                                version=bug_version))
+                                version=bug_version) & ~Q(state=5))
                     else:
                         bug_version = 99
                         bug_list = self.filter(
                             Q(project__project_name=project_name) & Q(module__module_name=module_name) & ~Q(
-                                version=bug_version))
+                                version=bug_version) & ~Q(state=5))
                 elif module_name != "All" and developer_name == "":
                     if bug_version != "All":
                         bug_list = self.filter(
                             Q(project__project_name=project_name) & Q(module__module_name=module_name) & Q(
-                                version=bug_version))
+                                version=bug_version) & ~Q(state=5))
                     else:
                         bug_version = 99
                         bug_list = self.filter(
                             Q(project__project_name=project_name) & Q(module__module_name=module_name) & ~Q(
-                                version=bug_version))
+                                version=bug_version) & ~Q(state=5))
                 elif module_name == "All" and developer_name == "":
                     if bug_version != "All":
-                        bug_list = self.filter(Q(project__project_name=project_name) & Q(version__version=bug_version))
+                        bug_list = self.filter(
+                            Q(project__project_name=project_name) & Q(version__version=bug_version) & ~Q(state=5))
                     else:
                         bug_version = 99
-                        bug_list = self.filter(Q(project__project_name=project_name) & ~Q(version=bug_version))
+                        bug_list = self.filter(
+                            Q(project__project_name=project_name) & ~Q(version=bug_version) & ~Q(state=5))
                 elif module_name == "All" and developer_name != "":
                     if bug_version != "All":
                         bug_list = self.filter(
                             Q(project__project_name=project_name) & Q(developer__nick_name=developer_name) & Q(
-                                version__version=bug_version))
+                                version__version=bug_version) & ~Q(state=5))
                     else:
                         bug_version = 99
                         bug_list = self.filter(
                             Q(project__project_name=project_name) & Q(developer__nick_name=developer_name) & ~Q(
-                                version=bug_version))
+                                version=bug_version) & ~Q(state=5))
             else:
                 if developer_name != "" and project_name == "All":
                     bug_list = self.filter(developer__nick_name=developer_name)
@@ -290,7 +319,8 @@ class BugManager(models.Manager):
                     bug_list = self.filter(~Q(state=5))
         return list(
             bug_list.values("id", "project__project_name", "module__module_name", "version__version", "bug_title",
-                            "plantform", "state", "start", "developer__nick_name", "buger__nick_name", "png").order_by("-id"))
+                            "plantform", "state", "start", "developer__nick_name", "buger__nick_name", "png").order_by(
+                "-id"))
 
 
 class TestCaseSuiteInfoManager(models.Manager):

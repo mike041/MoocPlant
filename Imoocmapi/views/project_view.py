@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from rest_framework import serializers
 
-from .user_view import check_login, get_username
+from .user_view import check_login, get_username, chech_user_auth
 from ..models import ProjectInfo
 from django.forms.models import model_to_dict
 
@@ -18,6 +18,7 @@ class SomeModelSerializer(serializers.ModelSerializer):
 
 
 @check_login
+@chech_user_auth
 def addProject(request):
     '''
     :param request:
@@ -40,6 +41,7 @@ def addProject(request):
 
 
 @check_login
+@chech_user_auth
 def projectList(request):
     '''
     :param request:

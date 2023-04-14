@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}没权限{% endblock %}
+{% load static %}
+{% block content %}
+    <div class="admin-biaogelist" style="top: 0px">
+        <div style="margin-left: 30%;margin-top: 50px">
+            <img src="{% static '/assets/img/noauth.png' %}" >
+            <div style="margin-top: 50px;font-size: 60px">死鬼, 没权限 不要乱点!!!</div>
+            </div>
+    </div>
+{% endblock %}

@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 import json
 
-from .user_view import check_login
+from .user_view import check_login, chech_user_auth
 from ..models import Bug, ProjectInfo, ModuleInfo, Version, UserInfo
 from ..utils.common import send_notice
 from ..utils.tencent_cos import TencentCOS
@@ -76,6 +76,7 @@ def put_png(request):
 
 
 @check_login
+@chech_user_auth
 def bugList(request):
     platformItem = {"1": "IOS", "2": "Android", "3": "web", "4": "pc", "5": "pad", "6": "服务端"}
     start_level = {'1': '1星', '2': '2星', '3': '3星', '4': '4星'}
@@ -92,6 +93,8 @@ def bugList(request):
                 data["buger"] = username
             else:
                 data["developer"] = username
+        else:
+            data["only_me"] = "0"
         bug_list = Bug.objects.search_bug(data)
     else:
         bug_list = Bug.objects.get_all_bug()
@@ -120,6 +123,7 @@ def bugList(request):
 
 
 @check_login
+@chech_user_auth
 def addBug(request):
     if request.is_ajax():
         module_info = {

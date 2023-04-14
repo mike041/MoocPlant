@@ -2,7 +2,8 @@ from dataclasses import dataclass
 
 from django.db import models
 
-from Imoocmapi.managers import ProjectInfoManager, ModuleInfoManager, VersionManager, BugManager, UserInfoManager
+from Imoocmapi.managers import ProjectInfoManager, ModuleInfoManager, VersionManager, BugManager, UserInfoManager, \
+    UserPermissionManager
 
 
 class BaseTable(models.Model):
@@ -77,6 +78,11 @@ class UserPermission(BaseTable):
 
     user_id = models.ForeignKey(UserInfo, verbose_name="用户id", on_delete=models.CASCADE)
     system_model = models.CharField(verbose_name='系统功能模块名', max_length=50)
+    system_url = models.CharField(verbose_name='模块路由地址', max_length=50)
+    objects = UserPermissionManager()
+
+    def __str__(self):
+        return self.system_url
 
 
 class EnvInfo(BaseTable):
