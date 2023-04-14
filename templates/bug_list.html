@@ -24,10 +24,10 @@
                     <li style="padding-top: 5px">
                         <select name="project" id="project" class="am-input-zm am-input-xm"
                                 onchange="select_module()">
-                        <option value="All" selected>All</option>
+                            <option value="All" selected>All</option>
                             {% for project_name in project_list %}
                                 <option value="{{ project_name }}"
-                                        >{{ project_name }}</option>
+                                >{{ project_name }}</option>
                             {% endfor %}
 
                         </select>
@@ -41,13 +41,13 @@
                     <li style="padding-top: 5px"><input value="" type="text" name="developer"
                                                         class="am-input-sm am-input-xm"
                                                         placeholder="开发人员"/></li>
-                <li style="padding-top: 5px">
+                    <li style="padding-top: 5px">
                         <select name="search_versions" id="search_versions" class=" am-input-zm am-input-xm">
                             <option selected value="All">All</option>
                         </select>
                     </li>
-                <li style="padding-top: 10px"><input type="checkbox" name="only_me" id="only_me" value="1"></li>
-                <li style="padding-top: 10px"><span>只看自己</span></li>
+                    <li style="padding-top: 10px"><input type="checkbox" name="only_me" id="only_me" value="1"></li>
+                    <li style="padding-top: 10px"><span>只看自己</span></li>
                     <li>
 
                         <input type="button" class="am-btn am-radius am-btn-xs am-btn-success"
@@ -94,10 +94,15 @@
                         <td style="width: 50%">{{ foo.bug_title }}</td>
                         <td><a onclick=""> {{ foo.plantform }}</a></td>
                         <td>
-                            <div id="bug_id_{{ foo.id }}"><a onclick="editstate({{ foo.id }},'state')">{{ foo.state }}</a></div>
+                            <div id="bug_id_{{ foo.id }}"><a
+                                    onclick="editstate({{ foo.id }},'state')">{{ foo.state }}</a></div>
                         </td>
                         <td>{{ foo.start }}</td>
-                        <td><div id="developer_id_{{ foo.id }}"><a onclick="editstate({{ foo.id }},'developer')"> {{ foo.developer__nick_name }}</a></div></td>
+                        <td>
+                            <div id="developer_id_{{ foo.id }}"><a
+                                    onclick="editstate({{ foo.id }},'developer')"> {{ foo.developer__nick_name }}</a>
+                            </div>
+                        </td>
                         <td> {{ foo.buger__nick_name }}</td>
                         <td id="png_id" style="width:{{ foo.png_size }}px">
                             {% if foo.png %}

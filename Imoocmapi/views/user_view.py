@@ -1,7 +1,7 @@
 # coding=utf-8
 from django.shortcuts import render
 
-from ..models import UserInfo
+from ..models import UserInfo, Bug, ProjectInfo
 from django.http import HttpResponseRedirect, HttpResponse
 import json
 import jwt
@@ -83,11 +83,37 @@ def index(request):
     :return:
     这里来展示ios、android 性能数据、内存、cpu使用
     """
+
+    UNSOLVED = 1
+    LEGACY = 2
+    SOLVED = 3
     # project_num = ProjectInfo.objects.count()
     # module
     # if request.method is "POST":
     device_id = "00008101-00016C9E02F8001E"
-    dict_data = {}
+    token = request.COOKIES.get("token", None)
+    user_data = jwt.decode(token, "sercet", algorithms=['HS256'])
+    user_type = user_data.get("user_type", None)
+    username = user_data.get("username", None)
+    project_name = UserInfo.objects.get_project_name(username).project_name
+    data = {'user_name': username, 'user_type': user_type, 'project_name': project_name}
+    key_list = ['未解决的bug数', '线上遗留bug数', '已解决待验证']
+    data['statistics'] = UNSOLVED
+    unsolved_num = len(Bug.objects.bug_statistics(data))
+    data['statistics'] = LEGACY
+    legacy_num = len(Bug.objects.bug_statistics(data))
+    data['statistics'] = SOLVED
+    solved_num = len(Bug.objects.bug_statistics(data))
+    value_list = [unsolved_num, legacy_num, solved_num]
+
+    if request.is_ajax():
+        data = {
+            "code": 10000,
+            "msg": "获取成功",
+            'key_list': key_list,
+            'value_list': value_list
+        }
+        return HttpResponse(json.dumps(data, ensure_ascii=False), content_type="application/json,charset=utf-8")
     return render(request, "index.html")
 
 
@@ -101,7 +127,7 @@ def get_developer(request):
         token = request.COOKIES.get("token", None)
         user_data = jwt.decode(token, "sercet", algorithms=['HS256'])
         username = user_data.get("username", None)
-        #project_name = UserInfo.objects.filter(username=username).values('project_name')['project_name']
+        # project_name = UserInfo.objects.filter(username=username).values('project_name')['project_name']
         project_name = UserInfo.objects.get_project_name(username)
 
         developer_list = UserInfo.objects.get_develop_user(project_name)

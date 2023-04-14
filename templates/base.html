@@ -18,7 +18,7 @@
     <script src="https://cdn.bootcss.com/bootstrap-fileinput/4.4.8/js/fileinput.js"></script>
     <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://cdn.bootcss.com/bootstrap-fileinput/4.4.8/js/fileinput.min.js"></script>
-<script src="https://cdn.bootcss.com/amazeui/2.7.2/js/amazeui.min.js"></script>
+    <script src="https://cdn.bootcss.com/amazeui/2.7.2/js/amazeui.min.js"></script>
     <script src="https://cdn.bootcss.com/jquery.serializeJSON/2.9.0/jquery.serializejson.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js" type="text/javascript"
             charset="utf-8"></script>
@@ -28,7 +28,7 @@
 
     <script src="//apps.bdimg.com/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
     <script src="https://cdn.bootcss.com/popper.js/1.12.5/umd/popper.min.js"></script>
-<script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 
     <script src="{% static 'assets/js/app.js' %}"></script>
     <script src="{% static 'assets/js/commons.js' %}"></script>
@@ -39,7 +39,6 @@
     <link rel="stylesheet" href="{% static 'assets/css/common.css' %}">
 
 
-
 </head>
 <body class="modal-open">
 <div class="am-cf admin-main" style="position: absolute;z-index: 1222;">
@@ -47,8 +46,12 @@
     <div class="nav-navicon admin-main admin-sidebar">
 
 
-        <div class="sideMenu am-icon-dashboard" style="color:#aeb2b7; margin: 10px 0 0 0;"> 欢迎您：<div id="nick_name" style="display: inline"></div> &nbsp;&nbsp;<a
-                href='/log_out/' id="logout">注 销</a></div>
+        <div class="sideMenu am-icon-dashboard" style="color:#aeb2b7; margin: 10px 0 0 0;"> 欢迎您：
+            <div id="nick_name" style="display: inline"></div> &nbsp;&nbsp;<a
+                    href='/log_out/' id="logout">注 销</a></div>
+        <div class="sideMenu"> &nbsp;&nbsp;
+            <li><a href='/index/' style="font-size: 15px">首页</a></li>
+        </div>
         <div class="sideMenu">
             <h3 class="am-icon-th-list"><em></em> <a href="#"> bug管理</a></h3>
             <ul>
@@ -87,76 +90,76 @@
             <ul>
                 <li><a href="/env_list/">运 行 环 境</a></li>
             </ul>
+        </div>
+
+
+
+        {% block content %}
+
+        {% endblock %}
+
+        <script type="text/javascript">
+            $('#logout').click(function () {
+                $.cookie("token", null, {path: '/'})
+            });
+            var nick_name = localStorage.getItem("nick_name")
+            $('#nick_name').text(nick_name)
+
+            jQuery(".sideMenu").slide({
+                titCell: "h3", //鼠标触发对象
+                targetCell: "ul", //与titCell一一对应，第n个titCell控制第n个targetCell的显示隐藏
+                effect: "slideDown", //targetCell下拉效果
+                delayTime: 300, //效果时间
+                triggerTime: 150, //鼠标延迟触发时间（默认150）
+                defaultPlay: true,//默认是否执行效果（默认true）
+                returnDefault: false //鼠标从.sideMen移走后返回默认状态（默认false）
+            });
+
+
+            function initFileInput(ctrlName) {
+                var control = $('#' + ctrlName);
+                control.fileinput({
+                    resizeImage: true,
+                    resizePreference: 'width',
+                    uploadAsync: false,                             //采用同步上传
+                    language: 'zh', //设置语言
+                    uploadUrl: '/api/upload_file/',
+                    allowedFileExtensions: ['yml', 'yaml', 'json'],//接收的文件后缀
+                    showUpload: true, //是否显示上传按钮
+                    showRemove: false,
+                    showCaption: true,//是否显示标题
+                    browseClass: "btn btn-primary", //按钮样式
+                    previewFileIcon: "<i class='glyphicon glyphicon-king'></i>",
+                    maxFileCount: 10,
+                    msgFilesTooMany: "选择文件超过了最大数量",
+                    maxFileSize: 2000,
+                    uploadExtraData:
+                        function () {     //上传时要传输的其他参数
+                            project_name = $('#project option:selected').val();//选中的文本
+                            module_name = $('#upload_belong_module_id option:selected').val();//选中的文本
+                            return {"project": project_name, "module": module_name};
+                        },
+                    showClose: false,//显示右上角X关闭
+                    overwriteInitial: false, //是否显示预览
+                    dropZoneEnabled: false,//是否显示拖拽区域
+                });
+                control.on('fileerror', function (event, data, msg) {
+                    myAlert(msg)
+                });
+                control.on("filebatchuploadsuccess", function (event, data) {
+                    var obj = data.response;
+                    $("#bulk_uploadcase").trigger('click');
+                    if (obj.status.indexOf('/api/') !== -1) {
+                        window.location.href = obj.status;
+                    } else {
+                        myAlert(obj.status);
+                    }
+                });
+            }
+
+            initFileInput("uploadfile");
+        </script>
     </div>
-
-
-
-    {% block content %}
-
-    {% endblock %}
-
-    <script type="text/javascript">
-        $('#logout').click(function(){
-            $.cookie("token",null,{path:'/'})
-        });
-        var nick_name = localStorage.getItem("nick_name")
-        $('#nick_name').text(nick_name)
-
-        jQuery(".sideMenu").slide({
-            titCell: "h3", //鼠标触发对象
-            targetCell: "ul", //与titCell一一对应，第n个titCell控制第n个targetCell的显示隐藏
-            effect: "slideDown", //targetCell下拉效果
-            delayTime: 300, //效果时间
-            triggerTime: 150, //鼠标延迟触发时间（默认150）
-            defaultPlay: true,//默认是否执行效果（默认true）
-            returnDefault: false //鼠标从.sideMen移走后返回默认状态（默认false）
-        });
-
-
-        function initFileInput(ctrlName) {
-            var control = $('#' + ctrlName);
-            control.fileinput({
-                resizeImage: true,
-                resizePreference: 'width',
-                uploadAsync: false,                             //采用同步上传
-                language: 'zh', //设置语言
-                uploadUrl: '/api/upload_file/',
-                allowedFileExtensions: ['yml', 'yaml', 'json'],//接收的文件后缀
-                showUpload: true, //是否显示上传按钮
-                showRemove: false,
-                showCaption: true,//是否显示标题
-                browseClass: "btn btn-primary", //按钮样式
-                previewFileIcon: "<i class='glyphicon glyphicon-king'></i>",
-                maxFileCount: 10,
-                msgFilesTooMany: "选择文件超过了最大数量",
-                maxFileSize: 2000,
-                uploadExtraData:
-                    function () {     //上传时要传输的其他参数
-                        project_name = $('#project option:selected').val();//选中的文本
-                        module_name = $('#upload_belong_module_id option:selected').val();//选中的文本
-                        return {"project": project_name, "module": module_name};
-                    },
-                showClose: false,//显示右上角X关闭
-                overwriteInitial: false, //是否显示预览
-                dropZoneEnabled: false,//是否显示拖拽区域
-            });
-            control.on('fileerror', function (event, data, msg) {
-                myAlert(msg)
-            });
-            control.on("filebatchuploadsuccess", function (event, data) {
-                var obj = data.response;
-                $("#bulk_uploadcase").trigger('click');
-                if (obj.status.indexOf('/api/') !== -1) {
-                    window.location.href = obj.status;
-                } else {
-                    myAlert(obj.status);
-                }
-            });
-        }
-
-        initFileInput("uploadfile");
-    </script>
-</div>
 </div>
 <div class="am-modal am-modal-alert" tabindex="-1" id="my-alert">
     <div class="am-modal-dialog">
