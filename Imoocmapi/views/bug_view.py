@@ -5,12 +5,15 @@ from django.http import HttpResponse
 from django.shortcuts import render
 import json
 
-from .user_view import check_login
+from .user_view import check_login, chech_user_auth
 from ..models import Bug, ProjectInfo, ModuleInfo, Version, UserInfo
 from ..utils.common import send_notice
 from ..utils.tencent_cos import TencentCOS
 import os
 import datetime
+from PIL import Image
+from io import BytesIO
+import requests
 
 
 def put_png(request):
@@ -58,10 +61,13 @@ def put_png(request):
         url = os.path.join(settings.MEDIA_URL, 'images/bug', file_full_name)
         # 上传的文件：绝对路径
         local_file = file_path + '/' + file_full_name
-        # 将原始文件名作为key传给COS
+        img = Image.open(local_file)
+        img_size = img.size
+        width = str(img_size[0])
+        height = str(img_size[1])        # 将原始文件名作为key传给COS
         key = 'mooc plant/' + file_full_name
         # 调用COS上传文件，返回url
-        upload = TencentCOS().upload_cos(local_file, key)
+        upload = TencentCOS().upload_cos(local_file, key)+"#"+width+"*"+height
         file_list = [upload]
         return HttpResponse(json.dumps({'success': 1,
                                         'message': "上传成功！",
@@ -70,6 +76,7 @@ def put_png(request):
 
 
 @check_login
+@chech_user_auth
 def bugList(request):
     platformItem = {"1": "IOS", "2": "Android", "3": "web", "4": "pc", "5": "pad", "6": "服务端"}
     start_level = {'1': '1星', '2': '2星', '3': '3星', '4': '4星'}
@@ -86,6 +93,8 @@ def bugList(request):
                 data["buger"] = username
             else:
                 data["developer"] = username
+        else:
+            data["only_me"] = "0"
         bug_list = Bug.objects.search_bug(data)
     else:
         bug_list = Bug.objects.get_all_bug()
@@ -114,6 +123,7 @@ def bugList(request):
 
 
 @check_login
+@chech_user_auth
 def addBug(request):
     if request.is_ajax():
         module_info = {

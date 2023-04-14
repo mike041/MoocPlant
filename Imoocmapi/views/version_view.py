@@ -2,12 +2,13 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from .user_view import check_login
+from .user_view import check_login, chech_user_auth
 from ..models import Version, ProjectInfo
 import json
 
 
 @check_login
+@chech_user_auth
 def addVersion(request):
     '''
     :param request:
@@ -37,6 +38,7 @@ def addVersion(request):
 
 
 @check_login
+@chech_user_auth
 def versionList(request):
     '''
     :param request:

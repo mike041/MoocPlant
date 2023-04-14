@@ -1,11 +1,23 @@
 # coding=utf-8
 from django.shortcuts import render
 
-from ..models import UserInfo, Bug, ProjectInfo
+from ..models import UserInfo, Bug, ProjectInfo,UserPermission
 from django.http import HttpResponseRedirect, HttpResponse
 import json
 import jwt
 from ..utils.common import handle_redis
+
+
+def get_username(request):
+    """
+    根据用户获取项目信息
+    :param request:
+    :return:
+    """
+    token = request.COOKIES.get("token", None)
+    user_data = jwt.decode(token, "sercet", algorithms=['HS256'])
+    user_key = user_data.get("username")
+    return user_key
 
 
 def check_login(func):
@@ -29,7 +41,20 @@ def check_login(func):
 
 
 def chech_user_auth(func):
-    pass
+    def wrapper(request, *args, **kwargs):
+        username = get_username(request)
+        user_url_list = [url.get("system_url") for url in UserPermission.objects.get_user_permission(username)]
+        user_request_url = request.path
+        if user_request_url in user_url_list or "*" in user_url_list:
+            return func(request, *args, **kwargs)
+        else:
+            return HttpResponseRedirect("/no_auth/")
+
+    return wrapper
+
+
+def no_auth(request):
+    return render(request, "noautth.html")
 
 
 def login(request):
@@ -76,6 +101,7 @@ def logout(request):
 
 
 @check_login
+@chech_user_auth
 def index(request):
     """
     首页

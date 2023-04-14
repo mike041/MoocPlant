@@ -5,10 +5,11 @@ from django.shortcuts import render
 from Imoocmapi.models import ModuleInfo, ProjectInfo
 import json
 
-from Imoocmapi.views.user_view import check_login
+from Imoocmapi.views.user_view import check_login, chech_user_auth
 
 
 @check_login
+@chech_user_auth
 def addModule(request):
     '''
     :param request:
@@ -38,6 +39,7 @@ def addModule(request):
 
 
 @check_login
+@chech_user_auth
 def moduleList(request):
     '''
     :param ajax:
