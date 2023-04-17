@@ -64,10 +64,10 @@ def put_png(request):
         img = Image.open(local_file)
         img_size = img.size
         width = str(img_size[0])
-        height = str(img_size[1])        # 将原始文件名作为key传给COS
+        height = str(img_size[1])  # 将原始文件名作为key传给COS
         key = 'mooc plant/' + file_full_name
         # 调用COS上传文件，返回url
-        upload = TencentCOS().upload_cos(local_file, key)+"#"+width+"*"+height
+        upload = TencentCOS().upload_cos(local_file, key) + "#" + width + "*" + height
         file_list = [upload]
         return HttpResponse(json.dumps({'success': 1,
                                         'message': "上传成功！",
@@ -171,10 +171,11 @@ def addBug(request):
             request_data['developer'] = developer_object
             request_data['buger'] = buger_object
             Bug.objects.add_bug(**request_data)
-            # 发送Mind推送
 
+            # 发送Mind推送
+            username = UserInfo.objects.get_user_nick_name(tester)['nick_name']
             mind_uid = UserInfo.objects.get_mind_id(developer_name)['mind_uid']
-            notice = f'**{tester}** 新建了bug **{request_data["bug_title"]}**  http://test.im30.lan/bug_list/'
+            notice = f'**{username}** 新建了bug **{request_data["bug_title"]}**  http://test.im30.lan/bug_list/'
             if request_data['png']:
                 for png in request_data['png']:
                     notice = notice + f' ![]({png})'
@@ -244,7 +245,8 @@ def edit_bug(request):
         else:
             return HttpResponse(json.dumps(data))
         mind_uid = UserInfo.objects.get_mind_id_by_username(user_name)['mind_uid']
-        notice = f'**{operator}** 将bug: **{bug.bug_title}** 置为 **{bug_state_data.get(bug_state)}**  http://test.im30.lan/bug_list/'
+        username = UserInfo.objects.get_user_nick_name(operator)['nick_name']
+        notice = f'**{username}** 将bug: **{bug.bug_title}** 置为 **{bug_state_data.get(bug_state)}**  http://test.im30.lan/bug_list/'
         if bug.png != '[]':
             pngs = bug.png.replace('[', '').replace(']', '').replace('\'', '')
             for png in pngs.split(','):
