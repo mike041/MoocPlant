@@ -64,7 +64,7 @@ def login(request):
     data = {
         "code": 10000,
         "msg": "登录成功",
-        "url": "/index/",
+        "url": "/bug_list/",
         "token": "",
         "nick_name": ""
     }
