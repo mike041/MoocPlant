@@ -24,7 +24,6 @@
                     <li style="padding-top: 5px">
                         <select name="project" id="project" class="am-input-zm am-input-xm"
                                 onchange="select_module()">
-                        <option value="All" selected>All</option>
                             {% for project_name in project_list %}
                                 <option value="{{ project_name }}"
                                         >{{ project_name }}</option>
@@ -131,8 +130,29 @@
                 </button>
             </div>
 
-            <ul class="am-pagination am-fr">
-                {{ page_list }}
+            <ul class="am-pagination am-fr" id="page">
+                {# 上一页链接 #}
+                {% if bug_info.has_previous %}
+                <li class="previous"><a href="/bug_list/?page={{ bug_info.previous_page_number }}">上一页</a></li>
+                {% else %}
+                <li class="previous disabled"><a href="#">上一页</a></li>
+                {% endif %}
+
+                {# 中间数字显示 #}
+                {%  for num in bug_info.paginator.page_range %}
+                    {%  if num == currentPage %}
+                        <li class="item active"><a href="/bug_list/?page={{ num }}">{{ num }}</a></li>
+                    {% else %}
+                        <li class="item"><a href="/bug_list/?page={{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+
+                {# 下一页链接 #}
+                {% if bug_info.has_next %}   {# 如果有下一页，则正常显示下一页链接 #}
+                    <li class="next"><a href="/bug_list/?page={{ bug_info.next_page_number }}">下一页</a></li>
+                {% else %}
+                    <li class="next disabled"><a href="#">下一页</a></li>
+                {% endif %}
             </ul>
 
 

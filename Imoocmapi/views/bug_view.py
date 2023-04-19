@@ -5,15 +5,15 @@ from django.http import HttpResponse
 from django.shortcuts import render
 import json
 
-from .user_view import check_login, chech_user_auth
+from .user_view import check_login, chech_user_auth, get_project_name
 from ..models import Bug, ProjectInfo, ModuleInfo, Version, UserInfo
 from ..utils.common import send_notice
 from ..utils.tencent_cos import TencentCOS
 import os
 import datetime
 from PIL import Image
-from io import BytesIO
-import requests
+from django.core.paginator import Paginator,EmptyPage,PageNotAnInteger,InvalidPage
+
 
 
 def put_png(request):
@@ -78,28 +78,33 @@ def put_png(request):
 @check_login
 @chech_user_auth
 def bugList(request):
+    page = None
     platformItem = {"1": "IOS", "2": "Android", "3": "web", "4": "pc", "5": "pad", "6": "服务端"}
     start_level = {'1': '1星', '2': '2星', '3': '3星', '4': '4星'}
     bug_state = {'1': '未解决', '2': '已解决', '3': '延期解决', '4': '不解决', '5': '关闭', '6': '激活'}
+    project_name = get_project_name(request)
     if request.is_ajax():
         data = json.loads(request.body.decode('utf-8'))
+        data['project'] = project_name
         token = request.COOKIES.get("token", None)
         user_data = jwt.decode(token, "sercet", algorithms=['HS256'])
         user_type = user_data.get("user_type", None)
         username = user_data.get("username", None)
         data["search_versions"] = data.get("search_versions", None)
+        page = data.get("page", 1)
+        #data.pop("page")
         if "only_me" in data.keys():
             if user_type == 3:
                 data["buger"] = username
             else:
-                data["developer"] = username
+                user_nick_name = UserInfo.objects.get_user_nick_name(username)
+                data["developer"] = user_nick_name.get("nick_name")
         else:
             data["only_me"] = "0"
         bug_list = Bug.objects.search_bug(data)
     else:
-        bug_list = Bug.objects.get_all_bug()
-
-    project_list = []
+        bug_list = Bug.objects.get_all_bug(project_name)
+    project_list = project_name
     for bug in bug_list:
         bug_png_list = []
         bug['plantform'] = platformItem[bug.get("plantform")]
@@ -110,13 +115,31 @@ def bugList(request):
             bug_png_list = eval(bug_png)
             bug['png'] = bug_png_list
             bug['png_size'] = 60 * len(bug_png_list)
-        if bug["project__project_name"] not in project_list:
-            project_list.append(bug["project__project_name"])
+        #if bug["project__project_name"] not in project_list:
+        #    project_list.append(bug["project__project_name"])
+    #分页
+
+    if request.method =="GET":
+        paginator = Paginator(bug_list, 10)
+        page = request.GET.get("page",1)
+    else:
+        paginator = Paginator(bug_list, 50)
+    current_page = int(page)
+    try:
+        # 获取查询页数的接口数据列表，page()函数会判断page实参是否是有效数字。page()函数源码附在文章的最后
+        apitest_list = paginator.get_page(current_page)
+    except PageNotAnInteger:
+        apitest_list = paginator.page(1)
+    except (EmptyPage, InvalidPage):
+        # paginator.num_pages
+        apitest_list = paginator.page(paginator.num_pages)
+    #分页结束
     bug_info = {
-        "bug_info": bug_list,
+        "bug_info": apitest_list,#bug_list,
         "project_list": project_list
     }
     if request.is_ajax():
+        bug_info["bug_info"] = list(bug_info.get("bug_info"))
         return HttpResponse(json.dumps(bug_info))
     else:
         return render(request, 'bug_list.html', bug_info)
@@ -194,7 +217,7 @@ def addBug(request):
         user_data = jwt.decode(token, "sercet", algorithms=['HS256'])
         username = user_data.get("username", None)
         # todo 修改新增bug逻辑
-        project_name = UserInfo.objects.get_project_name(username)
+        project_name = UserInfo.objects.get_project_name(username)[0]
 
         developer_list = UserInfo.objects.get_develop_user(project_name)
         version_list = Version.objects.get_project_version(project_name)

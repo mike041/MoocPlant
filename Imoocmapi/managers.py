@@ -37,7 +37,7 @@ class UserInfoManager(models.Manager):
         获取所有开发人员
         :return:
         '''
-        nick_name_list = self.filter(user_type=2, project_name=project_name).values("id", "nick_name")
+        nick_name_list = self.filter(user_type=2, project_name__project_name=project_name).values("id", "nick_name")
         nick_name_data = list([nick_name for nick_name in nick_name_list])
         return nick_name_data
 
@@ -75,7 +75,9 @@ class UserInfoManager(models.Manager):
         :param user_name:
         :return:
         '''
-        project_name = self.get(username=user_name).project_name
+        project_name = list([project.get("project_name__project_name") for project in
+                             self.filter(username=user_name).values("project_name__project_name")])
+        # project_name = self.get(username=user_name).project_name
         return project_name
 
 
@@ -180,8 +182,11 @@ class VersionManager(models.Manager):
         self.create(**kwargs)
 
     def get_project_version(self, project_name):
-        version_list = self.filter(project_name__project_name=project_name).values("version")
+        version_list = self.filter(Q(project_name__project_name=project_name)).values("version").order_by("-id")[0:4]
+        online_list = self.filter(Q(project_name__project_name=project_name) & Q(version__contains ="线上")).values("version")
         version_name_list = [version for version in version_list]
+        online_version_name_list = [version for version in online_list]
+        version_name_list.extend(online_version_name_list)
         return version_name_list
 
     def get_all_version(self):
@@ -210,12 +215,12 @@ class BugManager(models.Manager):
     def add_bug(self, **kwargs):
         self.create(**kwargs)
 
-    def get_all_bug(self):
+    def get_all_bug(self, project_name):
         '''
         展示所有bug
         :return:
         '''
-        bug_list_object = self.filter(~Q(state=5))
+        bug_list_object = self.filter(~Q(state=5) & (Q(project__project_name__in=project_name)))
         # bug_list.values()
         bug_list = list(bug_list_object.values("id", "project__project_name", "module__module_name", "version__version",
                                                "bug_title",
@@ -223,6 +228,7 @@ class BugManager(models.Manager):
                                                "buger__nick_name", "png").order_by("-id"))
         # self.values())
         # self.values("id","project__")
+
         return bug_list
 
     def update_bug(self, bug_id, bug_state=None, developer=None):
@@ -237,6 +243,20 @@ class BugManager(models.Manager):
         else:
             bug.update(developer=int(developer))
 
+    def search_bug1(self, args):
+        print(args)
+        bug_version = args.get("search_versions")
+        args.pop("search_versions")
+
+        if "buger" in args.keys():
+            buger = args.get("buger")
+            args.pop("buger")
+        # {'project': 'All', 'module': 'All', 'developer': '', 'search_versions': 'All', 'only_me': '0'}
+        project_name, module_name, developer_name, bug_version, only_me = args.values()
+
+        if project_name == 'All':
+            self.filter()
+
     def search_bug(self, args):
         """
         根据项目、模块查找bug
@@ -245,7 +265,28 @@ class BugManager(models.Manager):
         """
         # self.filter(**args)
         bug_version = args.get("search_versions")
+        buger = args.get("buger", None)
+        if buger is not None:
+            args.pop("buger")
         args.pop("search_versions")
+        project_name, module_name, developer_name, only_me = args.values()
+        bug_list = []
+        if module_name == "All":
+            if developer_name != "":
+                if only_me == "1" and buger is not None:
+                    bug_list = self.filter(Q(project__project_name__in=project_name) & Q(buger__username=buger) & Q(developer__nick_name=developer_name) & ~Q(state=5))
+                else:
+                    bug_list = self.filter(
+                        Q(project__project_name__in=project_name) & Q(developer__nick_name=developer_name) & ~Q(state=5))
+            else:
+                if only_me == "1" and buger is not None:
+                    bug_list = self.filter(Q(project__project_name__in=project_name) & Q(buger__username=buger) & ~Q(state=5))
+                else:
+                    bug_list = self.filter(
+                        Q(project__project_name__in=project_name) & ~Q(state=5))
+        else:
+            bug_list = self.filter(Q(project__project_name__in=project_name) & Q(module__module_name=module_name) & ~Q(state=5))
+
         '''
         if "buger" in args.keys():
             buger = args.get("buger")
@@ -255,6 +296,7 @@ class BugManager(models.Manager):
         
         if project_name == 'All':
             self.filter()
+        '''
         '''
         if "buger" in args.keys() and "only_me" in args.keys():
             if bug_version == "All":
@@ -272,7 +314,11 @@ class BugManager(models.Manager):
                 bug_list = self.filter(
                     Q(developer__username=args["developer"]) & ~Q(version__version=bug_version) & ~Q(state=5))
         if "only_me" not in args.keys():
-            project_name, module_name, developer_name = args.values()
+            project_name, module_name, developer_name, only_me = args.values()
+            print("--->>>>>>>>",args)
+            if module_name == "All":
+                bug_list = self.filter(Q(module__module_name=module_name) & Q(project__project_name__in=project_name))
+                print("--->>>",bug_list)
             if project_name != "All":
                 if module_name != "" and developer_name != "" and module_name != "All" and developer_name != "All":
                     if bug_version != "All":
@@ -316,7 +362,9 @@ class BugManager(models.Manager):
                 if developer_name != "" and project_name == "All":
                     bug_list = self.filter(developer__nick_name=developer_name)
                 else:
+                    print("----------->")
                     bug_list = self.filter(~Q(state=5))
+        '''
         return list(
             bug_list.values("id", "project__project_name", "module__module_name", "version__version", "bug_title",
                             "plantform", "state", "start", "developer__nick_name", "buger__nick_name", "png").order_by(

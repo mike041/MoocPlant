@@ -124,12 +124,18 @@ def get_developer(request):
             "developer_list": None,
             "msg": ""
         }
-        token = request.COOKIES.get("token", None)
-        user_data = jwt.decode(token, "sercet", algorithms=['HS256'])
-        username = user_data.get("username", None)
-        # project_name = UserInfo.objects.filter(username=username).values('project_name')['project_name']
-        project_name = UserInfo.objects.get_project_name(username)
-
+        project_name = get_project_name(request)[0]
         developer_list = UserInfo.objects.get_develop_user(project_name)
         data["developer_list"] = developer_list
         return HttpResponse(json.dumps(data))
+
+
+def get_project_name(request):
+    """
+    根据用户获取项目名字
+    :param request:
+    :return:
+    """
+    username = get_username(request)
+    project_name = UserInfo.objects.get_project_name(username)
+    return project_name

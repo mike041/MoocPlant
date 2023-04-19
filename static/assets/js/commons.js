@@ -125,6 +125,23 @@ function auto_load_module(id, url, types) {
     if (types == 'versions') {
         data['version'] = '请选择'
     }
+    if(types =="add_bug"){
+        for(var i in data){
+            if(data[i]=="请选择"){
+                myAlert("有必填字段必填哦!")
+                return false
+            }
+            if(i=="bug_title"){
+                if(data["bug_title"]==""){
+                    myAlert("有必填字段必填哦!")
+                    return false
+                }
+            }
+        }
+
+    }
+
+
     $.ajax({
         type: 'post',
         headers: {'X-CSRFToken': csrftoken},
@@ -348,6 +365,7 @@ function search_bug() {
         contentType: "application/json",
         success: function (data) {
             data = JSON.parse(data)["bug_info"]
+            var page = $('#page')
             for (var i = 0; i < data.length; i++) {
                 var bug_id = data[i]["id"]
                 table_body.append('<tr><td><label><input type="checkbox" name="bug_' + bug_id + '" value="' + data[i]["id"] + '"/></label></td><td id="bug_num">' + data[i]["id"] + '</td><td><a href="#" onclick="">' + data[i]["project__project_name"] + '</a></td>' +
@@ -363,6 +381,7 @@ function search_bug() {
                 }
 
             }
+            page.remove()
         }
     })
 }
