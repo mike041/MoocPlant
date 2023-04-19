@@ -1,11 +1,14 @@
 # coding=utf-8
 from django.shortcuts import render
 
-from ..models import UserInfo, UserPermission
 from django.http import HttpResponseRedirect, HttpResponse
 import json
 import jwt
-from ..utils.common import handle_redis
+
+from ..models import UserInfo, UserPermission, Bug
+
+
+#from ..utils.common import handle_redis
 
 
 def get_username(request):
@@ -61,7 +64,7 @@ def login(request):
     data = {
         "code": 10000,
         "msg": "登录成功",
-        "url": "/bug_list/",
+        "url": "/index/",
         "token": "",
         "nick_name": ""
     }
@@ -121,7 +124,7 @@ def index(request):
     user_data = jwt.decode(token, "sercet", algorithms=['HS256'])
     user_type = user_data.get("user_type", None)
     username = user_data.get("username", None)
-    project_name = UserInfo.objects.get_project_name(username).project_name
+    project_name = UserInfo.objects.get_project_name(username)
     data = {'user_name': username, 'user_type': user_type, 'project_name': project_name}
     key_list = ['未解决的bug数', '线上遗留bug数', '已解决待验证']
     data['statistics'] = UNSOLVED

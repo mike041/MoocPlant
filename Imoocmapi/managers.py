@@ -377,26 +377,25 @@ class BugManager(models.Manager):
         # 开发
         if user_type == 2:
             if statistics == 1:
-                bug_list = self.filter(Q(developer__username=username) & Q(project__project_name=project_name)
+                bug_list = self.filter(Q(developer__username=username) & Q(project__project_name__in=project_name)
                                        & Q(Q(state=1) | Q(state=3) | Q(state=6)))
-                bug_list = self.filter(Q(developer__username=username) & Q(project__project_name=project_name))
+                bug_list = self.filter(Q(developer__username=username) & Q(project__project_name__in=project_name))
             elif statistics == 2:
-                bug_list = self.filter(Q(developer__username=username) & Q(project__project_name=project_name)
+                bug_list = self.filter(Q(developer__username=username) & Q(project__project_name__in=project_name)
                                        & Q(Q(state=1) | Q(state=3) | Q(state=6)))
             elif statistics == 3:
-                bug_list = self.filter(Q(developer__username=username) & Q(project__project_name=project_name) & Q(
+                bug_list = self.filter(Q(developer__username=username) & Q(project__project_name__in=project_name) & Q(
                     Q(state=2) | Q(state=4)))
         else:  # 测试或产品
             if statistics == 1:
-                bug_list = self.filter(Q(buger__username=username) & Q(project__project_name=project_name)
+                bug_list = self.filter(Q(buger__username=username) & Q(project__project_name__in=project_name)
                                        & Q(Q(state=1) | Q(state=3) | Q(state=6)))
             elif statistics == 2:
-                bug_list = self.filter(Q(buger__username=username) & Q(project__project_name=project_name)
+                bug_list = self.filter(Q(buger__username=username) & Q(project__project_name__in=project_name)
                                        & Q(Q(state=1) | Q(state=3) | Q(state=6)))
             elif statistics == 3:
-                bug_list = self.filter(Q(buger__username=username) & Q(project__project_name=project_name) & Q(
+                bug_list = self.filter(Q(buger__username=username) & Q(project__project_name__in=project_name) & Q(
                     Q(state=2) | Q(state=4)))
-
         return list(
             bug_list.values("id", "project__project_name", "module__module_name", "version__version", "bug_title",
                             "plantform", "state", "start", "developer__nick_name", "buger__nick_name", "png").order_by(
