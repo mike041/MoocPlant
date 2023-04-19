@@ -1,19 +1,82 @@
-{% extends "base_one.html" %}
-{% block title %}首页{% endblock %}
+{% extends "base.html" %}
+{% block title %}新增项目{% endblock %}
 {% load static %}
 {% block content %}
-    <script type="text/javascript" src="https://cdn.staticfile.org/echarts/4.3.0/echarts.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-stat@latest/dist/ecStat.min.js"></script>
-    <!-- <script type="text/javascript"
 
-            src="http://echarts.baidu.com/gallery/vendors/echarts/extension/dataTool.min.js"></script>
-    <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/map/js/china.js"></script>
-    <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/map/js/world.js"></script>
-    <script type="text/javascript"
-            src="http://echarts.baidu.com/gallery/vendors/echarts/extension/bmap.min.js"></script>
-    <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/simplex.js"></script>-->
+    <div class=" admin-content">
+
+        <div class="admin-biaogelist" style="top: 0px" onload="chart2()">
+            <div class="listbiaoti am-cf">
+                <ul class="am-icon-flag on"> 新增bug</ul>
+                <dl class="am-icon-home" style="float: right;"> 当前位置： bug管理 > <a href="#">新增bug</a></dl>
+            </div>
+            <div id="container" style="height: 100%">
+            </div>
+        </div>
+    </div>
 
 
+    <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.4.2/dist/echarts.min.js"></script>
+    <script type="text/javascript">
+        window.onload = function () {
+
+
+            const csrftoken = getCookie('csrftoken');
+            var data = {};
+            $.ajax({
+                type: 'post',
+                headers: {'X-CSRFToken': csrftoken},
+                url: '/index/',
+                data: JSON.stringify(data),
+                contentType: "application/json",
+                success: function (data) {
+                    var state = JSON.parse(JSON.stringify(data))['code']
+                    if (state !== 10000) {
+                        myAlert(data['msg']);
+                    } else {
+                        var dom = document.getElementById('container');
+                        var myChart = echarts.init(dom, null, {
+                            renderer: 'canvas',
+                            useDirtyRect: false
+                        });
+                        var app = {};
+                        var option;
+                        var keys = JSON.parse(JSON.stringify(data))['key_list']
+                        console.log(keys)
+                        var values = JSON.parse(JSON.stringify(data))['value_list']
+                        console.log(values)
+
+                        option = {
+                            xAxis: {
+                                type: 'category',
+                                data: keys
+                            },
+                            yAxis: {
+                                type: 'value'
+                            },
+                            series: [
+                                {
+                                    data: values,
+                                    type: 'bar'
+                                }
+                            ]
+                        };
+
+
+                        if (option && typeof option === 'object') {
+                            myChart.setOption(option);
+                        }
+
+                        window.addEventListener('resize', myChart.resize);
+                    }
+                },
+                error: function () {
+                    myAlert('Sorry，服务器可能开小差啦, 请重试!');
+                }
+            });
+
+
+        };
+    </script>
 
 {% endblock %}

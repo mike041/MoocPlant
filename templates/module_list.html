@@ -21,26 +21,26 @@
             <form id="pro_filter" method="post" action="/module_list/">
                 <ul>
                     <li style="padding-top: 5px">
-                            <select name="project" class="am-input-zm am-input-xm"
-                                    onchange="auto_load_module('#pro_filter', '/module_list/','module')">
-                                {% for foo in module %}
-                                    {% ifchanged foo.belong_project__project_name %}
-                                         <option value="{{ foo.belong_project__project_name }}">{{ foo.belong_project__project_name }}</option>
-                                    {% endifchanged %}
+                        <select name="project" class="am-input-zm am-input-xm"
+                                onchange="auto_load_module('#pro_filter', '/module_list/','module')">
+                            {% for foo in module %}
+                                {% ifchanged foo.belong_project__project_name %}
+                                    <option value="{{ foo.belong_project__project_name }}">{{ foo.belong_project__project_name }}</option>
+                                {% endifchanged %}
 
-                                {% endfor %}
-                            </select>
+                            {% endfor %}
+                        </select>
                     </li>
 
 
                     <li style="padding-top: 5px">
                         <select name="module" class=" am-input-zm am-input-xm" id="module">
                             {% for foo in module %}
-                                    {% ifchanged foo.module_name %}
-                                         <option selected value="{{ foo.module_name }}">{{ foo.module_name }}</option>
-                                    {% endifchanged %}
+                                {% ifchanged foo.module_name %}
+                                    <option selected value="{{ foo.module_name }}">{{ foo.module_name }}</option>
+                                {% endifchanged %}
 
-                                {% endfor %}
+                            {% endfor %}
 
                         </select>
                     </li>
@@ -72,7 +72,7 @@
                         <td><input type="checkbox" name="module_{{ foo.id }}" value="{{ foo.id }}"/></td>
                         <td>{{ forloop.counter }}</td>
                         <td>{{ foo.module_name }}</td>
-                    <td>{{ foo.belong_project__project_name }}</td>
+                        <td>{{ foo.belong_project__project_name }}</td>
                         <td>{{ foo.create_time|date:"Y-m-d H:i:s" }}</td>
 
 
@@ -137,11 +137,11 @@
         });
 
 
-
         $('#select_all').click(function () {
             var isChecked = $(this).prop("checked");
             $("input[name^='module']").prop("checked", isChecked);
         })
     </script>
+
 
 {% endblock %}
