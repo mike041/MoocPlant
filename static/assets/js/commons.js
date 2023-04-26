@@ -750,6 +750,9 @@ function change_date() {
         success: function (data){
             data = JSON.parse(data)["msg"]
             myAlert(data)
+        },
+        error: function () {
+            myAlert('Sorry，服务器可能开小差啦, 请重试!');
         }
 
     })

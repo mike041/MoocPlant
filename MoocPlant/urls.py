@@ -16,7 +16,7 @@ Including another URLconf
 from django.urls import path, re_path
 from django.views.generic import RedirectView
 from django.conf.urls.static import static
-from Imoocmapi.views import base_view, bug_view, module_view, project_view, user_view, version_view, user_view, \
+from Imoocmapi.views import base_view, bug_view, module_view, project_view, version_view, user_view, \
     interface_view
 import xadmin
 from MoocPlant import settings
@@ -46,7 +46,7 @@ urlpatterns = [
                   path("interface_list/", interface_view.interface_list),
                   path("add_interface/", interface_view.add_interface),
                   path('develop_list/', user_view.get_developer),
-                  path('no_auth/', user_view.no_auth),
-                  path('change_date/', base_view.change_date)
+                  path('change_date/', base_view.change_date),
+                  path('no_auth/', user_view.no_auth)
 
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
