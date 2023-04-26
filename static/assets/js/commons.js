@@ -597,6 +597,14 @@ function myAlert(data) {
         relatedTarget: this
     });
 }
+/*
+function bugDetail(bug_title) {
+    var bug_detail = $('#bug_detail')
+    bug_detail.text(bug_title)
+    $('#bug_detail').modal({
+        relatedTarget: this
+    });
+}*/
 
 function post(url, params) {
     var temp = document.createElement("form");
@@ -728,6 +736,23 @@ function update_bug(bug_id) {
             myAlert('Sorry，服务器可能开小差啦, 请重试!');
         }
     });
+}
+function change_date() {
+    const csrftoken = getCookie('csrftoken');
+    var date = $('#change_date').serializeJSON();
+    console.log(date);
+    $.ajax({
+        type: 'post',
+        headers: {'X-CSRFToken': csrftoken},
+        url: '/change_date/',
+        data: JSON.stringify(date),
+        contentType: "application/json",
+        success: function (data){
+            data = JSON.parse(data)["msg"]
+            myAlert(data)
+        }
+
+    })
 }
 
 function BigBig(src, width, height) {
