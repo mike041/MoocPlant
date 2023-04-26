@@ -737,7 +737,7 @@ function update_bug(bug_id) {
         }
     });
 }
-function change_date() {
+function changeDate() {
     const csrftoken = getCookie('csrftoken');
     var date = $('#change_date').serializeJSON();
     console.log(date);
