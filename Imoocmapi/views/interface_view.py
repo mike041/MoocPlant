@@ -28,21 +28,23 @@ def changeDate(request):
     :param request:
     :return:
     """
-    if request.is_ajax():
-        data = {
-            "msg": "更新成功"
-        }
-        request_data = json.loads(request.body.decode("utf-8")).get("datetime")
-        try:
-            change_system_date(request_data)
-        except Exception:
-            data["msg"] = "更新失败"
-        return HttpResponse(json.dumps(data))
-    else:
-        data = {
-            "time": ""
-        }
-        time_str = time.strftime("%Y-%m-%d %H:%M:%S",time.localtime())
-        #time_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        data["time"] = time_str
-        return render(request, "change_date.html", context=data)
+
+    data = {
+        "time": ""
+    }
+    time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    # time_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    data["time"] = time_str
+    return render(request, "change_date.html", context=data)
+
+
+def ctime(request):
+    data = {
+        "msg": "更新成功"
+    }
+    request_data = json.loads(request.body.decode("utf-8")).get("datetime")
+    try:
+        change_system_date(request_data)
+    except Exception:
+        data["msg"] = "更新失败"
+    return HttpResponse(json.dumps(data))

@@ -744,7 +744,7 @@ function changeDate() {
     $.ajax({
         type: 'post',
         headers: {'X-CSRFToken': csrftoken},
-        url: '/ctime',
+        url: '/changetime/',
         data: JSON.stringify(date),
         contentType: "application/json",
         success: function (data){
