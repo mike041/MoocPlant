@@ -43,6 +43,7 @@ def ctime(request):
         "msg": "更新成功"
     }
     request_data = json.loads(request.body.decode("utf-8")).get("datetime")
+    return HttpResponse(json.dumps(request_data))
     try:
         change_system_date(request_data)
     except Exception:
