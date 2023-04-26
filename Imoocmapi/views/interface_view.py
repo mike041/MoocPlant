@@ -34,7 +34,10 @@ def changeDate(request):
             "msg": "更新成功"
         }
         request_data = json.loads(request.body.decode("utf-8")).get("datetime")
-        change_system_date(request_data)
+        try:
+            change_system_date(request_data)
+        except Exception:
+            data["msg"] = "更新失败"
         return HttpResponse(json.dumps(data))
     else:
         data = {

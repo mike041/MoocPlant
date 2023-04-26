@@ -46,7 +46,7 @@ urlpatterns = [
                   path("interface_list/", interface_view.interface_list),
                   path("add_interface/", interface_view.add_interface),
                   path('develop_list/', user_view.get_developer),
-                  path('time_gate/', interface_view.changeDate),
+                  path('ctime', interface_view.changeDate),
                   path('no_auth/', user_view.no_auth)
 
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
