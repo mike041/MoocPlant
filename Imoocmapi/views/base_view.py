@@ -4,21 +4,14 @@ from random import randrange
 from django.http import HttpResponseRedirect, HttpResponse
 
 from django.shortcuts import render
+import datetime
 
 # Create your views here.
 
 
 from Imoocmapi.models import UserInfo, Bug, ProjectInfo
-from Imoocmapi.views.user_view import chech_user_auth
-
-
-def check_login(func):
-    def wrapper(request, *args, **kwargs):
-        if not request.session.get("login_status"):
-            return HttpResponseRedirect("/login/")
-        return func(request, *args, **kwargs)
-
-    return wrapper
+from Imoocmapi.utils.common import change_system_date
+from Imoocmapi.views.user_view import chech_user_auth, check_login
 
 
 @chech_user_auth
@@ -85,3 +78,28 @@ def envList(request):
     :return:
     '''
     return render(request, "env_list.html")
+
+
+@check_login
+@chech_user_auth
+def change_date(request):
+    """
+    修改服务端时间
+    :param request:
+    :return:
+    """
+    if request.is_ajax():
+        data = {
+            "msg":"更新成功"
+        }
+        request_data = json.loads(request.body.decode("utf-8")).get("datetime")
+        print(request_data)
+        change_system_date(request_data)
+        return HttpResponse(json.dumps(data))
+    else:
+        data = {
+            "time":""
+        }
+        time_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        data["time"] = time_str
+        return render(request, "change_date.html",data)

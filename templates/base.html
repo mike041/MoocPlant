@@ -34,6 +34,9 @@
     <script src="{% static 'assets/js/commons.js' %}"></script>
     <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap-fileinput/4.4.8/css/fileinput.min.css"/>
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
     <link rel="stylesheet" href="http://cdn.bootcss.com/amazeui/2.7.2/css/amazeui.min.css"/>
     <link rel="stylesheet" href="{% static 'assets/css/admin.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/common.css' %}">
@@ -79,6 +82,7 @@
             </ul>
             <h3 class="am-icon-th-list"><em></em> <a href="#"> 数据工具</a></h3>
             <ul>
+                <li><a href="/change_date/">时间之门</a></li>
                 <li><a href="/im_performance/">IM压测</a></li>
                 <li><a href="/chat_performance/">聊天压测</a></li>
                 <li><a href="/im_chat/">IM和聊天</a></li>
@@ -168,6 +172,18 @@
             <span class="am-modal-btn">确定</span>
         </div>
     </div>
+</div>
+<div class="am-modal am-modal-alert" tabindex="-1" id="bug_detail">
+    <div class="am-modal-dialog">
+        <div class="am-modal-hd">bug详情</div>
+        <div class="am-modal-bd" id="bug_title">
+            哈哈，bug
+        </div>
+        <div class="am-modal-footer">
+            <span class="am-modal-btn">确定</span>
+        </div>
+    </div>
+
 </div>
 </div>
 

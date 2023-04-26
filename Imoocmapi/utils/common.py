@@ -8,6 +8,9 @@ import json
 
 import redis
 import requests
+import http.client
+import time
+import os,sys
 
 
 class HandleRedis(object):
@@ -54,6 +57,12 @@ def send_notice(text, channel=''):
         'Content-Type': 'application/json'
     }
     res = requests.request("POST", url, headers=headers, data=payload)
+
+
+def change_system_date(data):
+    command = "date -s {}".format(data)
+    os.system(command)
+    sys.exit()
 
 
 handle_redis = HandleRedis()

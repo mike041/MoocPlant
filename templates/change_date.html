@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}时间之门{% endblock %}
+{% load static %}
+{% block content %}
+
+    <div class=" admin-content">
+
+        <div class="admin-biaogelist" style="top: 0px">
+            <div class="listbiaoti am-cf">
+                <ul class="am-icon-flag on"> 时间之门</ul>
+                <dl class="am-icon-home" style="float: right;"> 当前位置： 时间管理 > <a href="#">时间之门</a></dl>
+            </div>
+            <div class="fbneirong">
+                <form class="form-horizontal" id="change_date">
+                    <div class="form-group  has-feedback">
+                        <label class="control-label col-md-1 text-primary" for="project_name">当前时间：</label>
+                        <div class="col-md-5" style="margin-top: 7px;font-size: 16px">
+                            {{ time }}
+                        </div>
+                    </div>
+
+
+                    <div class="form-group  has-feedback">
+                        <label class="control-label col-md-1 text-primary" for="simple_desc">修改时间：</label>
+                        <input type="text" name="datetime" id="datetime" placeholder="Choose Date and Time" />
+                    </div>
+
+
+                    <div class="am-form-group am-cf">
+                        <div class="you" style="margin-left: 8%;">
+                            <button type="button" class="am-btn am-btn-success am-radius" id="send"
+                                    onclick="change_date()">点 击 提 交
+                            </button>&nbsp;
+
+                        </div>
+                    </div>
+                </form>
+
+
+            </div>
+        </div>
+    </div>
+<script>
+flatpickr("#datetime", {
+    enableTime: true,
+    dateFormat: "Y-m-d H:i",
+});
+</script>
+{% endblock %}
