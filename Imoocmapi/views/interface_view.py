@@ -1,5 +1,6 @@
-#coding=utf-8
+# coding=utf-8
 import datetime
+import time
 
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -14,12 +15,13 @@ from Imoocmapi.views.user_view import check_login, chech_user_auth
 def interface_list(request):
     return render(request, "interface_list.html")
 
+
 @check_login
 @chech_user_auth
 def add_interface(request):
-    return render(request,"add_interface.html")
+    return render(request, "add_interface.html")
 
-@check_login
+
 @chech_user_auth
 def changeDate(request):
     """
@@ -27,11 +29,10 @@ def changeDate(request):
     :param request:
     :return:
     """
-    if request.method == "POST":
+    if request.is_ajax():
         data = {
             "msg": "更新成功"
         }
-
         request_data = json.loads(request.body.decode("utf-8")).get("datetime")
         change_system_date(request_data)
         return HttpResponse(json.dumps(data))
@@ -39,6 +40,7 @@ def changeDate(request):
         data = {
             "time": ""
         }
-        time_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        time_str = time.strftime("%Y-%m-%d %H:%M:%S",time.localtime())
+        #time_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         data["time"] = time_str
         return render(request, "change_date.html", context=data)
