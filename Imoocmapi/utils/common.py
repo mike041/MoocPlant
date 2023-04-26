@@ -61,7 +61,8 @@ def send_notice(text, channel=''):
 
 
 def change_system_date(data):
-    command = 'sudo date -s "{}"'.format(data)
+    date = datetime.datetime.strptime(data, "%Y-%m-%d %H:%M") - datetime.timedelta(hours=8)
+    command = 'sudo date -s "{}"'.format(date)
     os.system(command)
     # sys.exit()
 
