@@ -80,9 +80,8 @@ def envList(request):
     return render(request, "env_list.html")
 
 
-
 @chech_user_auth
-def change_date(request):
+def changeDate(request):
     """
     修改服务端时间
     :param request:
@@ -90,15 +89,15 @@ def change_date(request):
     """
     if request.method == "POST":
         data = {
-            "msg":"更新成功"
+            "msg": "更新成功"
         }
         request_data = json.loads(request.body.decode("utf-8")).get("datetime")
         change_system_date(request_data)
         return HttpResponse(json.dumps(data))
     else:
         data = {
-            "time":""
+            "time": ""
         }
         time_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         data["time"] = time_str
-        return render(request, "change_date.html",data)
+        return render(request, "change_date.html", data)
