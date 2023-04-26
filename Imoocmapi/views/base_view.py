@@ -93,7 +93,6 @@ def change_date(request):
             "msg":"更新成功"
         }
         request_data = json.loads(request.body.decode("utf-8")).get("datetime")
-        print(request_data)
         change_system_date(request_data)
         return HttpResponse(json.dumps(data))
     else:
