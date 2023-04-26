@@ -22,7 +22,6 @@ def add_interface(request):
     return render(request, "add_interface.html")
 
 
-@chech_user_auth
 def changeDate(request):
     """
     修改服务端时间
