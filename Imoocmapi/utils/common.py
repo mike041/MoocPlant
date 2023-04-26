@@ -65,4 +65,4 @@ def change_system_date(data):
     sys.exit()
 
 
-handle_redis = HandleRedis()
+#handle_redis = HandleRedis()

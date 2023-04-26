@@ -8,10 +8,7 @@ import datetime
 
 # Create your views here.
 
-
-from Imoocmapi.models import UserInfo, Bug, ProjectInfo
-from Imoocmapi.utils.common import change_system_date
-from Imoocmapi.views.user_view import chech_user_auth, check_login
+from Imoocmapi.views.user_view import chech_user_auth
 
 
 @chech_user_auth
@@ -80,24 +77,4 @@ def envList(request):
     return render(request, "env_list.html")
 
 
-@chech_user_auth
-def changeDate(request):
-    """
-    修改服务端时间
-    :param request:
-    :return:
-    """
-    if request.method == "POST":
-        data = {
-            "msg": "更新成功"
-        }
-        request_data = json.loads(request.body.decode("utf-8")).get("datetime")
-        change_system_date(request_data)
-        return HttpResponse(json.dumps(data))
-    else:
-        data = {
-            "time": ""
-        }
-        time_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        data["time"] = time_str
-        return render(request, "change_date.html", data)
+
