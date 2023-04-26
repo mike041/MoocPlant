@@ -60,7 +60,8 @@ def send_notice(text, channel=''):
 
 
 def change_system_date(data):
-    command = "date -s {}".format(data)
+    command = 'date -s "{}"'.format(data)
     os.system(command)
+    sys.exit()
 
 #handle_redis = HandleRedis()
