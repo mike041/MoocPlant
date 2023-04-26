@@ -80,7 +80,7 @@ def envList(request):
     return render(request, "env_list.html")
 
 
-@check_login
+
 @chech_user_auth
 def change_date(request):
     """
@@ -88,7 +88,7 @@ def change_date(request):
     :param request:
     :return:
     """
-    if request.is_ajax():
+    if request.method == "POST":
         data = {
             "msg":"更新成功"
         }
