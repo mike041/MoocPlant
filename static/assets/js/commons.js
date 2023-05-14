@@ -125,14 +125,14 @@ function auto_load_module(id, url, types) {
     if (types == 'versions') {
         data['version'] = '请选择'
     }
-    if(types =="add_bug"){
-        for(var i in data){
-            if(data[i]=="请选择"){
+    if (types == "add_bug") {
+        for (var i in data) {
+            if (data[i] == "请选择") {
                 myAlert("有必填字段必填哦!")
                 return false
             }
-            if(i=="bug_title"){
-                if(data["bug_title"]==""){
+            if (i == "bug_title") {
+                if (data["bug_title"] == "") {
                     myAlert("有必填字段必填哦!")
                     return false
                 }
@@ -597,6 +597,7 @@ function myAlert(data) {
         relatedTarget: this
     });
 }
+
 /*
 function bugDetail(bug_title) {
     var bug_detail = $('#bug_detail')
@@ -737,6 +738,7 @@ function update_bug(bug_id) {
         }
     });
 }
+
 function changeDate() {
     const csrftoken = getCookie('csrftoken');
     var date = $('#change_date').serializeJSON();
@@ -747,7 +749,7 @@ function changeDate() {
         url: '/changetime/',
         data: JSON.stringify(date),
         contentType: "application/json",
-        success: function (data){
+        success: function (data) {
             data = JSON.parse(data)["msg"]
             myAlert(data)
         },
@@ -760,10 +762,10 @@ function changeDate() {
 
 function BigBig(src, width, height) {
     var img_size = src.split("#")[1]
-    if (img_size !=undefined) {
+    if (img_size != undefined) {
         var img_width = img_size.split("*")[0]
         var img_height = img_size.split("*")[1]
-    }else{
+    } else {
         var img_width = width * 20
         var img_height = height * 20
     }
@@ -783,6 +785,29 @@ function showimage(source) {
 }
 
 function login() {
+    var userinfo = $('#login_form').serializeJSON();
+    $.ajax({
+        type: 'post',
+        headers: {'X-CSRFToken': getCookie('csrftoken')},
+        url: '/login/',
+        data: JSON.stringify(userinfo),
+        contentType: "application/json",
+        success: function (data) {
+            data = JSON.parse(data)['status']
+            if (data === 10000) {
+                window.location.reload();
+            } else {
+                myAlert(data['msg']);
+            }
+        },
+        error: function () {
+            myAlert('Sorry，服务器可能开小差啦, 请重试!');
+        }
+    });
+}
+
+
+function ws_server(type) {
     var userinfo = $('#login_form').serializeJSON();
     $.ajax({
         type: 'post',

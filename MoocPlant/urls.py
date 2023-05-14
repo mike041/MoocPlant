@@ -33,7 +33,7 @@ urlpatterns = [
                   path('add_module/', module_view.addModule),
                   path('im_performance/', base_view.imPerformance),
                   path('chat_performance/', base_view.chatPerformance),
-                  path('interface_performance/',base_view.interfacePerformance),
+                  path('interface_performance/', base_view.interfacePerformance),
                   path('im_chat/', base_view.imChat),
                   path('add_version/', version_view.addVersion),
                   path('version_list/', version_view.versionList),
@@ -47,7 +47,7 @@ urlpatterns = [
                   path("add_interface/", interface_view.add_interface),
                   path('develop_list/', user_view.get_developer),
                   path('ctime', interface_view.changeDate),
-                  path('changetime/',interface_view.ctime),
-                  path('no_auth/', user_view.no_auth)
+                  path('changetime/', interface_view.ctime),
+                  path('no_auth/', user_view.no_auth),
 
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

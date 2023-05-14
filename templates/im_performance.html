@@ -12,33 +12,76 @@
             </div>
             <div class="fbneirong">
                 <form class="form-horizontal" id="im_performance">
-                    <div class="form-group  has-feedback">
-                        <label class="control-label col-md-1 text-primary" for="module_name">环境：</label>
+                    <div class="form-group">
+                        <label class="control-label col-md-1 text-primary" for="env">环境：</label>
                         <div class="col-md-5">
-                            <input type="text" class="form-control" id="module_name"
-                                   aria-describedby="inputSuccess3Status" name="module_name" placeholder="请输入环境"
-                                   value="">
+                            <select name="env" class="form-control">
+                                <option value="test">test</option>
+                                <option value="pre">pre</option>
+                            </select>
                         </div>
                     </div>
+
                     <div class="form-group">
-                        <label class="control-label col-md-1 text-primary" for="belong_project">所属项目：</label>
+                        <label class="control-label col-md-1 text-primary" for="mode">模式：</label>
                         <div class="col-md-5">
-                            <select name="belong_project" class="form-control">
-                                <option value="请选择">请选择</option>
-                                {% for foo in env %}
-                                    <option value="{{ foo }}">{{ foo }}</option>
-                                {% endfor %}
+                            <select name="mode" class="form-control">
+                                <option value="random">随机发送</option>
+                                <option value="assign">指定发送</option>
                             </select>
                         </div>
                     </div>
 
 
                     <div class="form-group  has-feedback">
-                        <label class="control-label col-md-1 text-primary" for="simple_desc">简要描述：</label>
+                        <label class="control-label col-md-1 text-primary" for="sender">发起人：</label>
                         <div class="col-md-5">
-                            <textarea type="text" rows="3" class="form-control" id="simple_desc" name="simple_desc"
-                                      aria-describedby="inputSuccess3Status" placeholder="模块简单概述"></textarea>
-                            <span class="glyphicon glyphicon-paperclip form-control-feedback" aria-hidden="true"></span>
+                            <input type="text" class="form-control" id="sender"
+                                   aria-describedby="inputSuccess3Status" name="sender" placeholder="请输入发起人手机号"
+                                   value="">
+                        </div>
+                    </div>
+
+                    <div class="form-group  has-feedback">
+                        <label class="control-label col-md-1 text-primary" for="receiver">接收人：</label>
+                        <div class="col-md-5">
+                            <input type="text" class="form-control" id="receiver"
+                                   aria-describedby="inputSuccess3Status" name="receiver"
+                                   placeholder="请输入接受人手机号，多个按逗号隔开"
+                                   value="">
+                        </div>
+                    </div>
+
+                    <div class="form-group  has-feedback">
+                        <label class="control-label col-md-1 text-primary" for="group">接收群：</label>
+                        <div class="col-md-5">
+                            <input type="text" class="form-control" id="group"
+                                   aria-describedby="inputSuccess3Status" name="group"
+                                   placeholder="请输入要发送的群组，多个按逗号隔开"
+                                   value="">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-1 text-primary" for="message_type">消息类型：</label>
+                        <div class="col-md-5">
+                            <select name="message_type" class="form-control" multiple=”multiple”>
+                                <option value="text">文本</option>
+                                <option value="robot">机器人</option>
+                                <option value="bi">BI</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-1 text-primary" for="server_num">开启本地服务数量：</label>
+                        <div class="col-md-5">
+                            <select name="server_num" class="form-control">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
                         </div>
                     </div>
                     <div class="am-form-group am-cf">
@@ -49,6 +92,8 @@
                         </div>
                     </div>
                 </form>
+
+
             </div>
         </div>
     </div>
