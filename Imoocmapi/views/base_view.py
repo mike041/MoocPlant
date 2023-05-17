@@ -1,14 +1,20 @@
 import json
+import os
+import random
 from random import randrange
 
+import gevent
 from django.http import HttpResponseRedirect, HttpResponse
 
 from django.shortcuts import render
 import datetime
 
 # Create your views here.
+from django.views.decorators.csrf import csrf_exempt
+
+from Imoocmapi import utils
 from Imoocmapi.utils.send_message import User
-from Imoocmapi.views.user_view import chech_user_auth
+from Imoocmapi.views.user_view import chech_user_auth, check_login
 from sdk.mind_im_server import IMServer
 
 
@@ -28,6 +34,22 @@ def index(request):
     return render(request, "index.html")
 
 
+def gevent_run(func, env='test', phone_list='', ports=None, message_types=[1, ]):
+    gevent_list = []
+    for phone in phone_list:
+        ge = gevent.spawn(func, env, phone=phone, ports=ports, message_type=message_types)
+        gevent_list.append(ge)
+    gevent.joinall(gevent_list)
+
+
+def random_run(env, phone, ports, message_types):
+    user = User(env, phone_number=phone)
+    user.login()
+    port = ports[random.randrange(0, len(ports), 1)]
+    user.start(port=port, message_types=message_types)
+
+
+@check_login
 @chech_user_auth
 def imPerformance(request):
     '''
@@ -40,28 +62,33 @@ def imPerformance(request):
         }
 
         request_data = json.loads(request.body.decode('utf-8'))
-
+        print('request_data', json.dumps(request_data))
         env = request_data.get("env")
         mode = request_data.get("mode")
         sender = request_data.get("sender")
         receiver = request_data.get("receiver")
         group = request_data.get("group")
         message_type = request_data.get("message_type")
-        server_num = request_data.get("server_num")
+        ports = request_data.get("server_num")
 
         # 1 开启服务
         server = IMServer(env)
-        for port in range(30001, 30000 + server_num + 1):
-            server.build_server(str(port))
 
-        # 关闭所有服务
-        # server.quit()
+        server.build_servers(ports)
 
         if mode == 'random':
             response_data = {
                 "msg": "开发中"
             }
+            if env == 'pre':
+                print('当前是预发环境')
+                json_data: dict = utils.parse_json_file(os.path.join('Imoocmapi/', 'userdata', 'user_cookie.json'))
+            elif env == 'test':
+                print('当前是测试环境')
+                json_data: dict = utils.parse_json_file(os.path.join('Imoocmapi/', 'userdata', 'test_user_cookie.json'))
             return HttpResponse(json.dumps(response_data))
+            user_list = list(json_data.keys())[20:25]
+            gevent_run(random_run, env=env, phone_list=user_list, ports=ports, message_types=message_type)
         elif mode == 'assign':
             if sender == '':
                 response_data = {
@@ -73,15 +100,14 @@ def imPerformance(request):
                     "msg": "至少填写一个接收者或群组"
                 }
                 return HttpResponse(json.dumps(response_data))
+            return HttpResponse(json.dumps(response_data))
             user = User(env, sender)
             user.login()
-            user.start(user_id=receiver, group_id=group, message_types=message_type)
+            user.start(user_id=receiver, group_id=group, message_types=message_type, servers=server.servers)
 
-        # server.quit()
 
-        return HttpResponse(json.dumps(response_data))
     else:
-        return render(request, "add_project.html")
+        return render(request, "im_performance.html")
 
 
 @chech_user_auth

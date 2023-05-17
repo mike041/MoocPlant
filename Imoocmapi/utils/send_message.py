@@ -9,7 +9,10 @@
 # -*- encoding: utf-8 -*-
 import time
 
+import gevent
+
 from Imoocmapi import utils
+from sdk.mind_im_server import IMServer
 
 '''
 @File    :   meeting.py
@@ -35,6 +38,7 @@ group_dict = {}
 class User:
 
     def __init__(self, env='test', phone_number=None):
+        self.env = env
         if env == 'test':
 
             self.BASE_URL = 'http://mind.im30.lan'
@@ -54,8 +58,6 @@ class User:
         self.session_id = None
         self.mind_im_token = None
         self.mind_im_userid = None
-        self.meeting_id = None
-        self.sendID = self.mind_im_userid
         self.device_id = utils.getRandom(32)
         self.im_cookie = {}
         self.header = {
@@ -65,14 +67,6 @@ class User:
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
             "sec-ch-ua-platform": "Windows"
         }
-
-        self.ws = websocket.WebSocketApp(
-            url=self.BASE_WS + "/?sendID={}&token={}&platformID=5".format(self.mind_im_userid, self.mind_im_token),
-            on_message=self.on_message,
-            on_pong=self.on_pong,
-            cookie=json.dumps(self.im_cookie)
-        )
-        self.ws.on_open = self.on_open
 
     def login(self):
 
@@ -133,12 +127,56 @@ class User:
             else:
                 return False
 
-        # 登录步骤 1、获取验证码 2、mind登录 3、im登录
-        get_verify_code()
-        mind_login()
-        im_login()
+        if self.env == 'pre':
+            json_data: dict = utils.parse_json_file(os.path.join(rootPath, 'userdata', 'user_cookie.json'))
+        elif self.env == 'test':
+            print('当前是测试环境')
+            json_data: dict = utils.parse_json_file(os.path.join(rootPath, 'userdata', 'test_user_cookie.json'))
 
-    def start(self, mode=2, user_id='', group_id='', message_types=[1, ]):
+        if json_data.get(str(self.phone)):
+            print('================有缓存不用登录')
+            user_json = json_data.get(str(self.phone))
+            self.cookie = user_json.get('mind_cookie')
+            self.base_user_id_or_mind_user_id = user_json.get('mind_cookie').get('MINDUSERID')
+            self.token_or_mind_token = user_json.get('mind_cookie').get('MINDTOKEN')
+            self.home_mind_token = user_json.get('mind_cookie').get('MINDTOKEN')
+            self.mind_teamid = user_json.get('mind_cookie').get('MINDTEAMID')
+            self.session_id = user_json.get('mind_cookie').get('sessionid')
+
+            self.im_cookie = user_json.get('im_cookie')
+            self.mind_im_token = user_json.get('im_cookie').get('MINDIMTOKEN')
+            self.mind_im_userid = user_json.get('im_cookie').get('MINDIMUSERID')
+
+        # 登录步骤 1、获取验证码 2、mind登录 3、im登录
+        else:
+            get_verify_code()
+            mind_login()
+            im_login()
+
+    def start(self, mode=2, user_id='', group_id='', message_types=[1, ], port=None):
+
+        self.ws = websocket.WebSocketApp(
+            # url=self.BASE_WS + "/?sendID={}&token={}&platformID=3".format(self.mind_im_userid, self.mind_im_token),
+            url='ws://127.0.0.1:30001' + "/?sendID={}&token={}&platformID=3".format(self.mind_im_userid,
+                                                                                    self.mind_im_token),
+            on_message=self.on_message,
+            on_pong=self.on_pong,
+            cookie=json.dumps(self.im_cookie)
+        )
+        self.ws.on_open = self.on_open
+
+        # 把手机号转换为im_user_id
+        if len(str(user_id)) == 11:
+            if self.env == 'pre':
+                json_data: dict = utils.parse_json_file(os.path.join(rootPath, 'userdata', 'user_cookie.json'))
+            elif self.env == 'test':
+                print('当前是测试环境')
+                json_data: dict = utils.parse_json_file(os.path.join(rootPath, 'userdata', 'test_user_cookie.json'))
+            if json_data.get(str(self.phone)):
+                user_json = json_data.get(str(user_id))
+                user_id = user_json.get('im_cookie').get('MINDIMUSERID')
+            else:
+                user_id = ''
 
         self.im = {
             'mode': mode,
@@ -184,18 +222,18 @@ class User:
         def message_body(sendID='', senderNickname='', groupID='', message_json={}):
             send_time = int(time.time())
             message = {
-                "clientMsgID": f"{utils.getRandom(16)}",
+                "clientMsgID": f"{utils.getRandom(32)}",
                 "serverMsgID": "",
                 "createTime": send_time,
                 "sendTime": send_time,
                 "sessionType": 0,
                 "sendID": f"{sendID}",
-                "recvID": "",
+                "recvID": f"{recvID}",
                 "msgFrom": 100,
                 "contentType": 140,
-                "platformID": 5,
-                "senderNickname": f"{senderNickname}",
-                "senderFaceUrl": "https://cdn-file-mind.im30.net/image_picker1883742117465822451.jpg",
+                "platformID": 3,
+                "senderNickname": f"{self.nickname}",
+                "senderFaceUrl": f"{self.faceURL}",
                 "groupID": f"{groupID}",
                 "content": f"{json.dumps(message_json)}",
                 "seq": 0,
@@ -300,8 +338,7 @@ class User:
             }
             return message
 
-        cookie = json.loads(ws.cookie)
-        userId = cookie.get("MINDIMUSERID")
+        userId = self.mind_im_userid
 
         if self.im.get('mode') == 1:
             recvID = ''
@@ -310,18 +347,22 @@ class User:
             recvID = self.im.get('user_id')
             groupID = self.im.get('group_id')
         # todo 消息类型还没写完
+
         all_messages = [text('这是文本消息'), text('这是bi消息'), text('这是机器人消息')]
         # 随机获取想发送的消息类型
-        messages = [all_messages[i] for i in self.im.get('message_types')]
-        message = utils.randomkey(messages)
+        messages = [all_messages[i - 1] for i in self.im.get('message_types')]
+        # message = utils.randomkey(messages)
+        message = text(time.strftime('%Y-%m-%d %H:%M:%S',
+                                     time.localtime()) + '若发起人为自己，则所有状态的审批单都可发起再次提交，并且将原单的值赋到最新版本的审批单中；否则不会显示【再次提交】的按钮（1）若新版本审批单的控件发生变化，则仅将与原单相同控件的值自动带入即可举例：原审批单表单控件为A B C，新版本表单控件为A D，则再次提交时，仅将A值带入新版本审批单即可（2）若该审批单被停用，则再次提交时，仅toast提示“该审批类型已停用，暂不支持再次提交”即可（3）若该审批单被删除，则再次提交时，仅taost提示“该审批类型已删除，不支持再次提交”即可PC端效果（审批中心与IM)侧边栏相同')
 
-        message_json = message_body(sendID=recvID, groupID=groupID, message_json=message)
-
+        message_json = message_body(sendID=userId, groupID=groupID, message_json=message)
+        new_message = {"title": "你收到一条新消息", "desc": "", "ex": "", "iOSPushSound": "+1", "iOSBadgeCount": True}
         data_json = {
             "recvID": recvID,
             "groupID": groupID,
-            "offlinePushInfo": "{\"title\":\"你收到一条新消息\",\"desc\":\"\",\"ex\":\"\",\"iOSPushSound\":\"+1\",\"iOSBadgeCount\":true}",
-            "message": json.dumps(message_json)
+            "offlinePushInfo": json.dumps(new_message),
+            "message": json.dumps(message_json),
+            'isResend': False
         }
         send_data = {
             "reqFuncName": "SendMessage",
@@ -334,18 +375,21 @@ class User:
 
     def on_open(self, ws):
         # 向服务器发送连接信息
-        cookie = json.loads(ws.cookie)
-        userId = cookie.get("MINDIMUSERID")
-        token = cookie.get("MINDIMTOKEN")
+
+        userId = self.mind_im_userid
+        token = self.mind_im_token
         user_data = json.dumps({
             "userID": userId,
-            "token": token
+            "token": token,
+            "batchMsg": 1,
+            "notCheck": False
         })
         data = {
             "reqFuncName": "Login",
             "operationID": utils.getRandom(32),
             "userID": userId,
-            "data": user_data
+            "data": user_data,
+            "batchMsg": 1
         }
         ws.send(json.dumps(data))
 
@@ -354,39 +398,39 @@ class User:
         res = json.loads(message)
         event = res.get("event")
         code = res.get("errCode")
-        print(res)
-        if event == "Login" and code == 0:
-            print('==============================登录')
-            self.get_user_info(ws)
-            self.getJoinedGroupList(ws)
-            self.getTotalUnreadMsgCount(ws)
 
-        if event == "GetSelfUserInfo" and code == 0:
-            # create_message(ws)
-            print('==============================获取用户信息')
-            pass
-
-        # if event == "SendMessage" and code == 0:
-        #     print('消息发送成功')
-        if event == "OnRecvNewMessages" and code == 0:
+        if event == "SendMessage" and code == 0:
+            print('==============================消息发送成功')
+        elif event == "OnRecvNewMessages" and code == 0:
+            print('==============================收到新消息')
             data = res.get('data')
-            self.im_send(ws)
+            for i in range(100):
+                self.im_send(ws)
             self.markGroupMessageAsRead(data)  # 将本话题所有消息置为已读
 
-        if event == "GetJoinedGroupList" and code == 0:
+        elif event == "GetJoinedGroupList" and code == 0:
             print('==============================获取群组信息')
-            cookie = json.loads(ws.cookie)
-            userId = cookie.get("MINDIMUSERID")
             # 把所有人对应的话题列表存起来
             data = res.get('data')
             for group in json.loads(data):
                 if group['status'] == 0 and group['dismissTime'] == 0:
                     self.groups.append(group['groupID'])
-            self.im_send(ws)
+            print('======groups', self.groups)
+        elif event == "Login" and code == 0:
+            print('==============================登录成功')
+            self.get_user_info(ws)
+            self.getJoinedGroupList(ws)
+            self.getTotalUnreadMsgCount(ws)
+
+        elif event == "GetSelfUserInfo" and code == 0:
+            print('==============================获取到用户信息')
+            data = res.get('data')
+            self.nickname = json.loads(data)['nickname']
+            self.faceURL = json.loads(data)['faceURL']
+            pass
 
     def on_pong(self, ws, data):
-        cookie = json.loads(ws.cookie)
-        userId = cookie.get("MINDIMUSERID")
+        userId = self.mind_im_userid
         data = {
             "reqFuncName": "OnPongPong",
             "operationID": utils.getRandom(22),
@@ -396,8 +440,7 @@ class User:
         ws.send(json.dumps(data))
 
     def handleConversationList(self, ws, conversationList):
-        cookie = json.loads(ws.cookie)
-        userId = cookie.get("MINDIMUSERID")
+        userId = self.mind_im_userid
         userConversationDic = {
             userId: []
         }
@@ -411,8 +454,7 @@ class User:
         """
         获取用户加入的话题list
         """
-        cookie = json.loads(ws.cookie)
-        userId = cookie.get("MINDIMUSERID")
+        userId = self.mind_im_userid
         group_operationID = utils.getRandom(22)
         data = {
             "reqFuncName": "GetJoinedGroupList",
@@ -426,8 +468,7 @@ class User:
         """
         获取未读消息总数
         """
-        cookie = json.loads(ws.cookie)
-        userId = cookie.get("MINDIMUSERID")
+        userId = self.mind_im_userid
         data = {
             "reqFuncName": "GetTotalUnreadMsgCount",
             "operationID": utils.getRandom(22),
@@ -437,8 +478,7 @@ class User:
         ws.send(json.dumps(data))
 
     def markGroupMessageAsRead(self, ws, data):
-        cookie = json.loads(ws.cookie)
-        userId = cookie.get("MINDIMUSERID")
+        userId = self.mind_im_userid
 
         msg_dict = {}
         for msg in json.loads(data):
@@ -464,8 +504,7 @@ class User:
         '''
         获取用户信息
         '''
-        cookie = json.loads(ws.cookie)
-        userId = cookie.get("MINDIMUSERID")
+        userId = self.mind_im_userid
         data = {
             "data": "",
             "operationID": utils.getRandom(22),
@@ -487,15 +526,28 @@ def send_request(method, url, data, cookie=None, header=None):
 websockt相关方法
 '''
 
+
+def gevent_run(func, phone_list):
+    gevent_list = []
+    for phone in phone_list:
+        ge = gevent.spawn(func, phone=phone)
+        gevent_list.append(ge)
+    gevent.joinall(gevent_list)
+
+
+def im_run(phone):
+    user = User('pre', phone_number=phone)
+    user.login()
+    # user.start(group_id='489320452')
+    user.start(mode=1)
+
+
 if __name__ == "__main__":
     # python case/meeting.py 50  1
     # 50 代表并发人数，最大100，  1代表执行方式，1纯文字聊天、2增加会议人数  3 文字聊天加增加人数，3还没写。
     '''
     纯聊天发文字
     '''
-    # gevent_run(im_run)
-
-    user = User(phone_number=15902379218)
-    user.login()
-    # user.send_message()
-    print(user)
+    server = IMServer('pre')
+    server.build_server('30001')
+    gevent_run(im_run, [18899530117, ])

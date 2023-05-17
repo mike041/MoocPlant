@@ -31,6 +31,7 @@ function show_case(case_info, id) {
 
 /*表单信息异步传输*/
 function info_ajax(id, url) {
+    const csrftoken = getCookie('csrftoken');
     var data = $(id).serializeJSON();
     if (id === '#add_task') {
         var include = [];
@@ -43,6 +44,7 @@ function info_ajax(id, url) {
 
     $.ajax({
         type: 'post',
+        headers: {'X-CSRFToken': csrftoken},
         url: url,
         data: JSON.stringify(data),
         contentType: "application/json",
@@ -64,6 +66,43 @@ function info_ajax(id, url) {
     });
 
 }
+
+
+function im(id, url) {
+    const csrftoken = getCookie('csrftoken');
+
+    var data = $(id).serializeJSON();
+    var message_type = []
+    $("input[name='message_type']:checked").each(function (i) {
+        message_type.push($(this).attr('value'))
+    });
+
+    var server_num = []
+    $("input[name='server_num']:checked").each(function (i) {
+        server_num.push($(this).attr('value'))
+    });
+
+    data['message_type'] = message_type
+    data['server_num'] = server_num
+
+    $.ajax({
+        type: 'post',
+        headers: {'X-CSRFToken': csrftoken},
+        url: url,
+        data: JSON.stringify(data),
+        contentType: "application/json",
+        success: function (data) {
+            var msg = JSON.parse(data)
+            myAlert(msg['msg']);
+        }
+        ,
+        error: function () {
+            myAlert('Sorry，服务器可能开小差啦, 请重试!');
+        }
+    });
+
+}
+
 
 function auto_load(id, url, target, type) {
     var data = $(id).serializeJSON();

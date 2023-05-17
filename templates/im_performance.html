@@ -65,35 +65,29 @@
                     <div class="form-group">
                         <label class="control-label col-md-1 text-primary" for="message_type">消息类型：</label>
                         <div class="col-md-5">
-                            <select name="message_type" class="form-control" multiple=”multiple”>
-                                <option value="text">文本</option>
-                                <option value="robot">机器人</option>
-                                <option value="bi">BI</option>
-                            </select>
+                            <input type="checkbox" name="message_type" value="1"/>文本<br/>
+                            <input type="checkbox" name="message_type" value="2"/>机器人<br/>
+                            <input type="checkbox" name="message_type" value="3"/>BI<br/>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="control-label col-md-1 text-primary" for="server_num">开启本地服务数量：</label>
+                        <label class="control-label col-md-1 text-primary" for="server_num">开启本地服务：</label>
                         <div class="col-md-5">
-                            <select name="server_num" class="form-control">
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select>
+                            <input type="checkbox" name="server_num" value="30001"/>30001<br/>
+                            <input type="checkbox" name="server_num" value="30002"/>30002<br/>
+                            <input type="checkbox" name="server_num" value="30003"/>30003<br/>
+                            <input type="checkbox" name="server_num" value="30004"/>30004<br/>
+                            <input type="checkbox" name="server_num" value="30005"/>30005<br/>
                         </div>
                     </div>
                     <div class="am-form-group am-cf">
                         <div class="you" style="margin-left: 8%;">
                             <button type="button" class="am-btn am-btn-success am-radius"
-                                    onclick="info_ajax('#add_module', '/add_module/')">点 击 提 交
+                                    onclick="im('#im_performance', '/im_performance/')">点 击 提 交
                             </button>&nbsp;
                         </div>
                     </div>
                 </form>
-
-
             </div>
         </div>
     </div>
