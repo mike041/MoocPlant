@@ -8,10 +8,12 @@
 """
 # -*- encoding: utf-8 -*-
 import time
+from multiprocessing import Process
 
 import gevent
 
 from Imoocmapi import utils
+from Imoocmapi.utils import randomkey
 from sdk.mind_im_server import IMServer
 
 '''
@@ -27,7 +29,6 @@ sys.path.append(rootPath)
 
 import requests
 import websocket
-import random
 import json
 
 requests.packages.urllib3.disable_warnings()
@@ -40,10 +41,9 @@ class User:
     def __init__(self, env='test', phone_number=None):
         self.env = env
         if env == 'test':
-
             self.BASE_URL = 'http://mind.im30.lan'
             self.BASE_WS = 'ws://10.2.4.100:30000'
-        else:
+        elif env == 'pre':
             self.BASE_URL = 'https://premind.im30.net'
             self.BASE_WS = 'wss://premind.im30.net/ws/web'
 
@@ -60,6 +60,7 @@ class User:
         self.mind_im_userid = None
         self.device_id = utils.getRandom(32)
         self.im_cookie = {}
+
         self.header = {
             "device-id": self.device_id,
             "accept": "application/json, text/plain",
@@ -67,6 +68,8 @@ class User:
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
             "sec-ch-ua-platform": "Windows"
         }
+
+        self.message_params = {}
 
     def login(self):
 
@@ -153,12 +156,12 @@ class User:
             mind_login()
             im_login()
 
-    def start(self, mode=2, user_id='', group_id='', message_types=[1, ], port=None):
+    def start(self, mode=2, user_id='', group_id='', message_types=[1, ], port=30001, times=1):
 
+        # 新建ws
         self.ws = websocket.WebSocketApp(
             # url=self.BASE_WS + "/?sendID={}&token={}&platformID=3".format(self.mind_im_userid, self.mind_im_token),
-            url='ws://127.0.0.1:30001' + "/?sendID={}&token={}&platformID=3".format(self.mind_im_userid,
-                                                                                    self.mind_im_token),
+            url=f"ws://127.0.0.1:{int(port)}/?sendID={self.mind_im_userid}&token={self.mind_im_token}&platformID=3",
             on_message=self.on_message,
             on_pong=self.on_pong,
             cookie=json.dumps(self.im_cookie)
@@ -183,9 +186,11 @@ class User:
             'user_id': user_id,
             'group_id': group_id,
             'message_types': message_types,
+            'times': times,
+
         }
 
-        self.ws.run_forever(ping_interval=10, ping_timeout=5)
+        self.ws.run_forever()
 
     def im_send(self, ws):
 
@@ -219,7 +224,7 @@ class User:
             }
             return message
 
-        def message_body(sendID='', senderNickname='', groupID='', message_json={}):
+        def message_body(groupID='', message_json={}):
             send_time = int(time.time())
             message = {
                 "clientMsgID": f"{utils.getRandom(32)}",
@@ -227,7 +232,7 @@ class User:
                 "createTime": send_time,
                 "sendTime": send_time,
                 "sessionType": 0,
-                "sendID": f"{sendID}",
+                "sendID": f"{self.mind_im_userid}",
                 "recvID": f"{recvID}",
                 "msgFrom": 100,
                 "contentType": 140,
@@ -338,8 +343,6 @@ class User:
             }
             return message
 
-        userId = self.mind_im_userid
-
         if self.im.get('mode') == 1:
             recvID = ''
             groupID = utils.randomkey(self.groups)
@@ -355,19 +358,18 @@ class User:
         message = text(time.strftime('%Y-%m-%d %H:%M:%S',
                                      time.localtime()) + '若发起人为自己，则所有状态的审批单都可发起再次提交，并且将原单的值赋到最新版本的审批单中；否则不会显示【再次提交】的按钮（1）若新版本审批单的控件发生变化，则仅将与原单相同控件的值自动带入即可举例：原审批单表单控件为A B C，新版本表单控件为A D，则再次提交时，仅将A值带入新版本审批单即可（2）若该审批单被停用，则再次提交时，仅toast提示“该审批类型已停用，暂不支持再次提交”即可（3）若该审批单被删除，则再次提交时，仅taost提示“该审批类型已删除，不支持再次提交”即可PC端效果（审批中心与IM)侧边栏相同')
 
-        message_json = message_body(sendID=userId, groupID=groupID, message_json=message)
-        new_message = {"title": "你收到一条新消息", "desc": "", "ex": "", "iOSPushSound": "+1", "iOSBadgeCount": True}
         data_json = {
             "recvID": recvID,
             "groupID": groupID,
-            "offlinePushInfo": json.dumps(new_message),
-            "message": json.dumps(message_json),
+            "offlinePushInfo": json.dumps(
+                {"title": "你收到一条新消息", "desc": "", "ex": "", "iOSPushSound": "+1", "iOSBadgeCount": True}),
+            "message": json.dumps(message_body(groupID=groupID, message_json=message)),
             'isResend': False
         }
         send_data = {
             "reqFuncName": "SendMessage",
             "operationID": utils.getRandom(23),
-            "userID": userId,
+            "userID": self.mind_im_userid,
             "data": json.dumps(data_json)
         }
 
@@ -401,11 +403,11 @@ class User:
 
         if event == "SendMessage" and code == 0:
             print('==============================消息发送成功')
+        if event == "SendMessage" and code != 0:
+            print(res)
         elif event == "OnRecvNewMessages" and code == 0:
             print('==============================收到新消息')
             data = res.get('data')
-            for i in range(100):
-                self.im_send(ws)
             self.markGroupMessageAsRead(data)  # 将本话题所有消息置为已读
 
         elif event == "GetJoinedGroupList" and code == 0:
@@ -416,17 +418,21 @@ class User:
                 if group['status'] == 0 and group['dismissTime'] == 0:
                     self.groups.append(group['groupID'])
             print('======groups', self.groups)
+            for i in range(self.im.get('times')):
+                self.im_send(ws)
+            self.getTotalUnreadMsgCount(ws)
+
         elif event == "Login" and code == 0:
             print('==============================登录成功')
             self.get_user_info(ws)
-            self.getJoinedGroupList(ws)
-            self.getTotalUnreadMsgCount(ws)
 
         elif event == "GetSelfUserInfo" and code == 0:
             print('==============================获取到用户信息')
             data = res.get('data')
             self.nickname = json.loads(data)['nickname']
             self.faceURL = json.loads(data)['faceURL']
+            self.getJoinedGroupList(ws)
+
             pass
 
     def on_pong(self, ws, data):
@@ -527,19 +533,23 @@ websockt相关方法
 '''
 
 
-def gevent_run(func, phone_list):
-    gevent_list = []
+def process_run(func, phone_list):
+    process_list = []
     for phone in phone_list:
-        ge = gevent.spawn(func, phone=phone)
-        gevent_list.append(ge)
-    gevent.joinall(gevent_list)
+        my_process = Process(target=func, args=(phone,))
+        process_list.append(my_process)
+        my_process.daemon
+        my_process.start()
+    for process in process_list:
+        print('=======进程pid', process.pid)
+        process.join()
 
 
 def im_run(phone):
     user = User('pre', phone_number=phone)
     user.login()
     # user.start(group_id='489320452')
-    user.start(mode=1)
+    user.start(mode=2, user_id='15902379217', times=5)
 
 
 if __name__ == "__main__":
@@ -550,4 +560,4 @@ if __name__ == "__main__":
     '''
     server = IMServer('pre')
     server.build_server('30001')
-    gevent_run(im_run, [18899530117, ])
+    process_run(im_run, [18500000002, 18899530117])

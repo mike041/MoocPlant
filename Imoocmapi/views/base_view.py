@@ -1,13 +1,11 @@
 import json
 import os
 import random
-from random import randrange
 
 import gevent
 from django.http import HttpResponseRedirect, HttpResponse
 
 from django.shortcuts import render
-import datetime
 
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
@@ -34,19 +32,20 @@ def index(request):
     return render(request, "index.html")
 
 
-def gevent_run(func, env='test', phone_list='', ports=None, message_types=[1, ]):
+def gevent_run(func, env='test', phone_list='', ports=[30001, ], message_types=[1, ]):
     gevent_list = []
     for phone in phone_list:
-        ge = gevent.spawn(func, env, phone=phone, ports=ports, message_type=message_types)
+        ge = gevent.spawn(func, env, phone, mode=2, user_id='', group_id='', message_types=message_types, ports=ports)
         gevent_list.append(ge)
     gevent.joinall(gevent_list)
 
 
-def random_run(env, phone, ports, message_types):
+def random_run(env, phone, mode=2, user_id='', group_id='', message_types=[1, ], ports=[30001, ]):
     user = User(env, phone_number=phone)
     user.login()
     port = ports[random.randrange(0, len(ports), 1)]
-    user.start(port=port, message_types=message_types)
+    user.start(mode=mode, user_id=user_id, group_id=group_id, message_types=message_types, port=port)
+
 
 
 @check_login
@@ -73,9 +72,11 @@ def imPerformance(request):
 
         # 1 开启服务
         server = IMServer(env)
-
         server.build_servers(ports)
 
+        server_pids = server.pids
+
+        return HttpResponse(json.dumps(response_data))
         if mode == 'random':
             response_data = {
                 "msg": "开发中"
@@ -86,9 +87,9 @@ def imPerformance(request):
             elif env == 'test':
                 print('当前是测试环境')
                 json_data: dict = utils.parse_json_file(os.path.join('Imoocmapi/', 'userdata', 'test_user_cookie.json'))
-            return HttpResponse(json.dumps(response_data))
-            user_list = list(json_data.keys())[20:25]
+            user_list = list(json_data.keys())[20:21]
             gevent_run(random_run, env=env, phone_list=user_list, ports=ports, message_types=message_type)
+            return HttpResponse(json.dumps(response_data))
         elif mode == 'assign':
             if sender == '':
                 response_data = {
@@ -100,12 +101,9 @@ def imPerformance(request):
                     "msg": "至少填写一个接收者或群组"
                 }
                 return HttpResponse(json.dumps(response_data))
+            print('============指定发消息')
+            random_run(env, sender, mode=2, user_id=receiver, group_id=group, message_types=message_type, ports=ports)
             return HttpResponse(json.dumps(response_data))
-            user = User(env, sender)
-            user.login()
-            user.start(user_id=receiver, group_id=group, message_types=message_type, servers=server.servers)
-
-
     else:
         return render(request, "im_performance.html")
 

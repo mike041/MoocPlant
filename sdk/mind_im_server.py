@@ -11,7 +11,6 @@ import subprocess
 import sys
 import threading
 
-
 rootPath = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(rootPath)
 
@@ -34,6 +33,7 @@ class IMServer:
     def __init__(self, env):
         self._env = env
         self.servers = {}
+        self.pids = []
         pass
 
     def build_servers(self, ports):
@@ -54,7 +54,7 @@ class IMServer:
             imWsAddress = "wss://premind.im30.net/ws/mobile"
         _cmd = f'{IMServer.exe_path} -openIMApiAddress {imApiAddress} -openIMWsAddress {imWsAddress} -sdkWsPort {port} -openIMDbDir {IMServer.db_path}'
         server = subprocess.Popen(_cmd)
-
+        self.pids.append(server.pid)
         self.servers[port] = server
         pass
 
