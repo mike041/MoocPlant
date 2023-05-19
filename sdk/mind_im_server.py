@@ -51,14 +51,14 @@ class IMServer:
         else:
             imApiAddress = "https://premind.im30.net/im/api"
             imWsAddress = "wss://premind.im30.net/ws/mobile"
-        _cmd = f'sudo {IMServer.exe_path} -openIMApiAddress {imApiAddress} -openIMWsAddress {imWsAddress} -sdkWsPort {port} -openIMDbDir {IMServer.db_path}'
+        _cmd = f'{IMServer.exe_path} -openIMApiAddress {imApiAddress} -openIMWsAddress {imWsAddress} -sdkWsPort {port} -openIMDbDir {IMServer.db_path}'
 
         if sys_name == 'nt':
             server = subprocess.Popen(_cmd)
             self.pids.append(str(server.pid))
             self.servers[port] = server
         else:
-            os.system(_cmd)
+            os.system('sudo' + _cmd)
 
     def close(self, port):
         server: subprocess.Popen = self.servers.get(port)
@@ -70,7 +70,7 @@ class IMServer:
     def quit(self):
         pids = None
         if os.name == 'nt':
-            os.system('sudo taskkill /f /im %s' % f'{IMServer.sdk}')
+            os.system('taskkill /f /im %s' % f'{IMServer.sdk}')
         else:
             pids = get_process_id(IMServer.sdk)
         if not pids:

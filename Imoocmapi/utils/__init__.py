@@ -44,8 +44,13 @@ def task_kill(pids: list):
     sdk = 'open_im_sdk_electron' if sys_name == 'posix' else 'mind_ws_server_win.exe'
 
     if pids is [] or pids == ['']:
-        os.system('sudo taskkill /f /im %s' % f'{sdk}')
+        _cmd = 'taskkill /f /im %s' % f'{sdk}' if sys_name == 'posix' else f"sudo ps -ef | grep {sdk} | grep -v grep " + "| awk '{print $2}' | xargs kill -9"
+        os.system(_cmd)
         return
-    command = 'sudo taskkill /f /PID ' if os.name == 'nt' else "sudo kill -9 "
+    command = 'taskkill /f /PID ' if os.name == 'nt' else "sudo kill -9 "
     for pid in pids:
         result = os.system(command + str(pid))
+
+
+if __name__ == '__main__':
+    task_kill([''])

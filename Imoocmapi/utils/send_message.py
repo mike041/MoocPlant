@@ -553,7 +553,7 @@ class Performance:
         for process in process_list:
             process.start()
         for process in process_list:
-            # process.join()
+            process.join()
             self.user_pids.append(str(process.pid))
 
         return {'server_pids': self.server_pids,
