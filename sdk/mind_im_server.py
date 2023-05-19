@@ -36,6 +36,7 @@ class IMServer:
         pass
 
     def build_servers(self, ports):
+        # 停止之前的所有服务
         self.quit()
         for port in ports:
             self.build_server(port)
@@ -44,7 +45,7 @@ class IMServer:
     def build_server(self, port):
         if self.servers.get(port):
             return
-        # 停止之前的所有服务
+
         if self._env == 'test':
             imApiAddress = "http://10.2.4.100:10000"
             imWsAddress = "ws://10.2.4.100:17778"
@@ -53,12 +54,11 @@ class IMServer:
             imWsAddress = "wss://premind.im30.net/ws/mobile"
         _cmd = f'{IMServer.exe_path} -openIMApiAddress {imApiAddress} -openIMWsAddress {imWsAddress} -sdkWsPort {port} -openIMDbDir {IMServer.db_path}'
 
-        if sys_name == 'nt':
-            server = subprocess.Popen(_cmd)
-            self.pids.append(str(server.pid))
-            self.servers[port] = server
-        else:
-            os.system('sudo' + _cmd)
+        if sys_name != 'nt':
+            _cmd = 'sudo nohup ' + _cmd
+        server = subprocess.Popen(_cmd)
+        self.pids.append(str(server.pid))
+        self.servers[port] = server
 
     def close(self, port):
         server: subprocess.Popen = self.servers.get(port)
