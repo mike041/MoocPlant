@@ -27,7 +27,7 @@ class IMServer:
     elif sys_name == 'nt':
         sdk = 'mind_ws_server_win.exe'
     exe_path = os.path.join(rootPath, sdk)
-    db_path = os.path.join(rootPath, 'db')
+    db_path = os.path.join(rootPath, 'db/')
 
     def __init__(self, env):
         self._env = env
@@ -51,7 +51,7 @@ class IMServer:
         else:
             imApiAddress = "https://premind.im30.net/im/api"
             imWsAddress = "wss://premind.im30.net/ws/mobile"
-        _cmd = f'{IMServer.exe_path} -openIMApiAddress {imApiAddress} -openIMWsAddress {imWsAddress} -sdkWsPort {port} -openIMDbDir {IMServer.db_path}'
+        _cmd = f'sudo {IMServer.exe_path} -openIMApiAddress {imApiAddress} -openIMWsAddress {imWsAddress} -sdkWsPort {port} -openIMDbDir {IMServer.db_path}'
         server = subprocess.Popen(_cmd)
         self.pids.append(str(server.pid))
         self.servers[port] = server
