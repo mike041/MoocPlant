@@ -12,6 +12,7 @@ import sys
 
 rootPath = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(rootPath)
+sys_name = os.name
 
 
 def get_process_id(name):
@@ -21,7 +22,6 @@ def get_process_id(name):
 
 
 class IMServer:
-    sys_name = os.name
     if sys_name == 'posix':
         sdk = 'open_im_sdk_electron'
     elif sys_name == 'nt':
@@ -52,10 +52,13 @@ class IMServer:
             imApiAddress = "https://premind.im30.net/im/api"
             imWsAddress = "wss://premind.im30.net/ws/mobile"
         _cmd = f'sudo {IMServer.exe_path} -openIMApiAddress {imApiAddress} -openIMWsAddress {imWsAddress} -sdkWsPort {port} -openIMDbDir {IMServer.db_path}'
-        server = subprocess.Popen(_cmd)
-        self.pids.append(str(server.pid))
-        self.servers[port] = server
-        pass
+
+        if sys_name == 'nt':
+            server = subprocess.Popen(_cmd)
+            self.pids.append(str(server.pid))
+            self.servers[port] = server
+        else:
+            os.system(_cmd)
 
     def close(self, port):
         server: subprocess.Popen = self.servers.get(port)
@@ -67,7 +70,7 @@ class IMServer:
     def quit(self):
         pids = None
         if os.name == 'nt':
-            os.system('taskkill /f /im %s' % f'{IMServer.sdk}')
+            os.system('sudo taskkill /f /im %s' % f'{IMServer.sdk}')
         else:
             pids = get_process_id(IMServer.sdk)
         if not pids:

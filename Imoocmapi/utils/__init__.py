@@ -9,6 +9,8 @@ import os
 import random
 import subprocess
 
+sys_name = os.name
+
 
 def get_process_id(name) -> list:
     child = subprocess.Popen(["pgrep", "-f", name], stdout=subprocess.PIPE, shell=False)
@@ -39,8 +41,11 @@ def randomkey(li: list):
 
 
 def task_kill(pids: list):
-    if pids is []:
+    sdk = 'open_im_sdk_electron' if sys_name == 'posix' else 'mind_ws_server_win.exe'
+
+    if pids is [] or pids == ['']:
+        os.system('sudo taskkill /f /im %s' % f'{sdk}')
         return
-    command = 'taskkill /f /PID ' if os.name == 'nt' else "sudo kill -9 "
+    command = 'sudo taskkill /f /PID ' if os.name == 'nt' else "sudo kill -9 "
     for pid in pids:
         result = os.system(command + str(pid))
