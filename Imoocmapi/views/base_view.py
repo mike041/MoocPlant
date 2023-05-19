@@ -1,8 +1,5 @@
 import json
-import os
-import random
 
-import gevent
 from django.http import HttpResponseRedirect, HttpResponse
 
 from django.shortcuts import render

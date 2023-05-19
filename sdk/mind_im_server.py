@@ -9,7 +9,6 @@
 import os
 import subprocess
 import sys
-import threading
 
 rootPath = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(rootPath)
