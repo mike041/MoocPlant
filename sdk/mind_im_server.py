@@ -54,7 +54,7 @@ class IMServer:
             imWsAddress = "wss://premind.im30.net/ws/mobile"
         _cmd = f'{IMServer.exe_path} -openIMApiAddress {imApiAddress} -openIMWsAddress {imWsAddress} -sdkWsPort {port} -openIMDbDir {IMServer.db_path}'
         server = subprocess.Popen(_cmd)
-        self.pids.append(server.pid)
+        self.pids.append(str(server.pid))
         self.servers[port] = server
         pass
 

@@ -9,11 +9,9 @@
 # -*- encoding: utf-8 -*-
 import time
 from multiprocessing import Process
-
-import gevent
+import random
 
 from Imoocmapi import utils
-from Imoocmapi.utils import randomkey
 from sdk.mind_im_server import IMServer
 
 '''
@@ -24,7 +22,7 @@ from sdk.mind_im_server import IMServer
 import sys
 import os
 
-rootPath = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+rootPath = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(rootPath)
 
 import requests
@@ -33,7 +31,7 @@ import json
 
 requests.packages.urllib3.disable_warnings()
 
-group_dict = {}
+sys_name = os.name
 
 
 class User:
@@ -48,7 +46,7 @@ class User:
             self.BASE_WS = 'wss://premind.im30.net/ws/web'
 
         self.groups = []
-        self.phone = phone_number
+        self.phone = int(phone_number)
 
         self.cookie = {}
         self.base_user_id_or_mind_user_id = None
@@ -60,6 +58,11 @@ class User:
         self.mind_im_userid = None
         self.device_id = utils.getRandom(32)
         self.im_cookie = {}
+
+        file_name = 'user_cookie.json' if env == 'pre' else 'test_user_cookie.json'
+        self.user_data = utils.parse_json_file(os.path.join(os.path.dirname(rootPath), 'userdata', file_name))
+        # self.user_data = utils.parse_json_file(
+        #     os.path.join('D:/pythonProject/MoocPlant/Imoocmapi/', 'userdata', file_name))
 
         self.header = {
             "device-id": self.device_id,
@@ -130,15 +133,9 @@ class User:
             else:
                 return False
 
-        if self.env == 'pre':
-            json_data: dict = utils.parse_json_file(os.path.join(rootPath, 'userdata', 'user_cookie.json'))
-        elif self.env == 'test':
-            print('当前是测试环境')
-            json_data: dict = utils.parse_json_file(os.path.join(rootPath, 'userdata', 'test_user_cookie.json'))
-
-        if json_data.get(str(self.phone)):
+        if self.user_data.get(str(self.phone)):
             print('================有缓存不用登录')
-            user_json = json_data.get(str(self.phone))
+            user_json = self.user_data.get(str(self.phone))
             self.cookie = user_json.get('mind_cookie')
             self.base_user_id_or_mind_user_id = user_json.get('mind_cookie').get('MINDUSERID')
             self.token_or_mind_token = user_json.get('mind_cookie').get('MINDTOKEN')
@@ -156,9 +153,7 @@ class User:
             mind_login()
             im_login()
 
-    def start(self, mode=2, user_id='', group_id='', message_types=[1, ], port=30001, times=1):
-
-        # 新建ws
+    def start(self, receivers=[], groups=[], message_types=[1, ], port=30001, times=1):
         self.ws = websocket.WebSocketApp(
             # url=self.BASE_WS + "/?sendID={}&token={}&platformID=3".format(self.mind_im_userid, self.mind_im_token),
             url=f"ws://127.0.0.1:{int(port)}/?sendID={self.mind_im_userid}&token={self.mind_im_token}&platformID=3",
@@ -168,23 +163,9 @@ class User:
         )
         self.ws.on_open = self.on_open
 
-        # 把手机号转换为im_user_id
-        if len(str(user_id)) == 11:
-            if self.env == 'pre':
-                json_data: dict = utils.parse_json_file(os.path.join(rootPath, 'userdata', 'user_cookie.json'))
-            elif self.env == 'test':
-                print('当前是测试环境')
-                json_data: dict = utils.parse_json_file(os.path.join(rootPath, 'userdata', 'test_user_cookie.json'))
-            if json_data.get(str(self.phone)):
-                user_json = json_data.get(str(user_id))
-                user_id = user_json.get('im_cookie').get('MINDIMUSERID')
-            else:
-                user_id = ''
-
         self.im = {
-            'mode': mode,
-            'user_id': user_id,
-            'group_id': group_id,
+            'receivers': receivers,
+            'groups': groups,
             'message_types': message_types,
             'times': times,
 
@@ -192,7 +173,33 @@ class User:
 
         self.ws.run_forever()
 
-    def im_send(self, ws):
+    def send(self):
+        if self.im.get('receivers') == [] and self.im.get('groups') == []:
+            for i in range(100):
+                self.im_send(mode=2)
+
+        for receiver in self.im.get('receivers'):
+            # 把手机号转换为im_user_id
+            if len(str(receiver)) == 11:
+                if self.user_data.get(str(receiver)):
+                    user_json = self.user_data.get(str(receiver))
+                    user_id = user_json.get('im_cookie').get('MINDIMUSERID')
+                else:
+                    user_id = str(receiver)
+            self.im_send(recvID=user_id)
+        for group in self.im.get('groups'):
+            self.im_send(groupID=str(group))
+
+    def im_send(self, mode=1, recvID='', groupID=''):
+
+        def message_template(self, message_type=None):
+            all_messages = [text('这是文本消息'), text('这是bi消息'), text('这是机器人消息')]
+
+            # 随机获取想发送的消息类型
+            messages = [all_messages[int(i) - 1] for i in self.im.get('message_types')]
+            message = utils.randomkey(messages)
+
+            return message
 
         def text(character=''):
             message = {
@@ -224,7 +231,7 @@ class User:
             }
             return message
 
-        def message_body(groupID='', message_json={}):
+        def message_body(message_json={}):
             send_time = int(time.time())
             message = {
                 "clientMsgID": f"{utils.getRandom(32)}",
@@ -343,27 +350,18 @@ class User:
             }
             return message
 
-        if self.im.get('mode') == 1:
-            recvID = ''
+        # 随机模式,往随机群里发
+        if mode == 2:
             groupID = utils.randomkey(self.groups)
-        else:
-            recvID = self.im.get('user_id')
-            groupID = self.im.get('group_id')
-        # todo 消息类型还没写完
 
-        all_messages = [text('这是文本消息'), text('这是bi消息'), text('这是机器人消息')]
-        # 随机获取想发送的消息类型
-        messages = [all_messages[i - 1] for i in self.im.get('message_types')]
-        # message = utils.randomkey(messages)
-        message = text(time.strftime('%Y-%m-%d %H:%M:%S',
-                                     time.localtime()) + '若发起人为自己，则所有状态的审批单都可发起再次提交，并且将原单的值赋到最新版本的审批单中；否则不会显示【再次提交】的按钮（1）若新版本审批单的控件发生变化，则仅将与原单相同控件的值自动带入即可举例：原审批单表单控件为A B C，新版本表单控件为A D，则再次提交时，仅将A值带入新版本审批单即可（2）若该审批单被停用，则再次提交时，仅toast提示“该审批类型已停用，暂不支持再次提交”即可（3）若该审批单被删除，则再次提交时，仅taost提示“该审批类型已删除，不支持再次提交”即可PC端效果（审批中心与IM)侧边栏相同')
+        message = text(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
 
         data_json = {
             "recvID": recvID,
             "groupID": groupID,
             "offlinePushInfo": json.dumps(
                 {"title": "你收到一条新消息", "desc": "", "ex": "", "iOSPushSound": "+1", "iOSBadgeCount": True}),
-            "message": json.dumps(message_body(groupID=groupID, message_json=message)),
+            "message": json.dumps(message_body(message_json=message)),
             'isResend': False
         }
         send_data = {
@@ -372,8 +370,9 @@ class User:
             "userID": self.mind_im_userid,
             "data": json.dumps(data_json)
         }
+        # print('=============================send_data', json.dumps(send_data))
 
-        ws.send(json.dumps(send_data))
+        self.ws.send(json.dumps(send_data))
 
     def on_open(self, ws):
         # 向服务器发送连接信息
@@ -404,7 +403,7 @@ class User:
         if event == "SendMessage" and code == 0:
             print('==============================消息发送成功')
         if event == "SendMessage" and code != 0:
-            print(res)
+            print('======================消息发送失败', str(res))
         elif event == "OnRecvNewMessages" and code == 0:
             print('==============================收到新消息')
             data = res.get('data')
@@ -417,9 +416,8 @@ class User:
             for group in json.loads(data):
                 if group['status'] == 0 and group['dismissTime'] == 0:
                     self.groups.append(group['groupID'])
-            print('======groups', self.groups)
-            for i in range(self.im.get('times')):
-                self.im_send(ws)
+
+            self.send()
             self.getTotalUnreadMsgCount(ws)
 
         elif event == "Login" and code == 0:
@@ -528,36 +526,49 @@ def send_request(method, url, data, cookie=None, header=None):
     return res
 
 
-'''
-websockt相关方法
-'''
+class Performance:
+    def __init__(self, env):
+        self.env = env
+        self.server_pids = []
+        self.user_pids = []
 
+    def open_servers(self, ports):
+        imServer = IMServer(self.env)
+        imServer.build_servers(ports)
+        self.server_pids = imServer.pids
 
-def process_run(func, phone_list):
-    process_list = []
-    for phone in phone_list:
-        my_process = Process(target=func, args=(phone,))
-        process_list.append(my_process)
-        my_process.daemon
-        my_process.start()
-    for process in process_list:
-        print('=======进程pid', process.pid)
-        process.join()
+    def process_run(self, senders, ports, **kwargs):
+        # 开启sdk服务
+        self.open_servers(ports)
 
+        process_list = []
+        for phone in senders:
+            port = ports[random.randrange(0, len(ports), 1)]
+            kwargs['port'] = port
+            kwargs['phone'] = int(phone)
+            my_process = Process(target=self.im_run, kwargs=kwargs)
+            process_list.append(my_process)
+            my_process.daemon
 
-def im_run(phone):
-    user = User('pre', phone_number=phone)
-    user.login()
-    # user.start(group_id='489320452')
-    user.start(mode=2, user_id='15902379217', times=5)
+        for process in process_list:
+            process.start()
+        for process in process_list:
+            # process.join()
+            self.user_pids.append(str(process.pid))
+
+        return {'server_pids': self.server_pids,
+                'user_pids': self.user_pids}
+
+    def im_run(self, **kwargs):
+        phone = kwargs.pop('phone')
+        user = User(self.env, phone_number=phone)
+        user.login()
+        user.start(kwargs['receivers'], kwargs['groups'], kwargs['message_types'], kwargs['port'])
 
 
 if __name__ == "__main__":
-    # python case/meeting.py 50  1
-    # 50 代表并发人数，最大100，  1代表执行方式，1纯文字聊天、2增加会议人数  3 文字聊天加增加人数，3还没写。
-    '''
-    纯聊天发文字
-    '''
-    server = IMServer('pre')
-    server.build_server('30001')
-    process_run(im_run, [18500000002, 18899530117])
+    performance = Performance('pre')
+    performance.process_run(senders=[18500000001, 18500000002], ports=[30001], receivers=[15902379217, ],
+                            groups=[],
+                            message_types=[1, ],
+                            )

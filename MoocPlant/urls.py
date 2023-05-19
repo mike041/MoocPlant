@@ -49,5 +49,6 @@ urlpatterns = [
                   path('ctime', interface_view.changeDate),
                   path('changetime/', interface_view.ctime),
                   path('no_auth/', user_view.no_auth),
+                  path('taskkill/', base_view.taskkill),
 
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

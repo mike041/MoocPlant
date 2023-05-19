@@ -5,6 +5,7 @@
 @Author  :   Mushishi 
 """
 import json
+import os
 import random
 import subprocess
 
@@ -35,3 +36,11 @@ def getRandom(randomlength=16):
 def randomkey(li: list):
     index = random.randrange(0, len(li), 1)
     return li[index]
+
+
+def task_kill(pids: list):
+    if pids is []:
+        return
+    command = 'taskkill /f /PID ' if os.name == 'nt' else "kill -9 "
+    for pid in pids:
+        result = os.system(command + str(pid))

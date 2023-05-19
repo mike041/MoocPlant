@@ -66,8 +66,8 @@
                         <label class="control-label col-md-1 text-primary" for="message_type">消息类型：</label>
                         <div class="col-md-5">
                             <input type="checkbox" name="message_type" value="1"/>文本<br/>
-                            <input type="checkbox" name="message_type" value="2"/>机器人<br/>
-                            <input type="checkbox" name="message_type" value="3"/>BI<br/>
+                            <input type="checkbox" name="message_type" value="2" disabled/>机器人<br/>
+                            <input type="checkbox" name="message_type" value="3" disabled/>BI<br/>
                         </div>
                     </div>
                     <div class="form-group">
@@ -88,15 +88,40 @@
                         </div>
                     </div>
                 </form>
-                <div class="am-form-group am-cf">
-                    <div class="you" style="margin-left: 8%;">
-                        <button type="button" class="am-btn am-btn-success am-radius"
-                                onclick="cmdRecording()">结束
-                        </button>&nbsp;
+
+                <form class="form-horizontal" id="taskkill">
+                    <div class="form-group  has-feedback">
+                        <label class="control-label col-md-1 text-primary" for="server_pids">sdk服务pids：</label>
+                        <div class="col-md-5">
+                            <input type="text" class="form-control" id="server_pids"
+                                   aria-describedby="inputSuccess3Status" name="server_pids"
+                                   placeholder="请输入要发送的群组，多个按逗号隔开"
+                                   value="">
+                        </div>
                     </div>
-                </div>
+
+                    <div class="form-group  has-feedback">
+                        <label class="control-label col-md-1 text-primary" for="user_pids">用户pids：</label>
+                        <div class="col-md-5">
+                            <input type="text" class="form-control" id="user_pids"
+                                   aria-describedby="inputSuccess3Status" name="user_pids"
+                                   placeholder="请输入要发送的群组，多个按逗号隔开"
+                                   value="">
+                        </div>
+                    </div>
+                    <div class="am-form-group am-cf">
+                        <div class="you" style="margin-left: 8%;">
+                            <button type="button" class="am-btn am-btn-success am-radius"
+                                    onclick="taskkill('#taskkill', '/taskkill/')">结束进程
+                            </button>&nbsp;
+                        </div>
+                    </div>
+                </form>
+
+
             </div>
         </div>
+    </div>
     </div>
 
 {% endblock %}

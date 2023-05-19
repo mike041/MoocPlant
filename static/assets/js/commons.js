@@ -93,6 +93,9 @@ function im(id, url) {
         contentType: "application/json",
         success: function (data) {
             var msg = JSON.parse(data)
+            $("#server_pids").val(msg['server_pids'])
+            $("#user_pids").val(msg['user_pids'])
+
             myAlert(msg['msg']);
         }
         ,
@@ -103,6 +106,27 @@ function im(id, url) {
 
 }
 
+function taskkill(id, url) {
+    const csrftoken = getCookie('csrftoken');
+
+    const data = $(id).serializeJSON();
+    $.ajax({
+        type: 'post',
+        headers: {'X-CSRFToken': csrftoken},
+        url: url,
+        data: JSON.stringify(data),
+        contentType: "application/json",
+        success: function (data) {
+            var msg = JSON.parse(data)
+            myAlert(msg['msg']);
+        }
+        ,
+        error: function () {
+            myAlert('Sorry，服务器可能开小差啦, 请重试!');
+        }
+    });
+
+}
 
 
 function auto_load(id, url, target, type) {

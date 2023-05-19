@@ -10,10 +10,9 @@ from django.shortcuts import render
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
 
-from Imoocmapi import utils
-from Imoocmapi.utils.send_message import User
+from Imoocmapi.utils import task_kill
+from Imoocmapi.utils.send_message import User, Performance
 from Imoocmapi.views.user_view import chech_user_auth, check_login
-from sdk.mind_im_server import IMServer
 
 
 @chech_user_auth
@@ -30,22 +29,6 @@ def index(request):
     device_id = "00008101-00016C9E02F8001E"
     dict_data = {}
     return render(request, "index.html")
-
-
-def gevent_run(func, env='test', phone_list='', ports=[30001, ], message_types=[1, ]):
-    gevent_list = []
-    for phone in phone_list:
-        ge = gevent.spawn(func, env, phone, mode=2, user_id='', group_id='', message_types=message_types, ports=ports)
-        gevent_list.append(ge)
-    gevent.joinall(gevent_list)
-
-
-def random_run(env, phone, mode=2, user_id='', group_id='', message_types=[1, ], ports=[30001, ]):
-    user = User(env, phone_number=phone)
-    user.login()
-    port = ports[random.randrange(0, len(ports), 1)]
-    user.start(mode=mode, user_id=user_id, group_id=group_id, message_types=message_types, port=port)
-
 
 
 @check_login
@@ -70,26 +53,8 @@ def imPerformance(request):
         message_type = request_data.get("message_type")
         ports = request_data.get("server_num")
 
-        # 1 开启服务
-        server = IMServer(env)
-        server.build_servers(ports)
-
-        server_pids = server.pids
-
-        return HttpResponse(json.dumps(response_data))
         if mode == 'random':
-            response_data = {
-                "msg": "开发中"
-            }
-            if env == 'pre':
-                print('当前是预发环境')
-                json_data: dict = utils.parse_json_file(os.path.join('Imoocmapi/', 'userdata', 'user_cookie.json'))
-            elif env == 'test':
-                print('当前是测试环境')
-                json_data: dict = utils.parse_json_file(os.path.join('Imoocmapi/', 'userdata', 'test_user_cookie.json'))
-            user_list = list(json_data.keys())[20:21]
-            gevent_run(random_run, env=env, phone_list=user_list, ports=ports, message_types=message_type)
-            return HttpResponse(json.dumps(response_data))
+            pass
         elif mode == 'assign':
             if sender == '':
                 response_data = {
@@ -101,11 +66,47 @@ def imPerformance(request):
                     "msg": "至少填写一个接收者或群组"
                 }
                 return HttpResponse(json.dumps(response_data))
-            print('============指定发消息')
-            random_run(env, sender, mode=2, user_id=receiver, group_id=group, message_types=message_type, ports=ports)
-            return HttpResponse(json.dumps(response_data))
+
+        senders = str(sender).split(',')
+        receivers = str(receiver).split(',')
+        groups = str(group).split(',')
+        performance = Performance(env)
+        print('===================================================================================================')
+        print(env)
+        print(senders)
+        print(receivers)
+        print(groups)
+        print(message_type)
+
+        performance.process_run(senders=senders, ports=ports, receivers=receivers, groups=groups,
+                                message_types=message_type,
+                                )
+        response_data['server_pids'] = ','.join(performance.server_pids)
+
+        response_data['user_pids'] = ','.join(performance.user_pids)
+        return HttpResponse(json.dumps(response_data))
     else:
         return render(request, "im_performance.html")
+
+
+@check_login
+@chech_user_auth
+def taskkill(request):
+    '''
+    :param request:
+    :return:
+    '''
+    if request.is_ajax():
+        response_data = {
+            "msg": "执行成功"
+        }
+        request_data = json.loads(request.body.decode('utf-8'))
+        server_pids = [] if request_data.get('server_pids') == '' else request_data.get('server_pids').split(',')
+        user_pids = [] if request_data.get('user_pids') == '' else request_data.get('user_pids').split(',')
+
+        task_kill(user_pids)
+        task_kill(server_pids)
+        return HttpResponse(json.dumps(response_data))
 
 
 @chech_user_auth
