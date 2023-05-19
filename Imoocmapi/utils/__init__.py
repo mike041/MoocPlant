@@ -41,6 +41,6 @@ def randomkey(li: list):
 def task_kill(pids: list):
     if pids is []:
         return
-    command = 'taskkill /f /PID ' if os.name == 'nt' else "kill -9 "
+    command = 'taskkill /f /PID ' if os.name == 'nt' else "sudo kill -9 "
     for pid in pids:
         result = os.system(command + str(pid))

@@ -77,7 +77,7 @@ class IMServer:
         else:
             for pid in pids:
                 print(pid)
-                result = os.system("kill -9 " + str(pid))
+                result = os.system("sudo kill -9 " + str(pid))
                 if result == 0:
                     print(f'{pid} kill success')
 
