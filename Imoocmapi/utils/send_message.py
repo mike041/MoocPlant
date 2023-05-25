@@ -12,6 +12,7 @@ from multiprocessing import Process
 import random
 
 from Imoocmapi import utils
+from Imoocmapi.log import logger
 from sdk.mind_im_server import IMServer
 
 '''
@@ -176,7 +177,9 @@ class User:
     def send(self):
         if self.im.get('receivers') == [] and self.im.get('groups') == []:
             for i in range(100):
+                logger.info('发随机消息')
                 self.im_send(mode=2)
+            return
 
         for receiver in self.im.get('receivers'):
             # 把手机号转换为im_user_id
@@ -186,20 +189,13 @@ class User:
                     user_id = user_json.get('im_cookie').get('MINDIMUSERID')
                 else:
                     user_id = str(receiver)
+            logger.info(f'向{receiver}发消息')
             self.im_send(recvID=user_id)
         for group in self.im.get('groups'):
+            logger.info(f'向{group}发消息')
             self.im_send(groupID=str(group))
 
     def im_send(self, mode=1, recvID='', groupID=''):
-
-        def message_template(self, message_type=None):
-            all_messages = [text('这是文本消息'), text('这是bi消息'), text('这是机器人消息')]
-
-            # 随机获取想发送的消息类型
-            messages = [all_messages[int(i) - 1] for i in self.im.get('message_types')]
-            message = utils.randomkey(messages)
-
-            return message
 
         def text(character=''):
             message = {
@@ -370,7 +366,6 @@ class User:
             "userID": self.mind_im_userid,
             "data": json.dumps(data_json)
         }
-        # print('=============================send_data', json.dumps(send_data))
 
         self.ws.send(json.dumps(send_data))
 
@@ -401,9 +396,9 @@ class User:
         code = res.get("errCode")
 
         if event == "SendMessage" and code == 0:
-            print('==============================消息发送成功')
+            logger.info('==============================消息发送成功')
         if event == "SendMessage" and code != 0:
-            print('======================消息发送失败', str(res))
+            logger.error('======================消息发送失败', str(res))
         elif event == "OnRecvNewMessages" and code == 0:
             print('==============================收到新消息')
             data = res.get('data')
@@ -417,7 +412,9 @@ class User:
                 if group['status'] == 0 and group['dismissTime'] == 0:
                     self.groups.append(group['groupID'])
 
-            self.send()
+            while True:
+                time.sleep(1)
+                self.send()
             self.getTotalUnreadMsgCount(ws)
 
         elif event == "Login" and code == 0:
@@ -539,10 +536,13 @@ class Performance:
 
     def process_run(self, senders, ports, **kwargs):
         # 开启sdk服务
+        logger.info('准备开启服务')
         self.open_servers(ports)
+        logger.info('开启服务成功')
 
         process_list = []
         for phone in senders:
+            logger.info('开启进程', str(phone))
             port = ports[random.randrange(0, len(ports), 1)]
             kwargs['port'] = port
             kwargs['phone'] = int(phone)
@@ -552,8 +552,9 @@ class Performance:
 
         for process in process_list:
             process.start()
+            logger.info('开启进程成功', process.pid)
         for process in process_list:
-            # process.join()
+            process.join()
             self.user_pids.append(str(process.pid))
 
         return {'server_pids': self.server_pids,
@@ -568,7 +569,9 @@ class Performance:
 
 if __name__ == "__main__":
     performance = Performance('pre')
-    performance.process_run(senders=[18500000001, 18500000002], ports=[30001], receivers=[15902379217, ],
+    # logger.error('asdsdasdsa')
+    # # pass
+    performance.process_run(senders=[18500000001, 18500000002], ports=[30001], receivers=[],
                             groups=[],
                             message_types=[1, ],
                             )

@@ -51,6 +51,3 @@ def task_kill(pids: list):
     for pid in pids:
         result = os.system(command + str(pid))
 
-
-if __name__ == '__main__':
-    task_kill([''])

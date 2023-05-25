@@ -64,16 +64,10 @@ def imPerformance(request):
                 }
                 return HttpResponse(json.dumps(response_data))
 
-        senders = str(sender).split(',')
-        receivers = str(receiver).split(',')
-        groups = str(group).split(',')
+        senders = str(sender).split(',') if sender == '' else []
+        receivers = str(receiver).split(',') if receiver == '' else []
+        groups = str(group).split(',') if group == '' else []
         performance = Performance(env)
-        print('===================================================================================================')
-        print(env)
-        print(senders)
-        print(receivers)
-        print(groups)
-        print(message_type)
 
         performance.process_run(senders=senders, ports=ports, receivers=receivers, groups=groups,
                                 message_types=message_type,
