@@ -350,7 +350,17 @@ class User:
         if mode == 2:
             groupID = utils.randomkey(self.groups)
 
-        message = text(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
+        content = str(time.strftime('%Y-%m-%d %H:%M:%S',
+                                    time.localtime())) + " 我会是你这一生最爱的那个，可现在呢，空房间里飘荡着浓烈的酒精味，一个人的孤单，听着伤感的音乐，带上耳机，泪水无处可躲，我第一次尝到了泪水的味道，咸咸的，很苦涩，在你离开之后，我把你的东西全都扔掉了，唯一没有扔掉的是我们的回忆，虽然我的爱情满目疮痍，不忍直视，但是我不后悔曾经爱过你，我苦笑着释怀这一切，你已不会再回来。白落梅说：“真爱无悔，无论你我以何种方式来对待自己的情感。"
+
+        message = text(content)
+
+        # 跳过大群
+        # 测试
+
+        # 预发
+        if groupID == '367694aea403361e2cd42377fd2bcd29' or groupID == '3083466545' or groupID == '1926813162' or groupID == '3446554249':
+            return
 
         data_json = {
             "recvID": recvID,
@@ -413,7 +423,7 @@ class User:
                     self.groups.append(group['groupID'])
 
             while True:
-                time.sleep(1)
+                time.sleep(5)
                 self.send()
             self.getTotalUnreadMsgCount(ws)
 
@@ -554,7 +564,7 @@ class Performance:
             process.start()
             logger.info('开启进程成功', process.pid)
         for process in process_list:
-            process.join()
+            # process.join()
             self.user_pids.append(str(process.pid))
 
         return {'server_pids': self.server_pids,
@@ -569,8 +579,6 @@ class Performance:
 
 if __name__ == "__main__":
     performance = Performance('pre')
-    # logger.error('asdsdasdsa')
-    # # pass
     performance.process_run(senders=[18500000001, 18500000002], ports=[30001], receivers=[],
                             groups=[],
                             message_types=[1, ],
