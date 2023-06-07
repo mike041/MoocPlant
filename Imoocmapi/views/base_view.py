@@ -47,7 +47,7 @@ def imPerformance(request):
         sender = request_data.get("sender")
         receiver = request_data.get("receiver")
         group = request_data.get("group")
-        message_type = request_data.get("message_type")
+        message_types = request_data.get("message_type")
         ports = request_data.get("server_num")
 
         if mode == 'random':
@@ -70,7 +70,7 @@ def imPerformance(request):
         performance = Performance(env)
 
         performance.process_run(senders=senders, ports=ports, receivers=receivers, groups=groups,
-                                message_types=message_type,
+                                message_types=message_types,
                                 )
         response_data['server_pids'] = ','.join(performance.server_pids)
 

@@ -183,7 +183,8 @@ class VersionManager(models.Manager):
 
     def get_project_version(self, project_name):
         version_list = self.filter(Q(project_name__project_name=project_name)).values("version").order_by("-id")[0:4]
-        online_list = self.filter(Q(project_name__project_name=project_name) & Q(version__contains ="线上")).values("version")
+        online_list = self.filter(Q(project_name__project_name=project_name) & Q(version__contains="线上")).values(
+            "version")
         version_name_list = [version for version in version_list]
         online_version_name_list = [version for version in online_list]
         version_name_list.extend(online_version_name_list)
@@ -269,23 +270,24 @@ class BugManager(models.Manager):
         if buger is not None:
             args.pop("buger")
         args.pop("search_versions")
+        title = args.pop("title")
         project_name, module_name, developer_name, only_me = args.values()
-        bug_list = []
         if module_name == "All":
             if developer_name != "":
                 if only_me == "1" and buger is not None:
-                    bug_list = self.filter(Q(project__project_name__in=project_name) & Q(buger__username=buger) & Q(developer__nick_name=developer_name) & ~Q(state=5))
+                    query = Q(project__project_name__in=project_name) & Q(buger__username=buger) & Q(
+                        developer__nick_name=developer_name) & ~Q(state=5)
                 else:
-                    bug_list = self.filter(
-                        Q(project__project_name__in=project_name) & Q(developer__nick_name=developer_name) & ~Q(state=5))
+                    query = Q(project__project_name__in=project_name) & Q(developer__nick_name=developer_name) & ~Q(
+                        state=5)
+
             else:
                 if only_me == "1" and buger is not None:
-                    bug_list = self.filter(Q(project__project_name__in=project_name) & Q(buger__username=buger) & ~Q(state=5))
+                    query = Q(project__project_name__in=project_name) & Q(buger__username=buger) & ~Q(state=5)
                 else:
-                    bug_list = self.filter(
-                        Q(project__project_name__in=project_name) & ~Q(state=5))
+                    query = Q(project__project_name__in=project_name) & ~Q(state=5)
         else:
-            bug_list = self.filter(Q(project__project_name__in=project_name) & Q(module__module_name=module_name) & ~Q(state=5))
+            query = Q(project__project_name__in=project_name) & Q(module__module_name=module_name) & ~Q(state=5)
 
         '''
         if "buger" in args.keys():
@@ -365,6 +367,12 @@ class BugManager(models.Manager):
                     print("----------->")
                     bug_list = self.filter(~Q(state=5))
         '''
+
+        if title != '':
+            query = query & Q(bug_title__icontains=title)
+
+        bug_list = self.filter(query)
+
         return list(
             bug_list.values("id", "project__project_name", "module__module_name", "version__version", "bug_title",
                             "plantform", "state", "start", "developer__nick_name", "buger__nick_name", "png").order_by(

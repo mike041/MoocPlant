@@ -418,6 +418,7 @@ function search_bug() {
     const csrftoken = getCookie('csrftoken')
     var a = $('#pro_filter');
     var data = a.serializeJSON()
+    console.log(data)
     var table_body = $('#table_body')
     table_body.children("tr").remove()
     var png_list;

@@ -7,13 +7,12 @@ import json
 
 from .user_view import check_login, chech_user_auth, get_project_name
 from ..models import Bug, ProjectInfo, ModuleInfo, Version, UserInfo
-from ..utils.common import send_notice
+from ..utils.common import robot_message
 from ..utils.tencent_cos import TencentCOS
 import os
 import datetime
 from PIL import Image
-from django.core.paginator import Paginator,EmptyPage,PageNotAnInteger,InvalidPage
-
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger, InvalidPage
 
 
 def put_png(request):
@@ -92,7 +91,7 @@ def bugList(request):
         username = user_data.get("username", None)
         data["search_versions"] = data.get("search_versions", None)
         page = data.get("page", 1)
-        #data.pop("page")
+        # data.pop("page")
         if "only_me" in data.keys():
             if user_type == 3:
                 data["buger"] = username
@@ -115,13 +114,13 @@ def bugList(request):
             bug_png_list = eval(bug_png)
             bug['png'] = bug_png_list
             bug['png_size'] = 60 * len(bug_png_list)
-        #if bug["project__project_name"] not in project_list:
+        # if bug["project__project_name"] not in project_list:
         #    project_list.append(bug["project__project_name"])
-    #分页
+    # 分页
 
-    if request.method =="GET":
+    if request.method == "GET":
         paginator = Paginator(bug_list, 10)
-        page = request.GET.get("page",1)
+        page = request.GET.get("page", 1)
     else:
         paginator = Paginator(bug_list, 50)
     current_page = int(page)
@@ -133,9 +132,9 @@ def bugList(request):
     except (EmptyPage, InvalidPage):
         # paginator.num_pages
         apitest_list = paginator.page(paginator.num_pages)
-    #分页结束
+    # 分页结束
     bug_info = {
-        "bug_info": apitest_list,#bug_list,
+        "bug_info": apitest_list,  # bug_list,
         "project_list": project_list
     }
     if request.is_ajax():
@@ -202,7 +201,7 @@ def addBug(request):
             if request_data['png']:
                 for png in request_data['png']:
                     notice = notice + f' ![]({png})'
-            send_notice(notice, mind_uid)
+            robot_message('bug提醒', notice, mind_uid)
 
             return HttpResponse(json.dumps(data))
             '''
@@ -275,6 +274,6 @@ def edit_bug(request):
             for png in pngs.split(','):
                 notice = notice + f' ![]({png})'
 
-        send_notice(notice, mind_uid)
+        robot_message('bug提醒', notice, mind_uid)
 
     return HttpResponse(json.dumps(data))

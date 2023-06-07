@@ -13,6 +13,8 @@ import random
 
 from Imoocmapi import utils
 from Imoocmapi.log import logger
+from Imoocmapi.utils import MESSAGE_TYPES
+from Imoocmapi.utils.common import robot_message
 from sdk.mind_im_server import IMServer
 
 '''
@@ -154,7 +156,7 @@ class User:
             mind_login()
             im_login()
 
-    def start(self, receivers=[], groups=[], message_types=[1, ], port=30001, times=1):
+    def start(self, receivers=[], groups=[], message_types=[MESSAGE_TYPES.TEXT, ], port=30001, times=1):
         self.ws = websocket.WebSocketApp(
             # url=self.BASE_WS + "/?sendID={}&token={}&platformID=3".format(self.mind_im_userid, self.mind_im_token),
             url=f"ws://127.0.0.1:{int(port)}/?sendID={self.mind_im_userid}&token={self.mind_im_token}&platformID=3",
@@ -169,16 +171,19 @@ class User:
             'groups': groups,
             'message_types': message_types,
             'times': times,
-
         }
 
         self.ws.run_forever()
 
     def send(self):
+        message_type = utils.randomkey(self.im.get('message_types'))
         if self.im.get('receivers') == [] and self.im.get('groups') == []:
-            for i in range(100):
-                logger.info('发随机消息')
-                self.im_send(mode=2)
+            logger.info('发随机消息')
+            groupID = utils.randomkey(self.groups)
+            if message_type == MESSAGE_TYPES.ROBOT:
+                robot_message('脚本机器人消息', channel=groupID, send_type='group')
+            else:
+                self.im_send(groupID=groupID, message_type=message_type)
             return
 
         for receiver in self.im.get('receivers'):
@@ -190,12 +195,21 @@ class User:
                 else:
                     user_id = str(receiver)
             logger.info(f'向{receiver}发消息')
-            self.im_send(recvID=user_id)
+
+            if message_type == MESSAGE_TYPES.ROBOT:
+                robot_message('脚本机器人消息', channel=user_id, send_type='personal')
+            else:
+                self.im_send(recvID=user_id, message_type=message_type)
+
         for group in self.im.get('groups'):
             logger.info(f'向{group}发消息')
-            self.im_send(groupID=str(group))
 
-    def im_send(self, mode=1, recvID='', groupID=''):
+            if message_type == MESSAGE_TYPES.ROBOT:
+                robot_message('脚本机器人消息', channel=user_id, send_type='group')
+            else:
+                self.im_send(groupID=str(group), message_type=message_type)
+
+    def im_send(self, recvID='', groupID='', message_type=MESSAGE_TYPES.TEXT):
 
         def text(character=''):
             message = {
@@ -346,16 +360,24 @@ class User:
             }
             return message
 
-        # 随机模式,往随机群里发
-        if mode == 2:
-            groupID = utils.randomkey(self.groups)
+        def get_message():
+            text_content = str(time.strftime('%Y-%m-%d %H:%M:%S',
+                                             time.localtime())) + " 我会是你这一生最爱的那个，可现在呢，空房间里飘荡着浓烈的酒精味，一个人的孤单"
 
-        content = str(time.strftime('%Y-%m-%d %H:%M:%S',
-                                    time.localtime())) + " 我会是你这一生最爱的那个，可现在呢，空房间里飘荡着浓烈的酒精味，一个人的孤单，听着伤感的音乐，带上耳机，泪水无处可躲，我第一次尝到了泪水的味道，咸咸的，很苦涩，在你离开之后，我把你的东西全都扔掉了，唯一没有扔掉的是我们的回忆，虽然我的爱情满目疮痍，不忍直视，但是我不后悔曾经爱过你，我苦笑着释怀这一切，你已不会再回来。白落梅说：“真爱无悔，无论你我以何种方式来对待自己的情感。"
+            text_message = text(text_content)
 
-        message = text(content)
+            if message_type == MESSAGE_TYPES.TEXT:
+                default_messages = text_message
+            elif message_type == MESSAGE_TYPES.BI:
+                pass
+            return default_messages
+
+        message = get_message()
 
         # 跳过大群
+        if groupID == '1204918865' or groupID == '1523490576' or groupID == '417454658' or groupID == '2802601985' \
+                or groupID == '4247814843' or groupID == 'c5775d24e4f33ae29024323aa7822cf9':
+            return
         # 测试
 
         # 预发
@@ -423,7 +445,7 @@ class User:
                     self.groups.append(group['groupID'])
 
             while True:
-                time.sleep(5)
+                time.sleep(1)
                 self.send()
             self.getTotalUnreadMsgCount(ws)
 
@@ -564,7 +586,7 @@ class Performance:
             process.start()
             logger.info('开启进程成功', process.pid)
         for process in process_list:
-            # process.join()
+            process.join()
             self.user_pids.append(str(process.pid))
 
         return {'server_pids': self.server_pids,
@@ -578,8 +600,8 @@ class Performance:
 
 
 if __name__ == "__main__":
-    performance = Performance('pre')
+    performance = Performance('test')
     performance.process_run(senders=[18500000001, 18500000002], ports=[30001], receivers=[],
                             groups=[],
-                            message_types=[1, ],
+                            message_types=[MESSAGE_TYPES.TEXT, ],
                             )

@@ -9,8 +9,6 @@ import json
 
 import redis
 import requests
-import http.client
-import time
 import os, sys
 
 
@@ -45,14 +43,15 @@ class HandleRedis(object):
             self.connect.hmset(key, value)
 
 
-def send_notice(text, channel=''):
+def robot_message(name, text, channel='', send_type='personal'):
+    if send_type == 'personal' and not channel.__contains__('@'):
+        channel = '@' + channel
     # mind推送
     url = "https://mind.im30.net/api/hooks/mq6bi815w7gxdqufs1grmkwadw"
     data = {
         "text": f"{text}",
-        "channel": f"@{channel}",
-        "username": "bug提醒"}
-    # data = {"text": f"{text}", "username": "bug提醒"}
+        "channel": channel,
+        "username": name}
     payload = json.dumps(data)
     headers = {
         'Content-Type': 'application/json'

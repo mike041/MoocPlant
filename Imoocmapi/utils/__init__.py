@@ -12,6 +12,12 @@ import subprocess
 sys_name = os.name
 
 
+class MESSAGE_TYPES:
+    ROBOT = 'robot'
+    TEXT = 'text'
+    BI = 'bi'
+
+
 def get_process_id(name) -> list:
     child = subprocess.Popen(["pgrep", "-f", name], stdout=subprocess.PIPE, shell=False)
     response = child.communicate()[0]
@@ -50,4 +56,3 @@ def task_kill(pids: list):
     command = 'taskkill /f /PID ' if os.name == 'nt' else "sudo kill -9 "
     for pid in pids:
         result = os.system(command + str(pid))
-
