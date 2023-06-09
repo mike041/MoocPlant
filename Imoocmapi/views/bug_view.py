@@ -7,7 +7,6 @@ import json
 
 from .user_view import check_login, chech_user_auth, get_project_name
 from ..models import Bug, ProjectInfo, ModuleInfo, Version, UserInfo
-from ..utils.common import robot_message
 from ..utils.tencent_cos import TencentCOS
 import os
 import datetime
@@ -287,42 +286,50 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from Imoocmapi.models import Bug
 from Imoocmapi.utils.common import robot_message
 
-scheduler = BackgroundScheduler()
-scheduler.add_jobstore(DjangoJobStore(), "default")
-
-
-def legacy_bug_notice_timedtask():
-    bug_list = Bug.objects.get_legacy_bug()
-    plantform_dict = {}
-    developer_dict = {}
-
-    plantform_list = [bug.get('plantform') for bug in bug_list]
-    developer_list = [bug.get('developer__nick_name') for bug in bug_list]
-
-    plantform_dict['移动端'] = plantform_list.count('1') + plantform_list.count('2') + plantform_list.count('5')
-    plantform_dict['PC端'] = plantform_list.count('3') + plantform_list.count('4')
-    plantform_dict['服务端'] = plantform_list.count('6')
-    for developer in developer_list:
-        developer_dict[developer] = developer_list.count(developer)
-
-    text = '**各端遗留bug如下:**\n'
-    for key, value in plantform_dict.items():
-        row = f'{key}:{value}\n'
-        text = text + row
-
-    text += '**各人遗留bug如下:**\n'
-    for key, value in developer_dict.items():
-        row = f'{key}:{value}\n'
-        text = text + row
-
-    robot_message(name='遗留问题通知', text=str(text), channel='3903994286', send_type='group')
-
-
-scheduler.remove_all_jobs()
-scheduler.add_job(legacy_bug_notice_timedtask, trigger='interval', args='', weeks=1,
-                  start_date='2023-06-09 02:00:00')
+import socket
 
 try:
-    scheduler.start()
-except (KeyboardInterrupt, SystemExit):
-    pass
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.bind(('127.0.0.1', 47200))
+except:
+    print("已启动一个任务计划进程！")
+else:
+    scheduler = BackgroundScheduler()
+    scheduler.add_jobstore(DjangoJobStore(), "default")
+
+
+    def legacy_bug_notice_timedtask():
+        bug_list = Bug.objects.get_legacy_bug()
+        plantform_dict = {}
+        developer_dict = {}
+
+        plantform_list = [bug.get('plantform') for bug in bug_list]
+        developer_list = [bug.get('developer__nick_name') for bug in bug_list]
+
+        plantform_dict['移动端'] = plantform_list.count('1') + plantform_list.count('2') + plantform_list.count('5')
+        plantform_dict['PC端'] = plantform_list.count('3') + plantform_list.count('4')
+        plantform_dict['服务端'] = plantform_list.count('6')
+        for developer in developer_list:
+            developer_dict[developer] = developer_list.count(developer)
+
+        text = '**各端遗留bug如下:**\n'
+        for key, value in plantform_dict.items():
+            row = f'{key}:{value}\n'
+            text = text + row
+
+        text += '**各人遗留bug如下:**\n'
+        for key, value in developer_dict.items():
+            row = f'{key}:{value}\n'
+            text = text + row
+
+        robot_message(name='遗留问题通知', text=str(text), channel='98c2e1bfda65f2c9e252c8db71372bfc', send_type='group')
+
+
+    scheduler.remove_all_jobs()
+    scheduler.add_job(legacy_bug_notice_timedtask, trigger='interval', args='', weeks=1,
+                      start_date='2023-06-09 02:00:00')
+
+    try:
+        scheduler.start()
+    except (KeyboardInterrupt, SystemExit):
+        pass
