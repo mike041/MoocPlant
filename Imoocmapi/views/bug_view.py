@@ -93,11 +93,8 @@ def bugList(request):
         page = data.get("page", 1)
         # data.pop("page")
         if "only_me" in data.keys():
-            if user_type == 3:
-                data["buger"] = username
-            else:
-                user_nick_name = UserInfo.objects.get_user_nick_name(username)
-                data["developer"] = user_nick_name.get("nick_name")
+            data["buger"] = username
+
         else:
             data["only_me"] = "0"
         bug_list = Bug.objects.search_bug(data)
@@ -194,14 +191,15 @@ def addBug(request):
             request_data['buger'] = buger_object
             Bug.objects.add_bug(**request_data)
 
-            # 发送Mind推送
-            username = UserInfo.objects.get_user_nick_name(tester)['nick_name']
-            mind_uid = UserInfo.objects.get_mind_id(developer_name)['mind_uid']
-            notice = f'**{username}** 新建了bug **{request_data["bug_title"]}**  http://test.im30.lan/bug_list/'
-            if request_data['png']:
-                for png in request_data['png']:
-                    notice = notice + f' ![]({png})'
-            robot_message('bug提醒', notice, mind_uid)
+            if request_data['push'] == '0':
+                # 发送Mind推送
+                username = UserInfo.objects.get_user_nick_name(tester)['nick_name']
+                mind_uid = UserInfo.objects.get_mind_id(developer_name)['mind_uid']
+                notice = f'**{username}** 新建了bug **{request_data["bug_title"]}**  http://test.im30.lan/bug_list/'
+                if request_data['png']:
+                    for png in request_data['png']:
+                        notice = notice + f' ![]({png})'
+                robot_message('bug提醒', notice, mind_uid)
 
             return HttpResponse(json.dumps(data))
             '''
@@ -277,3 +275,46 @@ def edit_bug(request):
         robot_message('bug提醒', notice, mind_uid)
 
     return HttpResponse(json.dumps(data))
+
+
+# 遗留bug定时任务
+
+
+# Create your views here.
+from django_apscheduler.jobstores import DjangoJobStore, register_job
+from apscheduler.schedulers.background import BackgroundScheduler
+
+from Imoocmapi.models import Bug
+from Imoocmapi.utils.common import robot_message
+
+scheduler = BackgroundScheduler()
+scheduler.add_jobstore(DjangoJobStore(), "default")
+
+
+# @register_job(scheduler, trigger='interval', args='', weeks=1, start_date='2023-06-09 10:01:50')
+def legacy_bug_notice_timedtask():
+    bug_list = Bug.objects.get_legacy_bug()
+    plantform_dict = {}
+    developer_dict = {}
+
+    plantform_list = [bug.get('plantform') for bug in bug_list]
+    developer_list = [bug.get('developer__nick_name') for bug in bug_list]
+
+    plantform_dict['移动端'] = plantform_list.count('1') + plantform_list.count('2') + plantform_list.count('5')
+    plantform_dict['PC端'] = plantform_list.count('3') + plantform_list.count('4')
+    plantform_dict['服务端'] = plantform_list.count('6')
+    for developer in developer_list:
+        developer_dict[developer] = developer_list.count(developer)
+
+    text = f'**各端遗留bug如下:**\n {plantform_dict}\n' + f'**各人遗留bug如下:**\n {developer_dict}'
+
+    robot_message(name='遗留问题通知', text=str(text), channel='3903994286', send_type='group')
+
+
+scheduler.add_job(legacy_bug_notice_timedtask, trigger='interval', args='', weeks=1,
+                  start_date='2023-06-09 10:00:00')
+
+try:
+    scheduler.start()
+except (KeyboardInterrupt, SystemExit):
+    pass

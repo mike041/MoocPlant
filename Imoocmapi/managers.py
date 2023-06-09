@@ -232,6 +232,23 @@ class BugManager(models.Manager):
 
         return bug_list
 
+    def get_legacy_bug(self):
+        '''
+        获取遗留的所有bug,只针对mind项目
+        :return:
+        '''
+        bug_list_object = self.filter(
+            (Q(state=1) | Q(state=3) | Q(state=6)) & (Q(project=1)))
+        # bug_list.values()
+        bug_list = list(bug_list_object.values("id", "project__project_name", "module__module_name", "version__version",
+                                               "bug_title",
+                                               "plantform", "state", "start", "developer__nick_name",
+                                               "buger__nick_name", "png").order_by("-id"))
+        # self.values())
+        # self.values("id","project__")
+
+        return bug_list
+
     def update_bug(self, bug_id, bug_state=None, developer=None):
         '''
         更新bug
@@ -265,6 +282,7 @@ class BugManager(models.Manager):
         :return:
         """
         # self.filter(**args)
+        print(args)
         bug_version = args.get("search_versions")
         buger = args.get("buger", None)
         if buger is not None:
@@ -272,22 +290,32 @@ class BugManager(models.Manager):
         args.pop("search_versions")
         title = args.pop("title")
         project_name, module_name, developer_name, only_me = args.values()
-        if module_name == "All":
-            if developer_name != "":
-                if only_me == "1" and buger is not None:
-                    query = Q(project__project_name__in=project_name) & Q(buger__username=buger) & Q(
-                        developer__nick_name=developer_name) & ~Q(state=5)
-                else:
-                    query = Q(project__project_name__in=project_name) & Q(developer__nick_name=developer_name) & ~Q(
-                        state=5)
 
-            else:
-                if only_me == "1" and buger is not None:
-                    query = Q(project__project_name__in=project_name) & Q(buger__username=buger) & ~Q(state=5)
-                else:
-                    query = Q(project__project_name__in=project_name) & ~Q(state=5)
-        else:
-            query = Q(project__project_name__in=project_name) & Q(module__module_name=module_name) & ~Q(state=5)
+        query = Q(project__project_name__in=project_name)
+
+        if module_name != "All":
+            query = query & Q(module__module_name=module_name)
+        if developer_name != '':
+            query = query & Q(developer__nick_name=developer_name)
+        if buger is not None:
+            query = (query & Q(buger__username=buger)) | query & Q(developer__username=buger)
+
+        # if module_name == "All":
+        #     if developer_name != "":
+        #         if only_me == "1" and buger is not None:
+        #             query = Q(project__project_name__in=project_name) & Q(buger__username=buger) & Q(
+        #                 developer__nick_name=developer_name) & ~Q(state=5)
+        #         else:
+        #             query = Q(project__project_name__in=project_name) & Q(developer__nick_name=developer_name) & ~Q(
+        #                 state=5)
+        #
+        #     else:
+        #         if only_me == "1" and buger is not None:
+        #             query = Q(project__project_name__in=project_name) & Q(buger__username=buger) & ~Q(state=5)
+        #         else:
+        #             query = Q(project__project_name__in=project_name) & ~Q(state=5)
+        # else:
+        #     query = Q(project__project_name__in=project_name) & Q(module__module_name=module_name) & ~Q(state=5)
 
         '''
         if "buger" in args.keys():
