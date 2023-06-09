@@ -319,7 +319,7 @@ def legacy_bug_notice_timedtask():
 
 
 scheduler.add_job(legacy_bug_notice_timedtask, trigger='interval', args='', weeks=1,
-                  start_date='2023-06-09 16:41:50')
+                  start_date='2023-06-09 10:00:00')
 
 try:
     scheduler.start()
