@@ -291,7 +291,6 @@ scheduler = BackgroundScheduler()
 scheduler.add_jobstore(DjangoJobStore(), "default")
 
 
-# @register_job(scheduler, trigger='interval', args='', weeks=1, start_date='2023-06-09 10:01:50')
 def legacy_bug_notice_timedtask():
     bug_list = Bug.objects.get_legacy_bug()
     plantform_dict = {}
@@ -306,13 +305,21 @@ def legacy_bug_notice_timedtask():
     for developer in developer_list:
         developer_dict[developer] = developer_list.count(developer)
 
-    text = f'**各端遗留bug如下:**\n {plantform_dict}\n' + f'**各人遗留bug如下:**\n {developer_dict}'
+    text = '**各端遗留bug如下:**\n'
+    for key, value in plantform_dict.items():
+        row = f'{key}:{value}\n'
+        text = text + row
+
+    text += '**各人遗留bug如下:**\n'
+    for key, value in developer_dict.items():
+        row = f'{key}:{value}\n'
+        text = text + row
 
     robot_message(name='遗留问题通知', text=str(text), channel='3903994286', send_type='group')
 
 
 scheduler.add_job(legacy_bug_notice_timedtask, trigger='interval', args='', weeks=1,
-                  start_date='2023-06-09 10:00:00')
+                  start_date='2023-06-09 16:41:50')
 
 try:
     scheduler.start()
