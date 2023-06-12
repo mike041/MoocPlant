@@ -291,7 +291,7 @@ class BugManager(models.Manager):
         title = args.pop("title")
         project_name, module_name, developer_name, only_me = args.values()
 
-        query = Q(project__project_name__in=project_name)
+        query = Q(project__project_name__in=project_name) & ~Q(state=5)
 
         if module_name != "All":
             query = query & Q(module__module_name=module_name)
