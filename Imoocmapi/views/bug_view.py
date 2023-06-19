@@ -322,7 +322,7 @@ else:
             row = f'{key}:{value}\n'
             text = text + row
 
-        robot_message(name='遗留问题通知', text=str(text), channel='3903994286', send_type='group')
+        robot_message(name='遗留问题通知', text=str(text), channel='09461611e2b8975afaaa6d2768e5ce42', send_type='group')
 
 
     scheduler.remove_all_jobs()
