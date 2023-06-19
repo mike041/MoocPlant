@@ -327,7 +327,7 @@ else:
 
     scheduler.remove_all_jobs()
     scheduler.add_job(legacy_bug_notice_timedtask, trigger='cron', args='', day_of_week='mon-fri',
-                      hour=10, minute=0, second=0)
+                      hour=11, minute=10, second=0)
 
     try:
         scheduler.start()
