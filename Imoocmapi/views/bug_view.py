@@ -294,7 +294,7 @@ try:
 except:
     print("已启动一个任务计划进程！")
 else:
-    scheduler = BackgroundScheduler()
+    scheduler = BackgroundScheduler(timezone='Asia/Shanghai')
     scheduler.add_jobstore(DjangoJobStore(), "default")
 
 
@@ -322,12 +322,12 @@ else:
             row = f'{key}:{value}\n'
             text = text + row
 
-        robot_message(name='遗留问题通知', text=str(text), channel='98c2e1bfda65f2c9e252c8db71372bfc', send_type='group')
+        robot_message(name='遗留问题通知', text=str(text), channel='3903994286', send_type='group')
 
 
     scheduler.remove_all_jobs()
-    scheduler.add_job(legacy_bug_notice_timedtask, trigger='interval', args='', weeks=1,
-                      start_date='2023-06-09 02:00:00')
+    scheduler.add_job(legacy_bug_notice_timedtask, trigger='cron', args='', day_of_week='mon-fri',
+                      hour=10, minute='*')
 
     try:
         scheduler.start()
