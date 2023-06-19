@@ -323,11 +323,12 @@ else:
             text = text + row
 
         robot_message(name='遗留问题通知', text=str(text), channel='09461611e2b8975afaaa6d2768e5ce42', send_type='group')
+        # robot_message(name='遗留问题通知', text=str(text), channel='3903994286', send_type='group')
 
 
     scheduler.remove_all_jobs()
     scheduler.add_job(legacy_bug_notice_timedtask, trigger='cron', args='', day_of_week='mon-fri',
-                      hour=11, minute=10, second=0)
+                      hour=10, minute=0, second=0)
 
     try:
         scheduler.start()
