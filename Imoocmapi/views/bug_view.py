@@ -129,9 +129,16 @@ def bugList(request):
         # paginator.num_pages
         apitest_list = paginator.page(paginator.num_pages)
     # 分页结束
+
+    # todo 新增模块和版本数据用于筛选
+    module_list = ModuleInfo.objects.get_all_module_name()
+    version_list = Version.objects.get_project_version(project_name)
     bug_info = {
         "bug_info": apitest_list,  # bug_list,
-        "project_list": project_list
+        "project_list": project_list,
+        "platformItem": platformItem,
+        "bug_state": bug_state
+
     }
     if request.is_ajax():
         bug_info["bug_info"] = list(bug_info.get("bug_info"))
@@ -326,7 +333,6 @@ else:
         # robot_message(name='遗留问题通知', text=str(text), channel='3903994286', send_type='group')
 
 
-    scheduler.remove_all_jobs()
     scheduler.add_job(legacy_bug_notice_timedtask, trigger='cron', args='', day_of_week='mon-fri',
                       hour=10, minute=0, second=0)
 
