@@ -7,6 +7,7 @@ import json
 
 from .user_view import check_login, chech_user_auth, get_project_name
 from ..models import Bug, ProjectInfo, ModuleInfo, Version, UserInfo
+from ..utils.common import robot_message
 from ..utils.tencent_cos import TencentCOS
 import os
 import datetime
@@ -81,8 +82,10 @@ def bugList(request):
     start_level = {'1': '1星', '2': '2星', '3': '3星', '4': '4星'}
     bug_state = {'1': '未解决', '2': '已解决', '3': '延期解决', '4': '不解决', '5': '关闭', '6': '激活'}
     project_name = get_project_name(request)
+
     if request.is_ajax():
         data = json.loads(request.body.decode('utf-8'))
+
         data['project'] = project_name
         token = request.COOKIES.get("token", None)
         user_data = jwt.decode(token, "sercet", algorithms=['HS256'])
@@ -131,12 +134,14 @@ def bugList(request):
     # 分页结束
 
     # todo 新增模块和版本数据用于筛选
-    module_list = ModuleInfo.objects.get_all_module_name()
-    version_list = Version.objects.get_project_version(project_name)
+    module_list = ModuleInfo.objects.get_module_name(project_name[0])
+    version_list = Version.objects.get_project_version(project_name[0])
     bug_info = {
         "bug_info": apitest_list,  # bug_list,
         "project_list": project_list,
-        "platformItem": platformItem,
+        "module_list": [module.get('module_name') for module in module_list],
+        "version_list": [version.get('version') for version in version_list],
+        "platform_item": platformItem,
         "bug_state": bug_state
 
     }
@@ -281,7 +286,6 @@ def edit_bug(request):
         robot_message('bug提醒', notice, mind_uid)
 
     return HttpResponse(json.dumps(data))
-
 
 # 遗留bug定时任务
 

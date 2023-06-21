@@ -15,6 +15,7 @@ function getCookie(name) {
     return cookieValue;
 }
 
+
 function show_case(case_info, id) {
     case_info = case_info.split('replaceFlag');
     var a = $(id);
@@ -392,6 +393,7 @@ function editstate(bug_id, edit_type) {
                 data = JSON.parse(data)['developer_list']
                 developer.prepend('<select name="developer_list" class="form-control" id="developer_list" onchange="update_bug(' + bug_id + ')" ></select>')
                 var debeloper_list = $('#developer_list')
+                debeloper_list.append("<option value='" + 0 + "'>" + "请选择" + "</option>")
                 for (var i = 0; i < data.length; i++) {
                     debeloper_list.append("<option value='" + data[i]['id'] + "'>" + data[i]['nick_name'] + "</option>")
                 }
@@ -892,4 +894,24 @@ function ws_server(type) {
             myAlert('Sorry，服务器可能开小差啦, 请重试!');
         }
     });
+}
+
+function ajax(options) {
+    // 设置默认参数
+    var defaults = {
+        method: 'GET',
+        url: '',
+        data: null,
+        headers: {'X-CSRFToken': getCookie('csrftoken')},
+        success: function () {
+        },
+        error: function () {
+        },
+        timeout: 0
+    };
+
+    // 合并参数
+    var settings = Object.assign({}, defaults, options);
+
+    $.ajax(settings);
 }

@@ -289,12 +289,18 @@ class BugManager(models.Manager):
             args.pop("buger")
         args.pop("search_versions")
         title = args.pop("title")
-        project_name, module_name, developer_name, only_me = args.values()
+        project_name, module_name, version, platform, status, developer_name, only_me = args.values()
 
         query = Q(project__project_name__in=project_name) & ~Q(state=5)
 
         if module_name != "All":
             query = query & Q(module__module_name=module_name)
+        if version != "All":
+            query = query & Q(version__version=version)
+        if platform != "All":
+            query = query & Q(plantform=platform)
+        if status != "All":
+            query = query & Q(state=status)
         if developer_name != '':
             query = query & Q(developer__nick_name=developer_name)
         if buger is not None:

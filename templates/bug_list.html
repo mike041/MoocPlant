@@ -33,18 +33,45 @@
                     </li>
 
                     <li style="padding-top: 5px">
-                        <select name="module" id="module" class=" am-input-zm am-input-xm" id="module">
+                        <select name="module" id="module" class=" am-input-zm am-input-xm">
                             <option selected value="All">All</option>
+                            {% for module_name in module_list %}
+                                <option value="{{ module_name }}"
+                                >{{ module_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </li>
+                    <li style="padding-top: 5px">
+                        <select name="version" id="version" class=" am-input-zm am-input-xm">
+                            <option selected value="All">All</option>
+                            {% for version_name in version_list %}
+                                <option value="{{ version_name }}"
+                                >{{ version_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </li>
+                    <li style="padding-top: 5px">
+                        <select name="platform" id="platform" class=" am-input-zm am-input-xm">
+                            <option selected value="All">All</option>
+                            {% for platform_id,platform_name in platform_item.items %}
+                                <option value="{{ platform_id }}"
+                                >{{ platform_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </li>
+
+                    <li style="padding-top: 5px">
+                        <select name="status" id="status" class=" am-input-zm am-input-xm">
+                            <option selected value="All">All</option>
+                            {% for status_id,status_name in bug_state.items %}
+                                <option value="{{ status_id }}"
+                                >{{ status_name }}</option>
+                            {% endfor %}
                         </select>
                     </li>
                     <li style="padding-top: 5px"><input value="" type="text" name="developer"
                                                         class="am-input-sm am-input-xm"
                                                         placeholder="开发人员"/></li>
-                    <li style="padding-top: 5px">
-                        <select name="search_versions" id="search_versions" class=" am-input-zm am-input-xm">
-                            <option selected value="All">All</option>
-                        </select>
-                    </li>
                     <li style="padding-top: 10px"><input type="checkbox" name="only_me" id="only_me" value="1"></li>
                     <li style="padding-top: 10px"><span>只看自己</span></li>
                     <li style="padding-top: 10px"><input type="text" name="title" id="title" placeholder="bug描述"></li>

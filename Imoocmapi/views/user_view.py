@@ -8,7 +8,7 @@ import jwt
 from ..models import UserInfo, UserPermission, Bug
 
 
-#from ..utils.common import handle_redis
+# from ..utils.common import handle_redis
 
 
 def get_username(request):
