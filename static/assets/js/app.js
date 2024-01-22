@@ -1,16 +1,70 @@
 (function ($) {
     'use strict';
 
+    // $(function () {
+    //     var $fullText = $('.admin-fullText');
+    //     $('#admin-fullscreen').on('click', function () {
+    //         $.AMUI.fullscreen.toggle();
+    //     });
+    //
+    //     $(document).on($.AMUI.fullscreen.raw.fullscreenchange, function () {
+    //         $.AMUI.fullscreen.isFullscreen ? $fullText.text('关闭全屏') : $fullText.text('开启全屏');
+    //     });
+    // });
+
     $(function () {
         var $fullText = $('.admin-fullText');
+
+        // 全屏切换功能
+        function toggleFullScreen() {
+            if (!document.fullscreenElement && // alternative standard method
+                !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) { // current working methods
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen();
+                } else if (document.documentElement.msRequestFullscreen) {
+                    document.documentElement.msRequestFullscreen();
+                } else if (document.documentElement.mozRequestFullScreen) {
+                    document.documentElement.mozRequestFullScreen();
+                } else if (document.documentElement.webkitRequestFullscreen) {
+                    document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
+            }
+        }
+
+        // 检查全屏状态，并更新按钮文本
+        function checkFullScreen() {
+            if (document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
+                $fullText.text('关闭全屏');
+            } else {
+                $fullText.text('开启全屏');
+            }
+        }
+
+        // 绑定按钮点击事件
         $('#admin-fullscreen').on('click', function () {
-            $.AMUI.fullscreen.toggle();
+            toggleFullScreen();
         });
 
-        $(document).on($.AMUI.fullscreen.raw.fullscreenchange, function () {
-            $.AMUI.fullscreen.isFullscreen ? $fullText.text('关闭全屏') : $fullText.text('开启全屏');
+        // 监听全屏状态变更事件
+        $(document).on('fullscreenchange webkitfullscreenchange mozfullscreenchange MSFullscreenChange', function () {
+            checkFullScreen();
         });
+
+        // 初始化全屏状态文本
+        checkFullScreen();
     });
+
+
 })(jQuery);
 (function (a) {
     a.fn.slide = function (b) {
@@ -195,10 +249,10 @@
             }, _ = function (a) {
                 if (!A || M != p || a || Q) {
                     if (Q ? p >= 1 ? p = 1 : 0 >= p && (p = 0) : (N = p, p >= k ? p = 0 : 0 > p && (p = k - 1)), R(), null != n && $(l.children()), o[0] && (P = o.eq(p), null != n && $(o), "slideDown" == e ? (o.not(P).stop(!0, !0).slideUp(q), P.slideDown(q, G, function () {
-                            l[0] || S()
-                        })) : (o.not(P).stop(!0, !0).hide(), P.animate({opacity: "show"}, q, function () {
-                            l[0] || S()
-                        }))), m >= u) switch (e) {
+                        l[0] || S()
+                    })) : (o.not(P).stop(!0, !0).hide(), P.animate({opacity: "show"}, q, function () {
+                        l[0] || S()
+                    }))), m >= u) switch (e) {
                         case"fade":
                             l.children().stop(!0, !0).eq(p).animate({opacity: "show"}, q, G, function () {
                                 S()
@@ -275,17 +329,17 @@
                 clearInterval(H), i.addClass("pauseState")
             };
             if (v ? Q ? (w ? p-- : p++, bb(), z && l.hover(gb, fb)) : (ab(), z && d.hover(gb, fb)) : (Q && (w ? p-- : p++), i.addClass("pauseState")), i.click(function () {
-                    i.hasClass("pauseState") ? fb() : gb()
-                }), "mouseover" == c.trigger ? j.hover(function () {
-                    var a = j.index(this);
-                    I = setTimeout(function () {
-                        p = a, _(), cb()
-                    }, c.triggerTime)
-                }, function () {
-                    clearTimeout(I)
-                }) : j.click(function () {
-                    p = j.index(this), _(), cb()
-                }), Q) {
+                i.hasClass("pauseState") ? fb() : gb()
+            }), "mouseover" == c.trigger ? j.hover(function () {
+                var a = j.index(this);
+                I = setTimeout(function () {
+                    p = a, _(), cb()
+                }, c.triggerTime)
+            }, function () {
+                clearTimeout(I)
+            }) : j.click(function () {
+                p = j.index(this), _(), cb()
+            }), Q) {
                 if (g.mousedown(db), f.mousedown(eb), y) {
                     var hb, ib = function () {
                         hb = setTimeout(function () {
