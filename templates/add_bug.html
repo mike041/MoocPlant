@@ -118,7 +118,7 @@
                         <label class="control-label col-md-1 text-primary" for="simple_desc">图片上传：</label>
 
                         <div class="col-md-5" id="aaa" name="aaa" contentEditable="true"
-                             style="height:200px;width:40%;border:1px solid #ccc;margin-left: 15px"></div>
+                             style="height:200px;width:40%;border:1px solid #ccc;"></div>
                     </div>
                     <div class="am-form-group am-cf">
                         <div class="you" style="margin-left: 8%;">
@@ -136,6 +136,15 @@
             </div>
         </div>
     </div>
+    <style type="text/css">
+        textarea {
+            overflow: auto;
+            vertical-align: top;
+            resize: vertical;
+            width: 40%;
+            height: 200px;
+        }
+    </style>
     <script type="text/javascript">
         const csrftoken = getCookie('csrftoken');
         // 上传图片
