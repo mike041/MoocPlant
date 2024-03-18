@@ -185,9 +185,12 @@ class VersionManager(models.Manager):
         version_list = self.filter(Q(project_name__project_name=project_name)).values("version").order_by("-id")[0:4]
         online_list = self.filter(Q(project_name__project_name=project_name) & Q(version__contains="线上")).values(
             "version")
+        approval = self.filter(Q(project_name__project_name=project_name) & Q(version__contains="审批商业化")).values(
+            "version")
         version_name_list = [version for version in version_list]
         online_version_name_list = [version for version in online_list]
         version_name_list.extend(online_version_name_list)
+        version_name_list.extend(approval)
         return version_name_list
 
     def get_all_version(self):
