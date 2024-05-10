@@ -25,6 +25,7 @@ def run_test_plan(request):
         request_data = json.loads(request.body.decode('utf-8'))
         plan_name = request_data.get('plan_name')
 
+
         run_result = start_plan('https://metersphere.im30.net', 'IOkaSAdC2qZA2gOw', 'd9Dw7OIgZCwywgdb', plan_name)
         data['msg'] = run_result
         return HttpResponse(json.dumps(data))
