@@ -8,6 +8,8 @@
 """
 import json
 
+from django.http import HttpResponse
+
 from Imoocmapi.utils.run_plan import start_plan
 
 
@@ -25,4 +27,4 @@ def run_test_plan(request):
 
         run_result = start_plan('https://metersphere.im30.net', 'IOkaSAdC2qZA2gOw', 'd9Dw7OIgZCwywgdb', plan_name)
         data['msg'] = run_result
-        return data
+        return HttpResponse(json.dumps(data))
