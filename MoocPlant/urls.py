@@ -17,7 +17,7 @@ from django.urls import path, re_path
 from django.views.generic import RedirectView
 from django.conf.urls.static import static
 from Imoocmapi.views import base_view, bug_view, module_view, project_view, version_view, user_view, \
-    interface_view
+    interface_view, metersphere_view
 import xadmin
 from MoocPlant import settings
 
@@ -50,5 +50,6 @@ urlpatterns = [
                   path('changetime/', interface_view.ctime),
                   path('no_auth/', user_view.no_auth),
                   path('taskkill/', base_view.taskkill),
+                  path('metersphere/', metersphere_view.run_test_plan),
 
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
