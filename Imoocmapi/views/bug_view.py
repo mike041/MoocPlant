@@ -290,57 +290,57 @@ def edit_bug(request):
 # 遗留bug定时任务
 
 
-# Create your views here.
-from django_apscheduler.jobstores import DjangoJobStore, register_job
-from apscheduler.schedulers.background import BackgroundScheduler
-
-from Imoocmapi.models import Bug
-from Imoocmapi.utils.common import robot_message
-
-import socket
-
-try:
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.bind(('127.0.0.1', 47200))
-except:
-    print("已启动一个任务计划进程！")
-else:
-    scheduler = BackgroundScheduler(timezone='Asia/Shanghai')
-    scheduler.add_jobstore(DjangoJobStore(), "default")
-
-
-    def legacy_bug_notice_timedtask():
-        bug_list = Bug.objects.get_legacy_bug()
-        plantform_dict = {}
-        developer_dict = {}
-
-        plantform_list = [bug.get('plantform') for bug in bug_list]
-        developer_list = [bug.get('developer__nick_name') for bug in bug_list]
-
-        plantform_dict['移动端'] = plantform_list.count('1') + plantform_list.count('2') + plantform_list.count('5')
-        plantform_dict['PC端'] = plantform_list.count('3') + plantform_list.count('4')
-        plantform_dict['服务端'] = plantform_list.count('6')
-        for developer in developer_list:
-            developer_dict[developer] = developer_list.count(developer)
-
-        text = '**各端遗留bug如下:**\n'
-        for key, value in plantform_dict.items():
-            row = f'{key}:{value}\n'
-            text = text + row
-
-        text += '**各人遗留bug如下:**\n'
-        for key, value in developer_dict.items():
-            row = f'{key}:{value}\n'
-            text = text + row
-
-        robot_message(name='遗留问题通知', text=str(text), channel='09461611e2b8975afaaa6d2768e5ce42', send_type='group')
-        # robot_message(name='遗留问题通知', text=str(text), channel='3903994286', send_type='group')
-
-
-    scheduler.add_job(legacy_bug_notice_timedtask, trigger='cron', args='', day_of_week='mon-fri',
-                      hour=10, minute=0, second=0)
-
-    try:
-        scheduler.start()
-    except (KeyboardInterrupt, SystemExit):
-        pass
+# # Create your views here.
+# from django_apscheduler.jobstores import DjangoJobStore, register_job
+# from apscheduler.schedulers.background import BackgroundScheduler
+#
+# from Imoocmapi.models import Bug
+# from Imoocmapi.utils.common import robot_message
+#
+# import socket
+#
+# try:
+#     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#     sock.bind(('127.0.0.1', 47200))
+# except:
+#     print("已启动一个任务计划进程！")
+# else:
+#     scheduler = BackgroundScheduler(timezone='Asia/Shanghai')
+#     scheduler.add_jobstore(DjangoJobStore(), "default")
+#
+#
+#     def legacy_bug_notice_timedtask():
+#         bug_list = Bug.objects.get_legacy_bug()
+#         plantform_dict = {}
+#         developer_dict = {}
+#
+#         plantform_list = [bug.get('plantform') for bug in bug_list]
+#         developer_list = [bug.get('developer__nick_name') for bug in bug_list]
+#
+#         plantform_dict['移动端'] = plantform_list.count('1') + plantform_list.count('2') + plantform_list.count('5')
+#         plantform_dict['PC端'] = plantform_list.count('3') + plantform_list.count('4')
+#         plantform_dict['服务端'] = plantform_list.count('6')
+#         for developer in developer_list:
+#             developer_dict[developer] = developer_list.count(developer)
+#
+#         text = '**各端遗留bug如下:**\n'
+#         for key, value in plantform_dict.items():
+#             row = f'{key}:{value}\n'
+#             text = text + row
+#
+#         text += '**各人遗留bug如下:**\n'
+#         for key, value in developer_dict.items():
+#             row = f'{key}:{value}\n'
+#             text = text + row
+#
+#         robot_message(name='遗留问题通知', text=str(text), channel='09461611e2b8975afaaa6d2768e5ce42', send_type='group')
+#         # robot_message(name='遗留问题通知', text=str(text), channel='3903994286', send_type='group')
+#
+#
+#     scheduler.add_job(legacy_bug_notice_timedtask, trigger='cron', args='', day_of_week='mon-fri',
+#                       hour=10, minute=0, second=0)
+#
+#     try:
+#         scheduler.start()
+#     except (KeyboardInterrupt, SystemExit):
+#         pass
