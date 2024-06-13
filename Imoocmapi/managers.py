@@ -182,7 +182,7 @@ class VersionManager(models.Manager):
         self.create(**kwargs)
 
     def get_project_version(self, project_name):
-        version_list = self.filter(Q(project_name__project_name=project_name)).values("version").order_by("-id")[0:4]
+        version_list = self.filter(Q(project_name__project_name=project_name)).values("version").order_by("-id")[0:10]
         online_list = self.filter(Q(project_name__project_name=project_name) & Q(version__contains="线上")).values(
             "version")
         approval = self.filter(Q(project_name__project_name=project_name) & Q(version__contains="审批商业化")).values(
