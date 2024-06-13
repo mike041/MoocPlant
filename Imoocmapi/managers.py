@@ -189,8 +189,9 @@ class VersionManager(models.Manager):
             "version")
         version_name_list = [version for version in version_list]
         online_version_name_list = [version for version in online_list]
+        approval_version_name_list = [version for version in approval]
         version_name_list.extend(online_version_name_list)
-        version_name_list.extend(approval)
+        version_name_list.extend(approval_version_name_list)
         return version_name_list
 
     def get_all_version(self):
