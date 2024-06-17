@@ -187,10 +187,13 @@ class VersionManager(models.Manager):
             "version")
         approval = self.filter(Q(project_name__project_name=project_name) & Q(version__contains="审批商业化")).values(
             "version")
+        multi_tenancy = self.filter(Q(project_name__project_name=project_name) & Q(version__contains="多租户")).values(
+            "version")
         version_name_list = [version for version in version_list]
         online_version_name_list = [version for version in online_list]
         version_name_list.extend(online_version_name_list)
         version_name_list.extend(approval)
+        version_name_list.extend(multi_tenancy)
         return version_name_list
 
     def get_all_version(self):
